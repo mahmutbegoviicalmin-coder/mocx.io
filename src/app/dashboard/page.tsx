@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [prompt, setPrompt] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [refImageUrl, setRefImageUrl] = useState('');
-  const [activeTab, setActiveTab] = useState<'text' | 'website' | 'image'>('text');
+  const [activeTab, setActiveTab] = useState<'website' | 'image'>('website');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,13 +36,32 @@ export default function DashboardPage() {
   const clearFile = () => {
     setSelectedFile(null);
     setFilePreview(null);
-    // Reset file input manually if needed, or let React handle it via key/ref
+  };
+
+  const handleEnhance = async () => {
+    if (!prompt) return;
+    setEnhancing(true);
+    try {
+      const res = await fetch('/api/enhance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+      
+      const data = await res.json();
+      if (data.enhancedPrompt) {
+        setPrompt(data.enhancedPrompt);
+      }
+    } catch (err) {
+      console.error('Failed to enhance prompt', err);
+    } finally {
+      setEnhancing(false);
+    }
   };
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prompt && activeTab === 'text') return;
-
+    
     setLoading(true);
     setError(null);
     setGeneratedImage(null);
@@ -56,10 +76,14 @@ export default function DashboardPage() {
         } else if (refImageUrl) {
           // Use provided URL
           finalImageUrls = [refImageUrl];
+        } else {
+            throw new Error("Please upload an image or provide a reference URL.");
         }
-      } else if (activeTab === 'website' && websiteUrl) {
+      } else if (activeTab === 'website') {
+        if (!websiteUrl) {
+            throw new Error("Please provide a website URL.");
+        }
         // Automatically wrap website URL in a screenshot service proxy
-        // Using image.thum.io as a free, reliable screenshot provider
         finalImageUrls = [`https://image.thum.io/get/width/1920/crop/1080/noanimate/${websiteUrl}`];
       }
 
@@ -67,7 +91,7 @@ export default function DashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt,
+          prompt: prompt || "High quality professional product mockup", // Default prompt if empty
           imageUrls: finalImageUrls
         }),
       });
@@ -111,7 +135,7 @@ export default function DashboardPage() {
             setLoading(false);
             setError('Request timed out. Please check back later.');
         }
-      }, 90000); // Increased timeout to 90s
+      }, 90000);
 
     } catch (err: any) {
       console.error(err);
@@ -137,20 +161,12 @@ export default function DashboardPage() {
             {/* Tabs */}
             <div className="flex p-1 bg-muted/50 rounded-lg mb-6">
               <button
-                onClick={() => setActiveTab('text')}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'text' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Text
-              </button>
-              <button
                 onClick={() => setActiveTab('website')}
                 className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
                   activeTab === 'website' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Website
+                Website Screenshot
               </button>
               <button
                 onClick={() => setActiveTab('image')}
@@ -158,23 +174,13 @@ export default function DashboardPage() {
                   activeTab === 'image' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Upload
+                Upload Image
               </button>
             </div>
 
             <form onSubmit={handleGenerate} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2 text-muted-foreground">
-                  Prompt
-                </label>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe your mockup (e.g. 'Modern laptop on a wooden desk with coffee')"
-                  className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
-              </div>
-
+              
+              {/* Inputs based on Tab */}
               {activeTab === 'website' && (
                 <div className="animate-in fade-in slide-in-from-top-2">
                   <label className="block text-sm font-medium mb-2 text-muted-foreground">
@@ -230,28 +236,51 @@ export default function DashboardPage() {
                       </div>
                     )}
                   </div>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border" />
+                  
+                  {/* Optional Reference URL fallback */}
+                  {!filePreview && (
+                    <div className="relative">
+                       <div className="relative flex items-center justify-center mb-2">
+                          <span className="bg-card px-2 text-xs text-muted-foreground uppercase">Or use URL</span>
+                       </div>
+                        <div className="relative">
+                            <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                            <input
+                            type="url"
+                            value={refImageUrl}
+                            onChange={(e) => setRefImageUrl(e.target.value)}
+                            placeholder="https://example.com/image.jpg"
+                            className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            />
+                        </div>
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-muted-foreground">Or use URL</span>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <input
-                      type="url"
-                      value={refImageUrl}
-                      onChange={(e) => setRefImageUrl(e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                      className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
+                  )}
                 </div>
               )}
+
+              {/* Prompt Section */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-muted-foreground">
+                    Prompt
+                    </label>
+                    <button
+                    type="button"
+                    onClick={handleEnhance}
+                    disabled={!prompt || enhancing}
+                    className="text-xs flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                    >
+                    <Wand2 className={`w-3 h-3 ${enhancing ? 'animate-spin' : ''}`} />
+                    {enhancing ? 'Enhancing...' : 'Enhance Prompt'}
+                    </button>
+                </div>
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Describe your mockup (e.g. 'Modern laptop on a wooden desk with coffee')"
+                  className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                />
+              </div>
 
               <button 
                 type="submit"
@@ -282,7 +311,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-lg font-medium">Ready to generate</p>
                 <p className="text-sm opacity-70 max-w-xs mx-auto mt-2">
-                  Enter a prompt or upload a reference to get started.
+                  {activeTab === 'website' ? 'Enter a website URL' : 'Upload an image'} to get started.
                 </p>
               </div>
             )}
