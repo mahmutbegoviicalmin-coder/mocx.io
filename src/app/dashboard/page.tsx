@@ -1,13 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2 } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor } from 'lucide-react';
+
+const ASPECT_RATIOS = [
+  { label: 'Square', value: '1:1', icon: Square },
+  { label: 'Portrait', value: '9:16', icon: Smartphone },
+  { label: 'Landscape', value: '16:9', icon: Monitor },
+  { label: 'Standard', value: '4:3', icon: Layout },
+];
 
 export default function DashboardPage() {
   const [prompt, setPrompt] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [refImageUrl, setRefImageUrl] = useState('');
   const [activeTab, setActiveTab] = useState<'website' | 'image'>('website');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   
@@ -91,8 +99,9 @@ export default function DashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          prompt: prompt || "High quality professional product mockup", // Default prompt if empty
-          imageUrls: finalImageUrls
+          prompt: prompt || "High quality professional product mockup", 
+          imageUrls: finalImageUrls,
+          aspectRatio: aspectRatio
         }),
       });
 
@@ -258,6 +267,33 @@ export default function DashboardPage() {
                 </div>
               )}
 
+              {/* Aspect Ratio Selector */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">
+                  Aspect Ratio
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {ASPECT_RATIOS.map((ratio) => {
+                    const Icon = ratio.icon;
+                    return (
+                      <button
+                        key={ratio.value}
+                        type="button"
+                        onClick={() => setAspectRatio(ratio.value)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
+                          aspectRatio === ratio.value
+                            ? 'bg-primary/10 border-primary text-primary'
+                            : 'bg-muted/30 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5 mb-1" />
+                        <span className="text-[10px] font-medium">{ratio.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Prompt Section */}
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2">
@@ -301,7 +337,9 @@ export default function DashboardPage() {
 
         {/* Right Panel - Canvas/Result */}
         <div className="w-full lg:w-2/3">
-          <div className="bg-card border border-border rounded-xl h-[600px] flex items-center justify-center relative overflow-hidden shadow-sm">
+          <div className={`bg-card border border-border rounded-xl flex items-center justify-center relative overflow-hidden shadow-sm transition-all ${
+             aspectRatio === '1:1' ? 'aspect-square h-auto' : 'h-[600px]'
+          }`}>
             {generatedImage ? (
               <img src={generatedImage} alt="Generated Result" className="w-full h-full object-contain" />
             ) : (

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { prompt, imageUrls } = await request.json();
+    const { prompt, imageUrls, aspectRatio } = await request.json();
     
     if (!process.env.NANOBANANA_API_KEY) {
         return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
@@ -10,16 +10,13 @@ export async function POST(request: Request) {
 
     const hasImage = imageUrls && imageUrls.length > 0 && imageUrls[0] !== '';
 
-    // Using the PRO endpoint which seems more robust and has different params
     // Docs: /api/v1/nanobanana/generate-pro
     const payload = {
       prompt: prompt,
-      // Pro endpoint uses 'aspectRatio' instead of 'image_size'
-      aspectRatio: "16:9", 
-      // Pro endpoint uses 'resolution'
+      // Pro endpoint uses 'aspectRatio'
+      aspectRatio: aspectRatio || "16:9", // Default to 16:9 if not provided
       resolution: "2K", 
       callBackUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://mocx.io'}/api/webhook/nanobanana`,
-      // Only include imageUrls if present
       ...(hasImage && { imageUrls: imageUrls })
     };
 
