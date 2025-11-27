@@ -17,7 +17,7 @@ export function Hero() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <Sparkles className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium text-gray-300">Next-Gen AI Mockups</span>
+          <span className="text-sm font-medium text-gray-300">Mocx AI Studio</span>
         </div>
 
         {/* Headline */}
@@ -31,13 +31,13 @@ export function Hero() {
         {/* Subheadline */}
         <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
           Transform screenshots and ideas into photorealistic product renders instantly. 
-          Powered by the advanced NanoBanana engine.
+          Powered by the advanced Mocx engine.
         </p>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
           <Link 
-            href="/sign-up" 
+            href="/dashboard" 
             className="group relative px-8 py-4 bg-primary text-white rounded-full font-semibold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,90,95,0.5)]"
           >
             <span className="relative z-10 flex items-center gap-2">
