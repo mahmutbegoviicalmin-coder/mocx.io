@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Gallery } from "@/components/Gallery";
@@ -15,7 +16,12 @@ export default function Home() {
       
       <footer className="py-8 border-t border-border mt-auto">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} MockupGen. All rights reserved.</p>
+          <p className="mb-4">© {new Date().getFullYear()} Mocx. All rights reserved.</p>
+          <div className="flex justify-center gap-6">
+            <Link href="/legal#terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+            <Link href="/legal#privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/legal#refund" className="hover:text-foreground transition-colors">Refund Policy</Link>
+          </div>
         </div>
       </footer>
     </main>
