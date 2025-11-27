@@ -1,17 +1,42 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X } from 'lucide-react';
 
 export default function DashboardPage() {
   const [prompt, setPrompt] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [refImageUrl, setRefImageUrl] = useState('');
   const [activeTab, setActiveTab] = useState<'text' | 'website' | 'image'>('text');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size too large. Max 5MB.');
+        return;
+      }
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFilePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setError(null);
+    }
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    // Reset file input manually if needed, or let React handle it via key/ref
+  };
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,19 +47,18 @@ export default function DashboardPage() {
     setGeneratedImage(null);
 
     try {
-      // Logic to handle different tabs (Website Screenshot would happen here ideally)
-      // For now, passing the URL directly if it's an image URL, or just prompt
+      let finalImageUrls: string[] | undefined = undefined;
       
-      let finalImageUrls = undefined;
-      if (activeTab === 'image' && refImageUrl) {
-        finalImageUrls = [refImageUrl];
+      if (activeTab === 'image') {
+        if (selectedFile && filePreview) {
+          // Use Data URI from file upload
+          finalImageUrls = [filePreview];
+        } else if (refImageUrl) {
+          // Use provided URL
+          finalImageUrls = [refImageUrl];
+        }
       } else if (activeTab === 'website' && websiteUrl) {
-        // In a real app, we would call an API to screenshot this URL first
-        // For this demo, we might treat it as a reference URL if it points to an image, 
-        // or warn the user.
-        // To keep it simple as requested, we'll pass it as a reference URL hoping the API might handle it 
-        // or just use it as context in the prompt.
-        finalImageUrls = [websiteUrl]; // Assuming user pastes an image URL or we use it as context
+        finalImageUrls = [websiteUrl];
       }
 
       const res = await fetch('/api/generate', {
@@ -46,33 +70,50 @@ export default function DashboardPage() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to start generation');
-      
       const data = await res.json();
+
+      if (!res.ok) {
+         throw new Error(data.error || data.details?.msg || 'Failed to start generation');
+      }
+      
       const taskId = data.data?.taskId;
 
-      if (!taskId) throw new Error('No task ID received');
+      if (!taskId) {
+        console.error('API Response missing taskId:', data);
+        throw new Error('No task ID received from API');
+      }
 
       // Poll for results
       const pollInterval = setInterval(async () => {
-        const statusRes = await fetch(`/api/status?taskId=${taskId}`);
-        const statusData = await statusRes.json();
+        try {
+            const statusRes = await fetch(`/api/status?taskId=${taskId}`);
+            const statusData = await statusRes.json();
 
-        if (statusData.status !== 'pending' && statusData.result) {
-           clearInterval(pollInterval);
-           setGeneratedImage(statusData.result);
-           setLoading(false);
+            if (statusData.status === 'completed' && statusData.result) {
+               clearInterval(pollInterval);
+               setGeneratedImage(statusData.result);
+               setLoading(false);
+            } else if (statusData.status === 'failed') {
+               clearInterval(pollInterval);
+               setError(statusData.error || 'Generation failed on server.');
+               setLoading(false);
+            }
+        } catch (pollErr) {
+            console.error('Polling error', pollErr);
         }
       }, 2000);
 
       setTimeout(() => {
         clearInterval(pollInterval);
-        if (loading) setLoading(false); // Timeout
-      }, 60000);
+        if (loading) {
+            setLoading(false);
+            setError('Request timed out. Please check back later.');
+        }
+      }, 90000); // Increased timeout to 90s
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Generation failed. Please try again.');
+      setError(err.message || 'Generation failed. Please try again.');
       setLoading(false);
     }
   };
@@ -154,12 +195,51 @@ export default function DashboardPage() {
               )}
 
               {activeTab === 'image' && (
-                <div className="animate-in fade-in slide-in-from-top-2">
-                  <label className="block text-sm font-medium mb-2 text-muted-foreground">
-                    Reference Image URL
-                  </label>
+                <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-muted-foreground">
+                       Upload Reference (Photo)
+                    </label>
+                    
+                    {!filePreview ? (
+                      <div className="relative border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 transition-colors text-center">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground font-medium">Click or drag to upload</p>
+                        <p className="text-xs text-muted-foreground/50 mt-1">JPG, PNG up to 5MB</p>
+                      </div>
+                    ) : (
+                      <div className="relative rounded-lg overflow-hidden border border-border group">
+                         <img src={filePreview} alt="Preview" className="w-full h-32 object-cover opacity-80" />
+                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              type="button"
+                              onClick={clearFile}
+                              className="bg-red-500/80 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                         </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="relative">
-                    <Upload className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">Or use URL</span>
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                     <input
                       type="url"
                       value={refImageUrl}
@@ -168,9 +248,6 @@ export default function DashboardPage() {
                       className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Use an existing image as a reference.
-                  </p>
                 </div>
               )}
 
@@ -184,7 +261,7 @@ export default function DashboardPage() {
             </form>
             
             {error && (
-              <div className="mt-4 text-red-500 text-sm bg-red-500/10 p-3 rounded-lg">
+              <div className="mt-4 text-red-500 text-sm bg-red-500/10 p-3 rounded-lg break-words">
                 {error}
               </div>
             )}
@@ -223,4 +300,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

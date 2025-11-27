@@ -4,6 +4,10 @@ export async function POST(request: Request) {
   try {
     const { prompt, imageUrls } = await request.json();
     
+    if (!process.env.NANOBANANA_API_KEY) {
+        return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
+    }
+
     const hasImage = imageUrls && imageUrls.length > 0 && imageUrls[0] !== '';
     
     // Determine payload based on input
@@ -13,7 +17,7 @@ export async function POST(request: Request) {
       // If we have an image, switch to IMAGETOIAMGE (typo preserved from docs), else TEXTTOIAMGE
       type: hasImage ? "IMAGETOIAMGE" : "TEXTTOIAMGE",
       image_size: "16:9", 
-      callBackUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook/nanobanana`,
+      callBackUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://mocx.io'}/api/webhook/nanobanana`,
       ...(hasImage && { imageUrls: imageUrls })
     };
 
@@ -29,10 +33,14 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
+    console.log('NanoBanana Response:', data);
 
-    if (!response.ok) {
+    if (!response.ok || (data.code && data.code !== 200)) {
       console.error('API Error Response:', data);
-      throw new Error(data.msg || 'Failed to generate image');
+      return NextResponse.json(
+          { error: data.msg || 'Failed to start generation', details: data }, 
+          { status: 400 }
+      );
     }
 
     return NextResponse.json(data);
