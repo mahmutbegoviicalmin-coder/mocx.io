@@ -37,7 +37,7 @@ export function Hero() {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
           <Link 
-            href="/dashboard" 
+            href="/sign-up" 
             className="group relative px-8 py-4 bg-primary text-white rounded-full font-semibold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,90,95,0.5)]"
           >
             <span className="relative z-10 flex items-center gap-2">
