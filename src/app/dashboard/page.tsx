@@ -23,6 +23,7 @@ export default function DashboardPage() {
   const [enhancing, setEnhancing] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,9 +79,25 @@ export default function DashboardPage() {
       let finalImageUrls: string[] | undefined = undefined;
       
       if (activeTab === 'image') {
-        if (selectedFile && filePreview) {
-          // Use Data URI from file upload
-          finalImageUrls = [filePreview];
+        if (selectedFile) {
+          // 1. Upload file to Vercel Blob to get a public URL
+          setUploading(true);
+          try {
+             const uploadRes = await fetch(`/api/upload?filename=${selectedFile.name}`, {
+                method: 'POST',
+                body: selectedFile,
+             });
+             
+             if (!uploadRes.ok) throw new Error('Failed to upload image');
+             
+             const blob = await uploadRes.json();
+             finalImageUrls = [blob.url];
+          } catch (uploadError) {
+             console.error('Upload failed', uploadError);
+             throw new Error('Failed to upload reference image. Please try again or use a URL.');
+          } finally {
+             setUploading(false);
+          }
         } else if (refImageUrl) {
           // Use provided URL
           finalImageUrls = [refImageUrl];
@@ -95,6 +112,7 @@ export default function DashboardPage() {
         finalImageUrls = [`https://image.thum.io/get/width/1920/crop/1080/noanimate/${websiteUrl}`];
       }
 
+      // 2. Call Generation API with public URL
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -175,7 +193,7 @@ export default function DashboardPage() {
                   activeTab === 'website' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Website Screenshot
+                Screenshot
               </button>
               <button
                 onClick={() => setActiveTab('image')}
@@ -320,10 +338,10 @@ export default function DashboardPage() {
 
               <button 
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploading}
                 className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-semibold hover:brightness-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
-                {loading ? 'Generating...' : 'Generate Mockup'}
+                {uploading ? 'Uploading Image...' : loading ? 'Generating...' : 'Generate Mockup'}
               </button>
             </form>
             
@@ -358,7 +376,7 @@ export default function DashboardPage() {
                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
                  <div className="text-center text-white">
                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-4"></div>
-                   <p>Creating your masterpiece...</p>
+                   <p>{uploading ? 'Uploading your image...' : 'Creating your masterpiece...'}</p>
                  </div>
                </div>
             )}
