@@ -58,7 +58,9 @@ export default function DashboardPage() {
           finalImageUrls = [refImageUrl];
         }
       } else if (activeTab === 'website' && websiteUrl) {
-        finalImageUrls = [websiteUrl];
+        // Automatically wrap website URL in a screenshot service proxy
+        // Using image.thum.io as a free, reliable screenshot provider
+        finalImageUrls = [`https://image.thum.io/get/width/1920/crop/1080/noanimate/${websiteUrl}`];
       }
 
       const res = await fetch('/api/generate', {
@@ -189,7 +191,7 @@ export default function DashboardPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    We'll take a screenshot of this URL to use in the mockup.
+                    We'll automatically capture a screenshot of this website.
                   </p>
                 </div>
               )}
