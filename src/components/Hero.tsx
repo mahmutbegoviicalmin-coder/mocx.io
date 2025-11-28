@@ -14,35 +14,29 @@ export function Hero() {
 
       <div className="container relative z-20 max-w-6xl mx-auto text-center px-4 flex flex-col items-center">
         
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 hover:bg-white/10 transition-colors cursor-default">
-          <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-          <span className="text-sm font-medium text-gray-300">Mocx AI Studio</span>
-        </div>
-
         {/* Headline */}
         <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl leading-[1.1]">
-          Design <span className="bg-[#FF5A5F] text-white px-3 md:px-5 inline-block transform -skew-x-2">mockups</span> <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5A5F] to-orange-500">
-            from the future.
-          </span>
+          Create <span className="bg-[#FF5A5F] text-white px-3 md:px-5 inline-block transform -skew-x-2">photorealistic</span> <br />
+          mockups in seconds.
         </h1>
         
         {/* Subheadline */}
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-          Instantly transform screenshots and designs into photorealistic 8K product mockups. 
-          The ultimate AI tool for marketers, designers, and brands.
+        <p className="text-lg md:text-xl text-gray-400 font-light italic w-full max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 opacity-80 whitespace-nowrap md:whitespace-normal">
+          Turn your screenshots into stunning product showcases with one click.
         </p>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 w-full max-w-md mx-auto">
           <Link 
             href="/sign-up" 
-            className="group relative w-full px-8 py-4 bg-white text-black rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] active:scale-95"
+            className="group relative w-full sm:w-auto px-10 py-5 bg-[#FF5A5F] text-white rounded-full font-bold text-xl tracking-tight overflow-hidden transition-all hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_rgba(255,90,95,0.6)] active:scale-95 border border-white/10"
           >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              Start Creating <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <span className="relative z-10 flex items-center justify-center gap-3">
+              Start Creating 
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
           </Link>
         </div>
 
