@@ -5,7 +5,7 @@ import { HeroDemo } from './HeroDemo';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-20">
       {/* Background with Particles */}
       <div className="absolute inset-0 bg-[#0F0F0F] z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-background z-10" />
@@ -15,19 +15,25 @@ export function Hero() {
       <div className="container relative z-20 max-w-6xl mx-auto text-center px-4 flex flex-col items-center">
         
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 hover:bg-white/10 transition-colors cursor-default">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 hover:bg-white/10 transition-colors cursor-default">
           <Sparkles className="w-4 h-4 text-primary animate-pulse" />
           <span className="text-sm font-medium text-gray-300">Mocx AI Studio</span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-12 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl">
-          Design mockups <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-500 to-orange-500 animate-gradient-x">
+        <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl leading-[1.1]">
+          Design <span className="bg-[#FF5A5F] text-white px-3 md:px-5 inline-block transform -skew-x-2">mockups</span> <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5A5F] to-orange-500">
             from the future.
           </span>
         </h1>
         
+        {/* Subheadline */}
+        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+          Instantly transform screenshots and designs into photorealistic 8K product mockups. 
+          The ultimate AI tool for marketers, designers, and brands.
+        </p>
+
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 w-full max-w-md mx-auto">
           <Link 
