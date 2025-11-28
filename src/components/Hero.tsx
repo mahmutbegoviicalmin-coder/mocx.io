@@ -21,35 +21,22 @@ export function Hero() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-12 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl">
           Design mockups <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-500 to-orange-500 animate-gradient-x">
             from the future.
           </span>
         </h1>
         
-        {/* Subheadline */}
-        <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-          Transform screenshots and ideas into photorealistic product renders instantly. 
-          Powered by the advanced Mocx engine.
-        </p>
-
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 w-full max-w-md mx-auto">
           <Link 
             href="/sign-up" 
-            className="group relative w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] active:scale-95"
+            className="group relative w-full px-8 py-4 bg-white text-black rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] active:scale-95"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               Start Creating <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
-          </Link>
-          
-          <Link 
-            href="/#examples" 
-            className="w-full sm:w-auto px-8 py-4 rounded-full font-semibold text-lg text-white border border-white/10 hover:bg-white/5 hover:border-white/30 transition-all backdrop-blur-sm active:scale-95"
-          >
-            View Gallery
           </Link>
         </div>
 

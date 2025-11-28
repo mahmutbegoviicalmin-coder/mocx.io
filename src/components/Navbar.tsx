@@ -29,9 +29,6 @@ export function Navbar() {
         
         <div className="flex items-center gap-8 text-sm font-medium">
           <div className="hidden md:flex items-center gap-6 text-white/70">
-            <Link href="/#examples" className="hover:text-white transition-colors hover:scale-105 transform duration-200">
-              Examples
-            </Link>
             <Link href="/#pricing" className="hover:text-white transition-colors hover:scale-105 transform duration-200">
               Pricing
             </Link>
