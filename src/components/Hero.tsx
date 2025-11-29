@@ -5,7 +5,7 @@ import { HeroDemo } from './HeroDemo';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-40 pb-20">
       {/* Background with Particles */}
       <div className="absolute inset-0 bg-[#0F0F0F] z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-background z-10" />
@@ -41,14 +41,14 @@ export function Hero() {
         </div>
 
         {/* Floating UI Element (Interactive Demo) */}
-        <div className="mt-24 w-full relative max-w-5xl aspect-video bg-gradient-to-b from-white/5 to-transparent rounded-t-3xl border-t border-x border-white/10 p-2 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 shadow-2xl shadow-primary/10">
+        <div className="mt-24 w-full relative max-w-[1400px] bg-gradient-to-b from-white/5 to-transparent rounded-3xl border border-white/10 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 shadow-2xl shadow-primary/10 overflow-hidden">
           <div className="absolute inset-0 bg-primary/5 blur-3xl -z-10 rounded-full opacity-50" />
           
           {/* Interactive Demo Component */}
           <HeroDemo />
           
-          {/* Gradient overlay at bottom to blend with next section */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none z-30" />
+          {/* Gradient overlay at bottom to blend with next section - adjusted for full height */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/50 to-transparent pointer-events-none z-30" />
         </div>
 
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap } from 'lucide-react';
 
 const ASPECT_RATIOS = [
   { label: 'Square', value: '1:1', icon: Square },
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [aspectRatio, setAspectRatio] = useState('16:9');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [lastUploadedImage, setLastUploadedImage] = useState<string | null>(null);
   
   const [loading, setLoading] = useState(false);
   const [enhancing, setEnhancing] = useState(false);
@@ -35,7 +36,9 @@ export default function DashboardPage() {
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFilePreview(reader.result as string);
+        const url = reader.result as string;
+        setFilePreview(url);
+        setLastUploadedImage(url);
       };
       reader.readAsDataURL(file);
       setError(null);
@@ -45,6 +48,7 @@ export default function DashboardPage() {
   const clearFile = () => {
     setSelectedFile(null);
     setFilePreview(null);
+    setLastUploadedImage(null);
   };
 
   const handleEnhance = async () => {
@@ -178,12 +182,19 @@ export default function DashboardPage() {
         {/* Left Panel - Controls */}
         <div className="w-full lg:w-1/3 space-y-6">
           <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <span className="bg-primary/10 text-primary p-2 rounded-lg">
-                <ImageIcon className="w-5 h-5" />
-              </span>
-              Create Mockup
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <span className="bg-primary/10 text-primary p-2 rounded-lg">
+                  <ImageIcon className="w-5 h-5" />
+                </span>
+                Create Mockup
+              </h2>
+              
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-full border border-border">
+                <Zap className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                <span className="text-sm font-medium">100 Credits</span>
+              </div>
+            </div>
 
             {/* Tabs */}
             <div className="flex p-1 bg-muted/50 rounded-lg mb-6">
@@ -193,7 +204,7 @@ export default function DashboardPage() {
                   activeTab === 'website' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Screenshot
+                Scan Website
               </button>
               <button
                 onClick={() => setActiveTab('image')}
@@ -334,14 +345,34 @@ export default function DashboardPage() {
                   placeholder="Describe your mockup (e.g. 'Modern laptop on a wooden desk with coffee')"
                   className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                 />
+                
+                {/* Uploaded Photo Preview (New) */}
+                {lastUploadedImage && (
+                  <div className="rounded-xl bg-zinc-900/50 border border-white/5 p-3 mt-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                    <img src={lastUploadedImage} alt="Thumbnail" className="w-12 h-12 rounded-lg object-cover bg-black/20" />
+                    <span className="text-sm text-white/70 font-medium">Uploaded Photo</span>
+                  </div>
+                )}
               </div>
 
               <button 
                 type="submit"
                 disabled={loading || uploading}
-                className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-semibold hover:brightness-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-semibold hover:brightness-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
               >
-                {uploading ? 'Uploading Image...' : loading ? 'Generating...' : 'Generate Mockup'}
+                {uploading ? (
+                  'Uploading Image...'
+                ) : loading ? (
+                  'Generating...'
+                ) : (
+                  <>
+                    Generate Mockup
+                    <span className="flex items-center gap-1 text-xs bg-white/20 px-2 py-0.5 rounded-full ml-1">
+                      <Zap className="w-3 h-3 fill-current" />
+                      1 Credit
+                    </span>
+                  </>
+                )}
               </button>
             </form>
             

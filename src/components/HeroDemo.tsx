@@ -1,29 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DEMOS = [
   {
-    title: "Coffee Shop",
-    prompt: "Put my logo on this white coffee cup.",
-    image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=1000&q=80" 
+    title: "Neon City",
+    prompt: "Neon city billboard mockup, vivid and cinematic.",
+    image: "/prompt1.jpg",
+    preImage: "/preprompt1.jpg"
   },
   {
-    title: "Website",
-    prompt: "Show my website screenshot on the laptop screen.",
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=80"
+    title: "Headphones",
+    prompt: "Premium athletic mockup highlighting the headphones.",
+    image: "/prompt2.jpg",
+    preImage: "/preprompt2.jpg"
   },
   {
-    title: "Merchandise",
-    prompt: "Add this flower design to the tote bag.",
-    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+    title: "Beauty Product",
+    prompt: "Lux beauty mockup with soft studio lighting.",
+    image: "/prompt3.jpg",
+    preImage: "/preprompt3.jpg"
   },
   {
-    title: "Mobile App",
-    prompt: "Place my app screenshot on the iPhone.",
-    image: "https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=1000&q=80"
+    title: "Premium Tech",
+    prompt: "Premium Apple-style product mockup, dark studio.",
+    image: "/prompt4.jpg",
+    preImage: "/preprompt4.jpg"
   }
 ];
 
@@ -48,131 +52,156 @@ export function HeroDemo() {
       if (charIndex < currentDemo.prompt.length) {
         setDisplayPrompt(currentDemo.prompt.slice(0, charIndex + 1));
         charIndex++;
-        // Slower, friendlier typing speed
         timeout = setTimeout(typeChar, 50); 
       } else {
         setIsTyping(false);
-        // Wait a bit before showing image
         timeout = setTimeout(() => {
           setShowImage(true);
-          // Wait before moving to next slide
           timeout = setTimeout(() => {
             setCurrentIndex((prev) => (prev + 1) % DEMOS.length);
-          }, 4000); // View time
+          }, 4000);
         }, 800);
       }
     };
 
-    // Start typing after a small initial delay
     timeout = setTimeout(typeChar, 500);
-
     return () => clearTimeout(timeout);
   }, [currentIndex]);
 
   return (
-    <div className="w-full h-full bg-[#0F0F0F] rounded-2xl overflow-hidden flex flex-col relative border border-white/10 shadow-2xl ring-1 ring-white/5">
-      
-      {/* Simple Top Bar */}
-      <div className="h-14 border-b border-white/5 bg-black/20 flex items-center px-6">
-        <div className="flex gap-2 mr-4">
-          <div className="w-3 h-3 rounded-full bg-white/10" />
-          <div className="w-3 h-3 rounded-full bg-white/10" />
-        </div>
-        <div className="text-sm font-medium text-gray-400">New Mockup</div>
-      </div>
-
-      <div className="flex-1 flex flex-col md:flex-row">
+    <div className="w-full max-w-[1300px] mx-auto px-6 md:px-12 py-12 lg:py-16">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center justify-center min-h-[600px]">
         
-        {/* Left Panel: Simple Input */}
-        <div className="w-full md:w-2/5 bg-card/30 p-8 flex flex-col border-r border-white/5 justify-center">
-          
-          <div className="mb-6">
-             <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-3">
-               Example
-             </span>
-             <h3 className="text-xl font-bold text-white mb-1">{currentDemo.title}</h3>
-             <p className="text-sm text-muted-foreground">What do you want to do?</p>
-          </div>
+        {/* Left Column: Content (45%) */}
+        <div className="w-full lg:w-[45%] flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 z-10">
+          <div className="mb-8 space-y-6 w-full max-w-lg">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-600/10 text-red-500 text-xs font-bold uppercase tracking-wider mb-4">
+                Example
+              </span>
+              <motion.h3 
+                key={currentDemo.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl md:text-5xl font-semibold text-white mb-3 tracking-tight"
+              >
+                {currentDemo.title}
+              </motion.h3>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.6 }}
+                className="text-lg text-white font-light"
+              >
+                What do you want to do?
+              </motion.p>
+            </div>
 
-          {/* Friendly Input Box */}
-          <div className="relative bg-white/5 rounded-xl p-4 border border-white/10 min-h-[120px]">
-             <div className="text-lg text-gray-200 font-medium leading-relaxed">
-               {displayPrompt}
-               {isTyping && (
-                 <span className="inline-block w-0.5 h-5 bg-primary ml-1 align-middle animate-pulse" />
-               )}
-             </div>
-             
-             {/* Upload Icon Hint */}
-             {!isTyping && (
-                <div className="absolute bottom-4 right-4">
-                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center animate-in fade-in">
-                     <ImageIcon className="w-4 h-4 text-muted-foreground" />
+            <motion.div 
+              className="relative w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40 backdrop-blur-xl group transition-all duration-500 cursor-default overflow-hidden"
+              whileHover={{ scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
+            >
+              {/* Glass highlight */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
+              <div className="relative z-10">
+                <div className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed mb-8 min-h-[80px]">
+                  &quot;{displayPrompt}
+                  {isTyping && (
+                    <span className="inline-block w-0.5 h-6 md:h-8 bg-primary ml-1 align-middle animate-pulse" />
+                  )}
+                  &quot;
+                </div>
+                
+                {/* Status Indicator */}
+                <div className="flex items-center gap-2 mb-4">
+                   {isTyping ? (
+                     <div className="flex items-center gap-2 text-sm text-white/40 font-medium">
+                       <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                       Typing...
+                     </div>
+                   ) : !showImage ? (
+                     <div className="flex items-center gap-2 text-sm text-primary font-medium">
+                       <Sparkles className="w-4 h-4 animate-spin-slow" />
+                       Generating...
+                     </div>
+                   ) : (
+                     <div className="flex items-center gap-2 text-sm text-green-400 font-medium">
+                       <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                       Ready
+                     </div>
+                   )}
+                </div>
+
+                {/* Uploaded Image Thumbnail */}
+                <AnimatePresence>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="relative inline-flex items-center gap-3 bg-black/20 rounded-xl p-2 pr-4 border border-white/5"
+                  >
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+                      <img 
+                        src={currentDemo.preImage} 
+                        alt="Upload" 
+                        className="w-full h-full object-cover opacity-80"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">Upload</span>
+                      <span className="text-xs text-white/80 font-medium">image.jpg</span>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Right Column: Image Preview (55%) */}
+        <div className="w-full lg:w-[55%] order-1 lg:order-2 flex justify-center lg:justify-end">
+          <div className="relative w-full aspect-[4/3] md:aspect-auto md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/50 bg-[#050505] border border-white/5 ring-1 ring-white/5">
+            <AnimatePresence mode="wait">
+              {showImage ? (
+                <motion.div
+                  key={`img-${currentIndex}`}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full h-full"
+                >
+                  <img 
+                    src={currentDemo.image} 
+                    alt={currentDemo.title}
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Subtle Overlay for Depth */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={`placeholder-${currentIndex}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full h-full flex flex-col items-center justify-center p-12 bg-gradient-to-br from-white/5 to-transparent"
+                >
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                    <div className="relative w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-sm">
+                      <ImageIcon className="w-10 h-10 text-white/20" />
+                    </div>
                   </div>
-                </div>
-             )}
-          </div>
-
-          {/* Simple Status */}
-          <div className="mt-6 flex items-center gap-3">
-             {isTyping ? (
-               <>
-                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                 <span className="text-sm text-muted-foreground">Typing...</span>
-               </>
-             ) : showImage ? (
-               <>
-                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-                   <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                 </div>
-                 <span className="text-sm text-green-400 font-medium">Done!</span>
-               </>
-             ) : (
-               <>
-                 <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                 <span className="text-sm text-primary">Creating mockup...</span>
-               </>
-             )}
+                  <p className="text-white/30 font-medium tracking-wide uppercase text-sm">Generating Preview...</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Right Panel: Image Result */}
-        <div className="w-full md:w-3/5 relative bg-black/40 flex items-center justify-center overflow-hidden">
-          <AnimatePresence mode="wait">
-            {showImage ? (
-              <motion.div
-                key={`img-container-${currentIndex}`}
-                className="relative w-full h-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <motion.img
-                  src={currentDemo.image}
-                  alt="Mockup Result"
-                  initial={{ scale: 1.05, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key={`placeholder-${currentIndex}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center gap-4 p-8 text-center"
-              >
-                <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-2">
-                   <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
-                </div>
-                <p className="text-muted-foreground font-medium">Preview Area</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
     </div>
   );

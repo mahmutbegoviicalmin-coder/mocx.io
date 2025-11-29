@@ -1,11 +1,15 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { Check, X, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function BillingPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Modal State
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [buyAmount, setBuyAmount] = useState(5); // Default to 5 credits
 
   useEffect(() => {
     // Fetch credits from our API proxy
@@ -138,13 +142,85 @@ export default function BillingPage() {
            <div className="flex items-center justify-between">
               <p className="text-muted-foreground">Need just a few more? Buy individual credits.</p>
               <div className="flex items-center gap-4">
-                 <span className="font-bold text-lg">$1.00 <span className="text-sm font-normal text-muted-foreground">/ credit</span></span>
-                 <button className="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
+                 <span className="font-bold text-lg">$0.50 <span className="text-sm font-normal text-muted-foreground">/ credit</span></span>
+                 <button 
+                   onClick={() => setShowBuyModal(true)}
+                   className="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
+                 >
                    Buy Credits
                  </button>
               </div>
            </div>
         </div>
+
+        {/* Buy Credits Modal */}
+        {showBuyModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-[#0f0f11] border border-white/10 rounded-3xl w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+              
+              <button 
+                onClick={() => setShowBuyModal(false)}
+                className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold mb-2 text-white">Top Up Credits</h2>
+                <p className="text-white/50 text-lg">Choose a package to continue creating.</p>
+              </div>
+
+              <div className="space-y-8">
+                
+                {/* Credit Packs */}
+                <div className="grid grid-cols-3 gap-4">
+                  {[5, 10, 20].map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => setBuyAmount(amount)}
+                      className={`relative group flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 ${
+                        buyAmount === amount 
+                          ? 'bg-primary/10 border-primary shadow-[0_0_30px_-10px_var(--primary)]' 
+                          : 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className={`p-3 rounded-full mb-3 ${
+                         buyAmount === amount ? 'bg-primary/20 text-primary' : 'bg-white/5 text-white/40 group-hover:text-white/60'
+                      }`}>
+                        <Zap className="w-6 h-6 fill-current" />
+                      </div>
+                      <span className={`text-2xl font-bold mb-1 ${
+                        buyAmount === amount ? 'text-white' : 'text-white/80'
+                      }`}>
+                        {amount}
+                      </span>
+                      <span className={`text-xs font-medium uppercase tracking-wider ${
+                        buyAmount === amount ? 'text-primary' : 'text-white/40'
+                      }`}>
+                        Credits
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Total & Action */}
+                <div className="bg-white/5 rounded-2xl p-6 flex items-center justify-between border border-white/5">
+                  <div>
+                    <p className="text-sm text-white/40 font-medium mb-1">Total Amount</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-bold text-white">${(buyAmount * 0.5).toFixed(2)}</span>
+                      <span className="text-white/40">USD</span>
+                    </div>
+                  </div>
+                  <button className="bg-primary hover:brightness-110 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 transition-all transform hover:scale-105 active:scale-95">
+                    Pay Now
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
