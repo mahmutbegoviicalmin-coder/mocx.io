@@ -45,3 +45,4 @@ function scanDirectory(dir) {
 // Start scanning from current directory
 scanDirectory('.');
 
+

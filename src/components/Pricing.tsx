@@ -3,6 +3,9 @@
 import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { PLANS } from '@/config/plans';
 
 export function Pricing() {
   const [annual, setAnnual] = useState(false);
@@ -73,6 +76,7 @@ export function Pricing() {
             period={annual ? "/year" : "/mo"}
             features={[annual ? "600 Images/year" : "50 Images/mo", "Standard Speed", "Commercial License", "Basic Support"]}
             delay={0.1}
+            variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
           />
 
           <PricingCard 
@@ -82,6 +86,7 @@ export function Pricing() {
             features={[annual ? "3600 Images/year" : "300 Images/mo", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
             highlighted
             delay={0.2}
+            variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
           />
 
           <PricingCard 
@@ -90,6 +95,7 @@ export function Pricing() {
             period={annual ? "/year" : "/mo"}
             features={[annual ? "6000 Images/year" : "500 Images/mo", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
             delay={0.3}
+            variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
           />
         </div>
         
@@ -109,7 +115,40 @@ export function Pricing() {
   );
 }
 
-function PricingCard({ title, price, period = "/mo", features, highlighted = false, delay = 0 }: { title: string, price: number, period?: string, features: string[], highlighted?: boolean, delay?: number }) {
+function PricingCard({ title, price, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+
+  const handleCheckout = () => {
+    if (!isLoaded) return;
+    if (!user) {
+      router.push('/sign-up');
+      return;
+    }
+    if (!variantId) {
+      console.error("Variant ID missing. Please check environment variables.");
+      alert("Checkout configuration error. Please try again later.");
+      return;
+    }
+
+    const checkoutUrl = `https://store.lemonsqueezy.com/checkout/buy/${variantId}?checkout[custom][userId]=${user.id}`;
+    
+    // @ts-ignore
+    if (typeof window !== 'undefined' && window.LemonSqueezy) {
+       // @ts-ignore
+       window.LemonSqueezy.Url.Open(checkoutUrl);
+    } else {
+      // Fallback if script isn't loaded yet
+      const a = document.createElement('a');
+      a.href = checkoutUrl;
+      a.className = "lemonsqueezy-button"; // This class might not be enough if the script hasn't processed it, but standard links work too
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 30 }}
@@ -180,6 +219,7 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
       <motion.button 
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        onClick={handleCheckout}
         className={`w-full py-4 rounded-xl font-semibold text-sm transition-all relative z-10 ${
           highlighted 
             ? 'bg-gradient-to-r from-primary to-red-600 text-white hover:shadow-[0_0_25px_rgba(255,90,95,0.5)] hover:brightness-110 shadow-lg' 
