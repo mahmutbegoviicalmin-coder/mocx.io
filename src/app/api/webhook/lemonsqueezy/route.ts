@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { clerkClient } from '@clerk/nextjs/server';
+import { CREDIT_PACKS } from '@/config/credits';
 
 export async function POST(request: Request) {
   try {
@@ -17,43 +18,74 @@ export async function POST(request: Request) {
     const { meta, data } = payload;
     const eventName = meta.event_name;
     const customData = meta.custom_data || data.attributes.checkout_data?.custom;
-    const userId = customData?.userId;
+    let userId = customData?.userId;
 
     console.log(`Received Lemon Squeezy event: ${eventName}`, { userId });
 
-    if (!userId) {
-        // If we don't have a userId, we can't link it to a user. 
-        // Note: Sometimes we might want to look up by email if userId is missing.
-        const email = data.attributes.user_email;
-        if (!email) {
-             return NextResponse.json({ message: 'No user ID or email found' }, { status: 200 });
-        }
-        // TODO: specific logic to find user by email if needed, but custom_data is preferred
-    }
-
     const client = await clerkClient();
 
+    // Auth First flow: We expect userId to be present in custom_data
+    if (!userId) {
+        console.log('Webhook received without userId in custom_data. Ignoring as per Auth First flow.');
+        return NextResponse.json({ received: true, status: 'ignored_no_userid' });
+    }
+
     if (eventName === 'order_created' || eventName === 'subscription_created') {
-      // Grant access
-      // We can store the subscription ID, status, and plan info
       const attributes = data.attributes;
-      const subscriptionId = data.id; // For subscription_created, this is the sub ID. For order_created, it's order ID.
-      // Note: For subscriptions, we care about 'subscription_created'. 'order_created' also fires but we might prefer the sub one.
+      
+      // Check if it's a credit pack purchase (order_created only, usually)
+      // We check the first order item's variant_id
+      const firstOrderItem = attributes.first_order_item;
+      const variantId = firstOrderItem?.variant_id;
+      
+      const creditPack = CREDIT_PACKS.find(p => p.variantId === variantId);
+
+      if (creditPack && userId) {
+          // It's a credit pack purchase!
+          console.log(`Credit pack purchased: ${creditPack.name} for user ${userId}`);
+          
+          // Fetch current credits to add to them
+          const user = await client.users.getUser(userId);
+          const currentCredits = (user.publicMetadata.credits as number) || 0;
+          const newCredits = currentCredits + creditPack.credits;
+          
+          await client.users.updateUserMetadata(userId, {
+             publicMetadata: {
+                 credits: newCredits
+             }
+          });
+          
+          return NextResponse.json({ received: true, type: 'credit_pack' });
+      }
+
+      // If not a credit pack, assume it's a subscription (grant access)
+      const subscriptionId = data.id;
+      const planName = attributes.product_name || 'Unknown Plan';
+      
+      // Determine credits based on plan
+      let credits = 100;
+      if (planName.toLowerCase().includes('starter')) credits = 100;
+      else if (planName.toLowerCase().includes('pro')) credits = 300;
+      else if (planName.toLowerCase().includes('agency')) credits = 500;
       
       if (userId) {
           await client.users.updateUserMetadata(userId, {
             privateMetadata: {
               subscriptionId: subscriptionId,
-              status: attributes.status, // e.g. 'active'
+              status: attributes.status,
               variantId: attributes.variant_id,
               renewsAt: attributes.renews_at,
               endsAt: attributes.ends_at,
-              planName: attributes.product_name || 'Unknown Plan' // You might want to map variant_id to a cleaner name
+              planName: planName
+            },
+            publicMetadata: {
+              planName: planName,
+              credits: credits
             }
           });
       }
     } else if (eventName === 'subscription_updated') {
-      // Update status (e.g. active -> past_due, or plan change)
+      // Update status
       const attributes = data.attributes;
       if (userId) {
         await client.users.updateUserMetadata(userId, {
@@ -67,13 +99,16 @@ export async function POST(request: Request) {
       }
     } else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
        // Revoke access or mark as cancelled
-       // If cancelled, they might still have access until ends_at
        const attributes = data.attributes;
        if (userId) {
         await client.users.updateUserMetadata(userId, {
             privateMetadata: {
               status: attributes.status, // 'cancelled' or 'expired'
               endsAt: attributes.ends_at,
+            },
+            publicMetadata: {
+              planName: 'Free Plan', // Revert to free
+              credits: 0
             }
           });
        }
@@ -85,4 +120,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
-

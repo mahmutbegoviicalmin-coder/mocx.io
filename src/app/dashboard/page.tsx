@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap } from 'lucide-react';
+import { TopUpModal } from '@/components/TopUpModal';
 
 const ASPECT_RATIOS = [
   { label: 'Square', value: '1:1', icon: Square },
@@ -25,6 +26,25 @@ export default function DashboardPage() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Credits Logic
+  const [credits, setCredits] = useState<number | null>(null);
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+
+  useEffect(() => {
+    const fetchCredits = async () => {
+        try {
+            const res = await fetch('/api/credits');
+            const data = await res.json();
+            if (data.data !== undefined) {
+                setCredits(data.data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch credits', err);
+        }
+    };
+    fetchCredits();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,6 +94,12 @@ export default function DashboardPage() {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check credits locally before starting
+    if (credits !== null && credits < 1) {
+        setShowTopUpModal(true);
+        return;
+    }
     
     setLoading(true);
     setError(null);
@@ -130,6 +156,12 @@ export default function DashboardPage() {
       const data = await res.json();
 
       if (!res.ok) {
+         if (data.error && data.error.includes('credits')) {
+             // Handle server-side credit check failure
+             setShowTopUpModal(true);
+             setLoading(false);
+             return;
+         }
          throw new Error(data.error || data.details?.msg || 'Failed to start generation');
       }
       
@@ -150,6 +182,8 @@ export default function DashboardPage() {
                clearInterval(pollInterval);
                setGeneratedImage(statusData.result);
                setLoading(false);
+               // Decrement local credit count optimistically
+               setCredits(prev => (prev !== null ? prev - 1 : null));
             } else if (statusData.status === 'failed') {
                clearInterval(pollInterval);
                setError(statusData.error || 'Generation failed on server.');
@@ -177,6 +211,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background pt-20 pb-10">
+      <TopUpModal isOpen={showTopUpModal} onClose={() => setShowTopUpModal(false)} />
+      
       <div className="container max-w-6xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
         
         {/* Left Panel - Controls */}
@@ -189,11 +225,6 @@ export default function DashboardPage() {
                 </span>
                 Create Mockup
               </h2>
-              
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-full border border-border">
-                <Zap className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="text-sm font-medium">100 Credits</span>
-              </div>
             </div>
 
             {/* Tabs */}

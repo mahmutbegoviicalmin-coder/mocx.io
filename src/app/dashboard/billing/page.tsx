@@ -2,23 +2,26 @@
 
 import { Check, X, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { CREDIT_PACKS } from '@/config/credits';
+import { useUser } from '@clerk/nextjs';
 
 export default function BillingPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useUser();
   
   // Modal State
   const [showBuyModal, setShowBuyModal] = useState(false);
-  const [buyAmount, setBuyAmount] = useState(5); // Default to 5 credits
+  const [selectedPackId, setSelectedPackId] = useState('pack-5');
 
   useEffect(() => {
-    // Fetch credits from our API proxy
+    // Fetch credits from our API proxy or metadata
     const fetchCredits = async () => {
       try {
         const res = await fetch('/api/credits');
         const data = await res.json();
-        if (data.data) {
-          setCredits(data.data); // Assuming data.data is the integer
+        if (data.data !== undefined) {
+          setCredits(data.data);
         }
       } catch (error) {
         console.error('Failed to fetch credits', error);
@@ -29,6 +32,28 @@ export default function BillingPage() {
 
     fetchCredits();
   }, []);
+
+  const handleBuyCredits = () => {
+      const pack = CREDIT_PACKS.find(p => p.id === selectedPackId);
+      if (!pack) return;
+
+      const checkoutUrl = pack.checkoutUrl;
+      
+      // Add user ID to checkout URL for webhook matching
+      const urlWithUser = user 
+        ? `${checkoutUrl}&checkout[custom][userId]=${user.id}`
+        : checkoutUrl;
+
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.LemonSqueezy) {
+         // @ts-ignore
+         window.LemonSqueezy.Url.Open(urlWithUser);
+      } else {
+        window.open(urlWithUser, '_blank');
+      }
+  };
+
+  const selectedPack = CREDIT_PACKS.find(p => p.id === selectedPackId) || CREDIT_PACKS[0];
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -49,7 +74,10 @@ export default function BillingPage() {
                 <p className="text-3xl font-bold text-primary">{credits !== null ? credits : '0'}</p>
               )}
             </div>
-            <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition-all">
+            <button 
+              onClick={() => setShowBuyModal(true)}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition-all"
+            >
               Top Up
             </button>
           </div>
@@ -142,7 +170,7 @@ export default function BillingPage() {
            <div className="flex items-center justify-between">
               <p className="text-muted-foreground">Need just a few more? Buy individual credits.</p>
               <div className="flex items-center gap-4">
-                 <span className="font-bold text-lg">$0.50 <span className="text-sm font-normal text-muted-foreground">/ credit</span></span>
+                 <span className="font-bold text-lg">Top up instantly</span>
                  <button 
                    onClick={() => setShowBuyModal(true)}
                    className="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
@@ -174,28 +202,28 @@ export default function BillingPage() {
                 
                 {/* Credit Packs */}
                 <div className="grid grid-cols-3 gap-4">
-                  {[5, 10, 20].map((amount) => (
+                  {CREDIT_PACKS.map((pack) => (
                     <button
-                      key={amount}
-                      onClick={() => setBuyAmount(amount)}
+                      key={pack.id}
+                      onClick={() => setSelectedPackId(pack.id)}
                       className={`relative group flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-200 ${
-                        buyAmount === amount 
+                        selectedPackId === pack.id 
                           ? 'bg-primary/10 border-primary shadow-[0_0_30px_-10px_var(--primary)]' 
                           : 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10'
                       }`}
                     >
                       <div className={`p-3 rounded-full mb-3 ${
-                         buyAmount === amount ? 'bg-primary/20 text-primary' : 'bg-white/5 text-white/40 group-hover:text-white/60'
+                         selectedPackId === pack.id ? 'bg-primary/20 text-primary' : 'bg-white/5 text-white/40 group-hover:text-white/60'
                       }`}>
                         <Zap className="w-6 h-6 fill-current" />
                       </div>
                       <span className={`text-2xl font-bold mb-1 ${
-                        buyAmount === amount ? 'text-white' : 'text-white/80'
+                        selectedPackId === pack.id ? 'text-white' : 'text-white/80'
                       }`}>
-                        {amount}
+                        {pack.credits}
                       </span>
                       <span className={`text-xs font-medium uppercase tracking-wider ${
-                        buyAmount === amount ? 'text-primary' : 'text-white/40'
+                        selectedPackId === pack.id ? 'text-primary' : 'text-white/40'
                       }`}>
                         Credits
                       </span>
@@ -208,11 +236,14 @@ export default function BillingPage() {
                   <div>
                     <p className="text-sm text-white/40 font-medium mb-1">Total Amount</p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-white">${(buyAmount * 0.5).toFixed(2)}</span>
+                      <span className="text-3xl font-bold text-white">${selectedPack.price}</span>
                       <span className="text-white/40">USD</span>
                     </div>
                   </div>
-                  <button className="bg-primary hover:brightness-110 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 transition-all transform hover:scale-105 active:scale-95">
+                  <button 
+                    onClick={handleBuyCredits}
+                    className="bg-primary hover:brightness-110 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 transition-all transform hover:scale-105 active:scale-95"
+                  >
                     Pay Now
                   </button>
                 </div>
@@ -226,4 +257,3 @@ export default function BillingPage() {
     </div>
   );
 }
-

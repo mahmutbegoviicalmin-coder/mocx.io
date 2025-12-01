@@ -54,7 +54,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
-          <Script src="https://app.lemonsqueezy.com/js/lemon.js" strategy="lazyOnload" />
+          <Script src="https://assets.lemonsqueezy.com/lemon.js" strategy="lazyOnload" />
         </body>
       </html>
     </ClerkProvider>

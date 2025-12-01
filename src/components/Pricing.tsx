@@ -1,7 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,38 @@ import { PLANS } from '@/config/plans';
 
 export function Pricing() {
   const [annual, setAnnual] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Listen for Lemon Squeezy events
+    const handleLemonSqueezyEvent = (event: any) => {
+        // Check for the specific Payment.Success event in the detail
+        if (event.detail && event.detail.event === 'Payment.Success') {
+             // Redirect to sign-up after successful payment
+             router.push('/sign-up?ref=checkout_success');
+        }
+    };
+
+    // The standard event name dispatched on window is 'LemonSqueezy.Event'
+    window.addEventListener('LemonSqueezy.Event', handleLemonSqueezyEvent);
+    
+    // Fallback: Setup the event handler if the object exists (sometimes needed for overlay)
+    // @ts-ignore
+    if (typeof window !== 'undefined' && window.LemonSqueezy) {
+        // @ts-ignore
+        window.LemonSqueezy.Setup({
+            eventHandler: (event: any) => {
+                if (event.event === 'Payment.Success') {
+                    router.push('/sign-up?ref=checkout_success');
+                }
+            }
+        });
+    }
+
+    return () => {
+        window.removeEventListener('LemonSqueezy.Event', handleLemonSqueezyEvent);
+    };
+  }, [router]);
 
   return (
     <section id="pricing" className="py-32 px-4 relative overflow-hidden">
@@ -120,19 +152,30 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
   const router = useRouter();
 
   const handleCheckout = () => {
-    if (!isLoaded) return;
     if (!user) {
       router.push('/sign-up');
       return;
     }
+
     if (!variantId) {
-      console.error("Variant ID missing. Please check environment variables.");
+      console.error("Checkout URL missing. Please check environment variables.");
       alert("Checkout configuration error. Please try again later.");
       return;
     }
 
-    const checkoutUrl = `https://store.lemonsqueezy.com/checkout/buy/${variantId}?checkout[custom][userId]=${user.id}`;
+    // Ensure URL has correct params for overlay
+    let checkoutUrl = variantId;
     
+    const hasParams = checkoutUrl.includes('?');
+    const appendChar = hasParams ? '&' : '?';
+    
+    if (!checkoutUrl.includes('embed=1')) {
+       checkoutUrl += `${appendChar}embed=1&media=0&logo=0&desc=0`;
+    }
+
+    // Always pass the userId since we now require auth
+    checkoutUrl += `&checkout[custom][userId]=${user.id}`;
+
     // @ts-ignore
     if (typeof window !== 'undefined' && window.LemonSqueezy) {
        // @ts-ignore
@@ -141,7 +184,7 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
       // Fallback if script isn't loaded yet
       const a = document.createElement('a');
       a.href = checkoutUrl;
-      a.className = "lemonsqueezy-button"; // This class might not be enough if the script hasn't processed it, but standard links work too
+      a.className = "lemonsqueezy-button";
       a.style.display = "none";
       document.body.appendChild(a);
       a.click();
@@ -226,7 +269,7 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
             : 'bg-white/10 text-white hover:bg-white/20 hover:text-white'
         }`}
       >
-        Get Started
+        Get {title}
       </motion.button>
     </motion.div>
   );
