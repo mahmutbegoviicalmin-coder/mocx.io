@@ -17,7 +17,12 @@ export function Sidebar() {
   const { user } = useUser();
   const [credits, setCredits] = useState<number | null>(null);
   
-  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
+  const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
+  // Clean up plan name to avoid displaying just "Mocx" if that's the product name, 
+  // and remove "Monthly"/"Yearly" for the compact badge if desired, or keep it.
+  // For now, we'll just ensure it's not "Mocx" effectively.
+  const planName = planNameRaw === 'Mocx' ? 'Free Plan' : planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
+
   const renewsAt = user?.publicMetadata?.renewsAt as string | undefined;
 
   useEffect(() => {

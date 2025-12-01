@@ -60,7 +60,8 @@ export async function POST(request: Request) {
 
       // If not a credit pack, assume it's a subscription (grant access)
       const subscriptionId = data.id;
-      const planName = attributes.product_name || 'Unknown Plan';
+      // Prefer variant_name (e.g. "Starter Monthly") over product_name (e.g. "Mocx")
+      const planName = attributes.variant_name || attributes.product_name || 'Unknown Plan';
       // Get customer portal URL if available (usually in data.attributes.urls.customer_portal)
       const customerPortalUrl = attributes.urls?.customer_portal;
       
