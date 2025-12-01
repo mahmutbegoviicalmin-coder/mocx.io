@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap, Lock } from 'lucide-react';
 import { TopUpModal } from '@/components/TopUpModal';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const ASPECT_RATIOS = [
   { label: 'Square', value: '1:1', icon: Square },
@@ -27,24 +30,24 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  const { user } = useUser();
+  const router = useRouter();
+
   // Credits Logic
   const [credits, setCredits] = useState<number | null>(null);
+  const [isCreditsLoaded, setIsCreditsLoaded] = useState(false);
   const [showTopUpModal, setShowTopUpModal] = useState(false);
 
   useEffect(() => {
-    const fetchCredits = async () => {
-        try {
-            const res = await fetch('/api/credits');
-            const data = await res.json();
-            if (data.data !== undefined) {
-                setCredits(data.data);
-            }
-        } catch (err) {
-            console.error('Failed to fetch credits', err);
-        }
-    };
-    fetchCredits();
-  }, []);
+    if (user?.publicMetadata?.credits !== undefined) {
+        setCredits(user.publicMetadata.credits as number);
+        setIsCreditsLoaded(true);
+    } else if (user) {
+        // If user is loaded but no credits metadata, default to 0
+        setCredits(0);
+        setIsCreditsLoaded(true);
+    }
+  }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,8 +95,21 @@ export default function DashboardPage() {
     }
   };
 
+  // Determine Max Credits based on plan name
+  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
+  
+  // Lock if Free Plan AND no credits (or null/loading)
+  // We strictly lock until we are sure about the credits
+  const isLocked = !isCreditsLoaded || (planName === 'Free Plan' && (credits === null || credits < 1));
+
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isLocked) {
+       // Redirect free users to billing or show upgrade modal
+       router.push('/dashboard/billing'); 
+       return;
+    }
     
     // Check credits locally before starting
     if (credits !== null && credits < 1) {
@@ -247,8 +263,21 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleGenerate} className="space-y-4">
-              
+            <form onSubmit={handleGenerate} className="space-y-4 relative">
+              {/* Block interactions for free users */}
+              {isLocked && (
+                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center text-center p-6 rounded-xl border border-primary/20 shadow-2xl">
+                    <Lock className="w-10 h-10 text-primary mb-3" />
+                    <h3 className="text-lg font-bold text-white mb-1">Upgrade to Generate</h3>
+                    <p className="text-sm text-muted-foreground mb-4 max-w-[200px]">
+                      You need an active plan or credits to create mockups.
+                    </p>
+                    <Link href="/dashboard/billing" className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full font-semibold text-sm transition-colors shadow-lg shadow-primary/20">
+                      View Plans
+                    </Link>
+                 </div>
+              )}
+
               {/* Inputs based on Tab */}
               {activeTab === 'website' && (
                 <div className="animate-in fade-in slide-in-from-top-2">
@@ -259,10 +288,11 @@ export default function DashboardPage() {
                     <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                     <input
                       type="url"
+                      disabled={isLocked}
                       value={websiteUrl}
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       placeholder="https://yourwebsite.com"
-                      className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
@@ -279,12 +309,13 @@ export default function DashboardPage() {
                     </label>
                     
                     {!filePreview ? (
-                      <div className="relative border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 transition-colors text-center">
+                      <div className={`relative border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 transition-colors text-center ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         <input 
                           type="file" 
                           accept="image/*"
+                          disabled={isLocked}
                           onChange={handleFileChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                         />
                         <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground font-medium">Click or drag to upload</p>
@@ -297,7 +328,8 @@ export default function DashboardPage() {
                             <button
                               type="button"
                               onClick={clearFile}
-                              className="bg-red-500/80 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                              disabled={isLocked}
+                              className="bg-red-500/80 text-white p-2 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -316,10 +348,11 @@ export default function DashboardPage() {
                             <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                             <input
                             type="url"
+                            disabled={isLocked}
                             value={refImageUrl}
                             onChange={(e) => setRefImageUrl(e.target.value)}
                             placeholder="https://example.com/image.jpg"
-                            className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -339,8 +372,9 @@ export default function DashboardPage() {
                       <button
                         key={ratio.value}
                         type="button"
+                        disabled={isLocked}
                         onClick={() => setAspectRatio(ratio.value)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
+                        className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                           aspectRatio === ratio.value
                             ? 'bg-primary/10 border-primary text-primary'
                             : 'bg-muted/30 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
@@ -363,7 +397,7 @@ export default function DashboardPage() {
                     <button
                     type="button"
                     onClick={handleEnhance}
-                    disabled={!prompt || enhancing}
+                    disabled={!prompt || enhancing || isLocked}
                     className="text-xs flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
                     >
                     <Wand2 className={`w-3 h-3 ${enhancing ? 'animate-spin' : ''}`} />
@@ -372,9 +406,10 @@ export default function DashboardPage() {
                 </div>
                 <textarea
                   value={prompt}
+                  disabled={isLocked}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe your mockup (e.g. 'Modern laptop on a wooden desk with coffee')"
-                  className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 
                 {/* Uploaded Photo Preview (New) */}
@@ -388,7 +423,7 @@ export default function DashboardPage() {
 
               <button 
                 type="submit"
-                disabled={loading || uploading}
+                disabled={loading || uploading || isLocked}
                 className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-semibold hover:brightness-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
               >
                 {uploading ? (

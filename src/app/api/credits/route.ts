@@ -1,26 +1,20 @@
 import { NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export async function GET() {
   try {
-    if (!process.env.NANOBANANA_API_KEY) {
-      return NextResponse.json({ error: 'API Key missing' }, { status: 500 });
+    const { userId } = await auth();
+    
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const response = await fetch('https://api.nanobananaapi.ai/api/v1/common/credit', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${process.env.NANOBANANA_API_KEY}`,
-      },
-    });
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    
+    const credits = user.publicMetadata.credits !== undefined ? (user.publicMetadata.credits as number) : 0;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Credit check failed:', data);
-      return NextResponse.json(data, { status: response.status });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json({ data: credits });
   } catch (error) {
     console.error('Credit check error:', error);
     return NextResponse.json({ error: 'Failed to fetch credits' }, { status: 500 });

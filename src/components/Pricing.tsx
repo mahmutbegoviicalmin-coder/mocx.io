@@ -16,8 +16,8 @@ export function Pricing() {
     const handleLemonSqueezyEvent = (event: any) => {
         // Check for the specific Payment.Success event in the detail
         if (event.detail && event.detail.event === 'Payment.Success') {
-             // Redirect to sign-up after successful payment
-             router.push('/sign-up?ref=checkout_success');
+             // Redirect to dashboard after successful payment
+             router.push('/dashboard');
         }
     };
 
@@ -31,7 +31,7 @@ export function Pricing() {
         window.LemonSqueezy.Setup({
             eventHandler: (event: any) => {
                 if (event.event === 'Payment.Success') {
-                    router.push('/sign-up?ref=checkout_success');
+                    router.push('/dashboard');
                 }
             }
         });
@@ -174,7 +174,7 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
     }
 
     // Always pass the userId since we now require auth
-    checkoutUrl += `&checkout[custom][userId]=${user.id}`;
+       checkoutUrl += `&checkout[custom][userId]=${user.id}`;
 
     // @ts-ignore
     if (typeof window !== 'undefined' && window.LemonSqueezy) {

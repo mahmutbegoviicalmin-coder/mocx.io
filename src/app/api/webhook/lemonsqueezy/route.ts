@@ -61,6 +61,8 @@ export async function POST(request: Request) {
       // If not a credit pack, assume it's a subscription (grant access)
       const subscriptionId = data.id;
       const planName = attributes.product_name || 'Unknown Plan';
+      // Get customer portal URL if available (usually in data.attributes.urls.customer_portal)
+      const customerPortalUrl = attributes.urls?.customer_portal;
       
       // Determine credits based on plan
       let credits = 100;
@@ -76,6 +78,7 @@ export async function POST(request: Request) {
               variantId: attributes.variant_id,
               renewsAt: attributes.renews_at,
               endsAt: attributes.ends_at,
+              customer_portal_url: customerPortalUrl,
               planName: planName
             },
             publicMetadata: {
@@ -87,6 +90,8 @@ export async function POST(request: Request) {
     } else if (eventName === 'subscription_updated') {
       // Update status
       const attributes = data.attributes;
+      const customerPortalUrl = attributes.urls?.customer_portal;
+      
       if (userId) {
         await client.users.updateUserMetadata(userId, {
             privateMetadata: {
@@ -94,11 +99,13 @@ export async function POST(request: Request) {
               variantId: attributes.variant_id,
               renewsAt: attributes.renews_at,
               endsAt: attributes.ends_at,
+              customer_portal_url: customerPortalUrl,
             }
           });
       }
     } else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
-       // Revoke access or mark as cancelled
+       // Revoke access plan but KEEP remaining credits
+       // User becomes Free Plan but can use leftover credits until they run out
        const attributes = data.attributes;
        if (userId) {
         await client.users.updateUserMetadata(userId, {
@@ -108,7 +115,8 @@ export async function POST(request: Request) {
             },
             publicMetadata: {
               planName: 'Free Plan', // Revert to free
-              credits: 0
+              // We do NOT reset credits to 0 here. 
+              // Existing credits persist and user can use them until 0.
             }
           });
        }

@@ -11,8 +11,16 @@ export async function POST(request: Request) {
 
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
-    // Default to 2 credits if undefined ("po defaultu 2 kredita")
-    const credits = user.publicMetadata.credits !== undefined ? (user.publicMetadata.credits as number) : 2;
+    
+    // Default to 0 credits if undefined to prevent free usage
+    const credits = user.publicMetadata.credits !== undefined ? (user.publicMetadata.credits as number) : 0;
+    const planName = (user.publicMetadata.planName as string) || 'Free Plan';
+
+    // Strict check: If Free Plan and no credits, block.
+    // This matches the frontend "isLocked" logic.
+    if (planName === 'Free Plan' && credits < 1) {
+        return NextResponse.json({ error: 'Upgrade to a paid plan or top up credits to generate.' }, { status: 403 });
+    }
 
     if (credits < 1) {
         return NextResponse.json({ error: 'Insufficient credits. Please top up.' }, { status: 403 });

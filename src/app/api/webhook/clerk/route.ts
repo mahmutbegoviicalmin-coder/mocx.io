@@ -54,8 +54,19 @@ export async function POST(req: Request) {
   if (eventType === 'user.created') {
      const { id, email_addresses } = evt.data;
      console.log(`New user created: ${id}`);
-     // Auth First flow: No need to check for existing subscriptions on user creation
-     // because users must be logged in to purchase.
+     
+     // Initialize user credits to 0 explicitly
+     try {
+         const client = await clerkClient();
+         await client.users.updateUserMetadata(id, {
+            publicMetadata: {
+                credits: 0,
+                planName: 'Free Plan'
+            }
+         });
+     } catch (error) {
+         console.error('Failed to initialize user metadata:', error);
+     }
   }
 
   return new Response('', { status: 200 });

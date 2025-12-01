@@ -1,27 +1,51 @@
 'use client';
 
-import { Check, X, Zap } from 'lucide-react';
+import { Check, X, Zap, Calendar, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { CREDIT_PACKS } from '@/config/credits';
+import { PLANS } from '@/config/plans';
 import { useUser } from '@clerk/nextjs';
 
 export default function BillingPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
+  const [annual, setAnnual] = useState(false); // Toggle for yearly plans
   
+  // Subscription Data
+  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
+  const isFreePlan = planName === 'Free Plan';
+  const renewsAt = user?.privateMetadata?.renewsAt as string | undefined;
+  const endsAt = user?.privateMetadata?.endsAt as string | undefined;
+  const subscriptionStatus = user?.privateMetadata?.status as string | undefined;
+  const customerPortalUrl = user?.privateMetadata?.customer_portal_url as string; 
+
   // Modal State
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [selectedPackId, setSelectedPackId] = useState('pack-5');
 
-  useEffect(() => {
+  // ... (rest of useEffect)
+
+  const handleManageSubscription = async () => {
+      // Ideally, we should have the customer portal URL from Lemon Squeezy stored in metadata
+      // If not, we might need an API endpoint to fetch it or direct them to general support
+      // For now, let's assume we can fetch a portal URL or use a generic one
+      if (customerPortalUrl) {
+          window.open(customerPortalUrl, '_blank');
+      } else {
+          alert("Please contact support to manage your subscription or check your email for the management link.");
+      }
+  };
+
     // Fetch credits from our API proxy or metadata
     const fetchCredits = async () => {
       try {
-        const res = await fetch('/api/credits');
-        const data = await res.json();
-        if (data.data !== undefined) {
-          setCredits(data.data);
+        // We prefer to use the user's metadata credits which are synced via webhook
+        // The /api/credits endpoint was fetching NanoBanana credits, which is for the system, not the user
+        if (user?.publicMetadata?.credits !== undefined) {
+             setCredits(user.publicMetadata.credits as number);
+        } else {
+             setCredits(0);
         }
       } catch (error) {
         console.error('Failed to fetch credits', error);
@@ -30,8 +54,43 @@ export default function BillingPage() {
       }
     };
 
-    fetchCredits();
-  }, []);
+    if (user) {
+        fetchCredits();
+    }
+  }, [user]);
+
+  const handleSubscribe = (variantId: string) => {
+      if (!variantId) return;
+      
+      // Ensure URL has correct params for overlay
+      let checkoutUrl = variantId;
+      
+      const hasParams = checkoutUrl.includes('?');
+      const appendChar = hasParams ? '&' : '?';
+      
+      if (!checkoutUrl.includes('embed=1')) {
+         checkoutUrl += `${appendChar}embed=1&media=0&logo=0&desc=0`;
+      }
+
+      // Always pass the userId
+      if (user) {
+         checkoutUrl += `&checkout[custom][userId]=${user.id}`;
+      }
+
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.LemonSqueezy) {
+         // @ts-ignore
+         window.LemonSqueezy.Url.Open(checkoutUrl);
+      } else {
+        const a = document.createElement('a');
+        a.href = checkoutUrl;
+        a.className = "lemonsqueezy-button";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  };
 
   const handleBuyCredits = () => {
       const pack = CREDIT_PACKS.find(p => p.id === selectedPackId);
@@ -82,6 +141,65 @@ export default function BillingPage() {
             </button>
           </div>
         </div>
+        
+        {/* Toggle Yearly/Monthly */}
+        <div className="flex justify-center">
+            <div className="relative bg-muted/30 p-1 rounded-full flex items-center cursor-pointer border border-white/5" onClick={() => setAnnual(!annual)}>
+              <div 
+                className={`absolute top-1 bottom-1 w-[50%] bg-primary rounded-full shadow-lg transition-all duration-300 ${annual ? 'left-[50%]' : 'left-1'}`}
+              />
+              <button 
+                className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 w-32 ${!annual ? 'text-white' : 'text-muted-foreground hover:text-white'}`}
+                onClick={(e) => { e.stopPropagation(); setAnnual(false); }}
+              >
+                Monthly
+              </button>
+              <button 
+                className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 w-32 ${annual ? 'text-white' : 'text-muted-foreground hover:text-white'}`}
+                onClick={(e) => { e.stopPropagation(); setAnnual(true); }}
+              >
+                Yearly
+              </button>
+            </div>
+        </div>
+
+        {/* Active Plan & Subscription Management */}
+        {!isFreePlan && (
+            <div className="bg-card border border-primary/20 rounded-2xl p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Zap className="w-32 h-32 text-primary" />
+                </div>
+                
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h2 className="text-2xl font-bold text-white">Current Plan: <span className="text-primary">{planName}</span></h2>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${subscriptionStatus === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                {subscriptionStatus || 'Active'}
+                            </span>
+                        </div>
+                        
+                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                            <Calendar className="w-4 h-4" />
+                            {renewsAt ? (
+                                <span>Renews on {new Date(renewsAt).toLocaleDateString()}</span>
+                            ) : endsAt ? (
+                                <span>Access ends on {new Date(endsAt).toLocaleDateString()}</span>
+                            ) : (
+                                <span>Lifetime Access</span>
+                            )}
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={handleManageSubscription}
+                        className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-colors text-white"
+                    >
+                        Manage Subscription
+                    </button>
+                </div>
+            </div>
+        )}
 
         {/* Plans */}
         <div className="grid md:grid-cols-3 gap-8">
@@ -90,13 +208,13 @@ export default function BillingPage() {
             <div className="mb-4">
               <h3 className="text-xl font-bold">Starter</h3>
               <div className="text-3xl font-bold mt-2">
-                $29
-                <span className="text-base font-normal text-muted-foreground">/mo</span>
+                ${annual ? '205' : '29'}
+                <span className="text-base font-normal text-muted-foreground">{annual ? '/year' : '/mo'}</span>
               </div>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Check className="w-4 h-4 text-primary" /> 100 Credits
+                <Check className="w-4 h-4 text-primary" /> {annual ? '600' : '100'} Credits
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Check className="w-4 h-4 text-primary" /> Standard Speed
@@ -105,7 +223,10 @@ export default function BillingPage() {
                 <Check className="w-4 h-4 text-primary" /> Commercial License
               </li>
             </ul>
-            <button className="w-full py-2 border border-primary text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors">
+            <button 
+              onClick={() => handleSubscribe(annual ? PLANS.starter.yearly : PLANS.starter.monthly)}
+              className="w-full py-2 border border-primary text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors"
+            >
               Upgrade
             </button>
           </div>
@@ -118,13 +239,13 @@ export default function BillingPage() {
             <div className="mb-4">
               <h3 className="text-xl font-bold">Pro</h3>
               <div className="text-3xl font-bold mt-2">
-                $69
-                <span className="text-base font-normal text-muted-foreground">/mo</span>
+                ${annual ? '420' : '69'}
+                <span className="text-base font-normal text-muted-foreground">{annual ? '/year' : '/mo'}</span>
               </div>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
               <li className="flex items-center gap-2 text-sm text-foreground font-medium">
-                <Check className="w-4 h-4 text-primary" /> 300 Credits
+                <Check className="w-4 h-4 text-primary" /> {annual ? '3600' : '300'} Credits
               </li>
               <li className="flex items-center gap-2 text-sm text-foreground font-medium">
                 <Check className="w-4 h-4 text-primary" /> Fast Generation
@@ -133,7 +254,10 @@ export default function BillingPage() {
                 <Check className="w-4 h-4 text-primary" /> Priority Support
               </li>
             </ul>
-            <button className="w-full py-2 bg-primary text-white rounded-full font-medium hover:brightness-110 transition-all shadow-lg">
+            <button 
+              onClick={() => handleSubscribe(annual ? PLANS.pro.yearly : PLANS.pro.monthly)}
+              className="w-full py-2 bg-primary text-white rounded-full font-medium hover:brightness-110 transition-all shadow-lg"
+            >
               Upgrade
             </button>
           </div>
@@ -143,13 +267,13 @@ export default function BillingPage() {
             <div className="mb-4">
               <h3 className="text-xl font-bold">Agency</h3>
               <div className="text-3xl font-bold mt-2">
-                $199
-                <span className="text-base font-normal text-muted-foreground">/mo</span>
+                ${annual ? '850' : '199'}
+                <span className="text-base font-normal text-muted-foreground">{annual ? '/year' : '/mo'}</span>
               </div>
             </div>
             <ul className="space-y-3 mb-8 flex-1">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Check className="w-4 h-4 text-primary" /> 1000 Credits
+                <Check className="w-4 h-4 text-primary" /> {annual ? '6000' : '1000'} Credits
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Check className="w-4 h-4 text-primary" /> Max Speed
@@ -158,7 +282,10 @@ export default function BillingPage() {
                 <Check className="w-4 h-4 text-primary" /> API Access
               </li>
             </ul>
-            <button className="w-full py-2 border border-primary text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors">
+            <button 
+              onClick={() => handleSubscribe(annual ? PLANS.agency.yearly : PLANS.agency.monthly)}
+              className="w-full py-2 border border-primary text-primary rounded-full font-medium hover:bg-primary hover:text-white transition-colors"
+            >
               Upgrade
             </button>
           </div>
