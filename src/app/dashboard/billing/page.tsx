@@ -15,10 +15,14 @@ export default function BillingPage() {
   // Subscription Data
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
   const isFreePlan = planName === 'Free Plan';
-  const renewsAt = user?.privateMetadata?.renewsAt as string | undefined;
-  const endsAt = user?.privateMetadata?.endsAt as string | undefined;
-  const subscriptionStatus = user?.privateMetadata?.status as string | undefined;
-  const customerPortalUrl = user?.privateMetadata?.customer_portal_url as string; 
+  const [subscriptionData, setSubscriptionData] = useState<{
+    renewsAt?: string;
+    endsAt?: string;
+    status?: string;
+    customerPortalUrl?: string;
+  }>({});
+
+  const { renewsAt, endsAt, status: subscriptionStatus, customerPortalUrl } = subscriptionData; 
 
   // Modal State
   const [showBuyModal, setShowBuyModal] = useState(false);
@@ -37,11 +41,10 @@ export default function BillingPage() {
       }
   };
 
-    // Fetch credits from our API proxy or metadata
-    const fetchCredits = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      // Fetch Credits
       try {
-        // We prefer to use the user's metadata credits which are synced via webhook
-        // The /api/credits endpoint was fetching NanoBanana credits, which is for the system, not the user
         if (user?.publicMetadata?.credits !== undefined) {
              setCredits(user.publicMetadata.credits as number);
         } else {
@@ -49,13 +52,24 @@ export default function BillingPage() {
         }
       } catch (error) {
         console.error('Failed to fetch credits', error);
+      }
+
+      // Fetch Subscription Data
+      try {
+        const res = await fetch('/api/subscription');
+        if (res.ok) {
+            const data = await res.json();
+            setSubscriptionData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription', error);
       } finally {
         setLoading(false);
       }
     };
 
     if (user) {
-        fetchCredits();
+        fetchData();
     }
   }, [user]);
 
