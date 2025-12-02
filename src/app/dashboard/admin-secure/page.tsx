@@ -335,9 +335,18 @@ export default function AdminPage() {
 
                 {/* User Rows */}
                 {filteredUsers.map((user) => {
-                    // Fix Mocx -> Starter
-                    const planName = (user.publicMetadata.planName || 'Free Plan').replace('Mocx', 'Starter').replace('Free Plan', 'Free');
+                    // Normalize Plan Name
+                    let planName = user.publicMetadata.planName || 'Free Plan';
                     
+                    // Remove duplicate or weird names like "Starter (Pro)" or "Mocx"
+                    if (planName.includes('Mocx')) planName = 'Starter';
+                    if (planName.includes('Starter') && planName.includes('Pro')) planName = 'Pro';
+                    if (planName.includes('Starter') && planName.includes('Agency')) planName = 'Agency';
+                    if (planName.includes('Starter') && planName.includes('Starter')) planName = 'Starter'; // Fix "Starter (Starter)"
+                    
+                    // Fallback cleanup just in case
+                    planName = planName.replace(/\(.*\)/, '').trim(); 
+
                     return (
                     <motion.div 
                         initial={{ opacity: 0, y: 10 }}
