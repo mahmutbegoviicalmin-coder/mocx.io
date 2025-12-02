@@ -3,6 +3,7 @@ import { dark } from "@clerk/themes";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import FacebookPixel from "@/components/FacebookPixel";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -53,6 +54,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <FacebookPixel />
           {children}
           <Script src="https://assets.lemonsqueezy.com/lemon.js" strategy="lazyOnload" />
         </body>

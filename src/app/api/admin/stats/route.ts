@@ -40,7 +40,33 @@ export async function GET() {
         }
     }
 
-    // 3. Calculate Plan Counts
+    // 3. Fetch NanoBanana API Balance
+    let apiBalance = null;
+    if (process.env.NANOBANANA_API_KEY) {
+        try {
+            // Attempt to fetch user info/balance
+            const balanceRes = await fetch('https://api.nanobananaapi.ai/api/v1/common/credit', {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${process.env.NANOBANANA_API_KEY}`, 
+                    'Content-Type': 'application/json' 
+                }
+            });
+            
+            if (balanceRes.ok) {
+                const balanceData = await balanceRes.json();
+                console.log('NanoBanana Balance Data:', balanceData);
+                
+                if (balanceData.code === 200 && balanceData.data !== undefined) {
+                    apiBalance = balanceData.data;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch NanoBanana balance', e);
+        }
+    }
+
+    // 4. Calculate Plan Counts
     // Fetching up to 500 users to calculate stats. For larger scale, this should be indexed or cached.
     const userList = await client.users.getUserList({ limit: 500 });
     
@@ -68,7 +94,8 @@ export async function GET() {
     return NextResponse.json({
         totalUsers,
         totalRevenue,
-        planCounts
+        planCounts,
+        apiBalance
     });
   } catch (error) {
     console.error('[ADMIN_STATS_GET]', error);

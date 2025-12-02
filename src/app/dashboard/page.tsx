@@ -40,9 +40,10 @@ export default function DashboardPage() {
       interval = setInterval(() => {
         setProgress((prev) => {
           // Slower progress as it gets higher to simulate real waiting
-          if (prev >= 90) return prev; 
-          const increment = prev < 50 ? 2 : prev < 80 ? 1 : 0.5;
-          return Math.min(prev + increment, 90);
+          if (prev >= 95) return prev; 
+          // Adjusted for longer generation times (approx 5 mins to reach 90%)
+          const increment = prev < 30 ? 1.5 : prev < 60 ? 0.5 : 0.1;
+          return Math.min(prev + increment, 95);
         });
       }, 800);
     } else {
@@ -228,6 +229,11 @@ export default function DashboardPage() {
 
             const statusData = await statusRes.json();
 
+            // Update progress if provided by backend
+            if (statusData.progress && typeof statusData.progress === 'number') {
+                setProgress(prev => Math.max(prev, statusData.progress));
+            }
+
             if (statusData.status === 'completed' && statusData.result) {
                clearInterval(pollInterval);
                clearTimeout(timeoutId);
@@ -248,8 +254,8 @@ export default function DashboardPage() {
       timeoutId = setTimeout(() => {
         clearInterval(pollInterval);
         setLoading(false);
-        setError('Request timed out. Please check back later.');
-      }, 180000); // Increased timeout to 3 minutes
+        setError('Generation is taking longer than expected. Please check the "History" tab later or try again.');
+      }, 600000); // Increased timeout to 10 minutes
 
     } catch (err: any) {
       console.error(err);
@@ -266,10 +272,10 @@ export default function DashboardPage() {
       <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none opacity-50" />
       <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-indigo-500/5 rounded-full blur-[150px] -z-10 pointer-events-none opacity-50" />
 
-      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 h-[calc(100vh-3rem)]">
+      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 h-auto lg:h-[calc(100vh-3rem)]">
         
         {/* Left Panel - Controls */}
-        <div className="w-full lg:w-[420px] flex flex-col gap-6 h-full overflow-y-auto no-scrollbar pb-20 lg:pb-0 shrink-0">
+        <div className="w-full lg:w-[420px] flex flex-col gap-6 lg:h-full lg:overflow-y-auto no-scrollbar shrink-0">
           <div className="bg-[#1A1A1A]/80 backdrop-blur-xl border border-white/5 rounded-[24px] p-6 shadow-2xl flex flex-col gap-6">
             
             <div className="flex items-center justify-between">
@@ -311,7 +317,7 @@ export default function DashboardPage() {
                     <button
                         type="button"
                         onClick={() => setActiveTab('website')}
-                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 ${
                         activeTab === 'website' ? 'bg-[#2A2A2A] text-white shadow-lg border border-white/10' : 'text-white/40 hover:text-white hover:bg-white/5'
                         }`}
                     >
@@ -321,7 +327,7 @@ export default function DashboardPage() {
                     <button
                         type="button"
                         onClick={() => setActiveTab('image')}
-                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 ${
                         activeTab === 'image' ? 'bg-[#2A2A2A] text-white shadow-lg border border-white/10' : 'text-white/40 hover:text-white hover:bg-white/5'
                         }`}
                     >
@@ -400,7 +406,7 @@ export default function DashboardPage() {
                         type="button"
                         disabled={isLocked}
                         onClick={() => setAspectRatio(ratio.value)}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left group ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left group hover:scale-[1.02] active:scale-95 ${
                           isSelected
                             ? 'bg-primary/10 border-primary/50 text-white shadow-[0_0_20px_-10px_var(--primary)]'
                             : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:border-white/10 hover:text-white'
@@ -427,7 +433,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={handleEnhance}
                     disabled={!prompt || enhancing || isLocked}
-                    className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-primary hover:text-white transition-colors disabled:opacity-50 px-2 py-1 hover:bg-primary/10 rounded-lg"
+                    className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-primary hover:text-white transition-colors disabled:opacity-50 px-2 py-1 hover:bg-primary/10 rounded-lg hover:scale-105 active:scale-95"
                     >
                     <Wand2 className={`w-3 h-3 ${enhancing ? 'animate-spin' : ''}`} />
                     {enhancing ? 'Enhancing...' : 'AI Enhance'}
@@ -447,7 +453,7 @@ export default function DashboardPage() {
               <button 
                 type="submit"
                 disabled={loading || uploading || isLocked}
-                className="w-full bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group active:scale-[0.98] relative overflow-hidden"
+                className="w-full bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group active:scale-[0.98] relative overflow-hidden lg:static fixed bottom-4 left-4 right-4 lg:w-full w-[calc(100%-2rem)] z-40 hover:scale-[1.01]"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 <div className="relative flex items-center gap-2">
@@ -478,8 +484,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Right Panel - Result */}
-        <div className="flex-1 h-full min-h-[500px]">
-          <div className={`w-full h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all group ${
+        <div className="flex-1 w-full lg:h-full min-h-[400px] lg:min-h-[500px] mb-24 lg:mb-0">
+          <div className={`w-full h-[400px] lg:h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all group ${
              generatedImage ? 'border-primary/20' : 'border-dashed border-white/5'
           }`}>
             {generatedImage ? (
@@ -584,7 +590,7 @@ export default function DashboardPage() {
                     {uploading ? 'Uploading Assets...' : 'Creating Masterpiece...'}
                  </h3>
                  <p className="text-white/40 text-sm max-w-xs mx-auto leading-relaxed">
-                    {progress > 50 ? 'Applying advanced lighting and textures...' : 'Analyzing prompt and composition...'}
+                    {progress > 80 ? 'Finalizing details (this may take a few minutes)...' : progress > 50 ? 'Applying advanced lighting and textures...' : 'Analyzing prompt and composition...'}
                  </p>
                </div>
             )}

@@ -38,10 +38,14 @@ export async function GET(request: Request) {
         error = data.data.errorMessage || 'Generation failed';
     }
 
+    // Check for progress in the response (NanoBanana might provide it)
+    const progress = data.data?.progress || 0;
+
     return NextResponse.json({ 
         status, 
         result, 
         error, 
+        progress,
         originalData: data.data 
     });
 

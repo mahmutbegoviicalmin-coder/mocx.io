@@ -94,7 +94,7 @@ export function WhyMocx() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="group relative p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-xl transition-all duration-300 shadow-[0_0_0_1px_rgba(0,0,0,0)] overflow-hidden"
+              className="group relative p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-xl transition-all duration-300 shadow-[0_0_0_1px_rgba(0,0,0,0)] overflow-hidden hover:border-primary/30 hover:shadow-[0_0_30px_-10px_rgba(255,84,0,0.2)] hover:-translate-y-2 cursor-default"
             >
               {/* Gradient overlay on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${benefit.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />

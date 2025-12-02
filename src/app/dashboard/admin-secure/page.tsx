@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2 } from 'lucide-react';
+import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
@@ -32,6 +32,7 @@ interface UserData {
 interface Stats {
     totalRevenue: number;
     totalUsers: number;
+    apiBalance?: number | null;
     planCounts?: {
         starter: number;
         pro: number;
@@ -229,7 +230,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto space-y-8">
             
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
                         <DollarSign className="w-6 h-6" />
@@ -237,6 +238,18 @@ export default function AdminPage() {
                     <div>
                         <div className="text-sm text-white/50 font-medium uppercase tracking-wider">Total Earnings</div>
                         <div className="text-2xl font-bold text-white">${stats.totalRevenue.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                        <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <div className="text-sm text-white/50 font-medium uppercase tracking-wider">API Credits</div>
+                        <div className="text-2xl font-bold text-white">
+                            {stats.apiBalance !== undefined && stats.apiBalance !== null ? stats.apiBalance : 'N/A'}
+                        </div>
                     </div>
                 </div>
                 

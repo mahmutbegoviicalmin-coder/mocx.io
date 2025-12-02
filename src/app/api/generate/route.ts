@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     console.log('Sending payload to NanoBanana Pro:', payload);
 
-    const response = await fetch('https://api.nanobananaapi.ai/api/v1/nanobanana/generate-pro', {
+    let response = await fetch('https://api.nanobananaapi.ai/api/v1/nanobanana/generate-pro', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,13 +55,48 @@ export async function POST(request: Request) {
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    let data = await response.json();
+
+    // RETRY LOGIC: If we get a specific internal error, try once more
+    if (!response.ok || (data.code && data.code !== 200)) {
+        const errorMsg = JSON.stringify(data).toLowerCase();
+        // Check for known "flakey" errors like Director, Timeout, or generic internal server errors
+        if (errorMsg.includes('director') || errorMsg.includes('prediction') || response.status >= 500) {
+            console.warn('First attempt failed with internal error, retrying in 2s...', data);
+            
+            // Wait 2 seconds
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Retry the exact same request
+            response = await fetch('https://api.nanobananaapi.ai/api/v1/nanobanana/generate-pro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.NANOBANANA_API_KEY}`,
+                },
+                body: JSON.stringify(payload),
+            });
+            
+            data = await response.json();
+            console.log('Retry Response:', data);
+        }
+    }
+
     console.log('NanoBanana Pro Response:', data);
 
     if (!response.ok || (data.code && data.code !== 200)) {
       console.error('API Error Response:', data);
+      
+      // Extract friendly error message if possible
+      let errorMessage = data.message || data.msg || data.error || 'Failed to start generation';
+      
+      // Handle specific "Director" errors which are internal AI model errors
+      if (errorMessage.includes('Director:')) {
+          errorMessage = 'AI Model Error: The image could not be generated with this specific prompt/image combination. Please try a slightly different prompt or image.';
+      }
+
       return NextResponse.json(
-          { error: data.message || data.msg || 'Failed to start generation', details: data }, 
+          { error: errorMessage, details: data }, 
           { status: 400 }
       );
     }

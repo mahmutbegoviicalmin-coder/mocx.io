@@ -97,7 +97,7 @@ export function HeroDemo() {
             </div>
 
             <motion.div 
-              className="relative w-full bg-black/40 hover:bg-black/50 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40 backdrop-blur-xl group transition-all duration-500 cursor-default overflow-hidden ring-1 ring-white/5"
+              className="relative w-full bg-black/40 hover:bg-black/50 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40 backdrop-blur-xl group transition-all duration-500 cursor-pointer overflow-hidden ring-1 ring-white/5"
               whileHover={{ scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
             >
               {/* Glass highlight */}

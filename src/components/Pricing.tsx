@@ -260,13 +260,13 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
       </ul>
 
       <motion.button 
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
         onClick={handleCheckout}
-        className={`w-full py-4 rounded-xl font-semibold text-sm transition-all relative z-10 ${
+        className={`w-full py-4 rounded-xl font-semibold text-sm transition-all relative z-10 cursor-pointer ${
           highlighted 
-            ? 'bg-gradient-to-r from-primary to-red-600 text-white hover:shadow-[0_0_25px_rgba(255,90,95,0.5)] hover:brightness-110 shadow-lg' 
-            : 'bg-white/10 text-white hover:bg-white/20 hover:text-white'
+            ? 'bg-gradient-to-r from-primary to-red-600 text-white hover:shadow-[0_0_30px_rgba(255,90,95,0.6)] hover:brightness-110 shadow-lg' 
+            : 'bg-white/10 text-white hover:bg-white/20 hover:text-white border border-white/10 hover:border-white/20 hover:shadow-xl'
         }`}
       >
         Get {title}

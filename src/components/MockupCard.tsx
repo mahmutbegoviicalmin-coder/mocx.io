@@ -6,7 +6,7 @@ interface MockupCardProps {
 
 export function MockupCard({ title, imageUrl, prompt }: MockupCardProps) {
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
+    <div className="group relative overflow-hidden rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:scale-[1.02] cursor-pointer">
       <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
         {/* Using a simple div for now, would be Next/Image in production */}
         <div 

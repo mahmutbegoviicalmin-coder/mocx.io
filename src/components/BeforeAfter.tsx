@@ -27,10 +27,10 @@ export function BeforeAfter() {
           
           {/* BEFORE CARD (~45%) */}
           <div 
-            className="w-full md:w-[45%] relative group"
+            className="w-full md:w-[45%] relative group cursor-pointer hover:z-10"
           >
             <div className="absolute -inset-1 bg-gradient-to-b from-white/5 to-transparent rounded-[32px] blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative rounded-[28px] overflow-hidden border border-white/5 bg-zinc-900/20 backdrop-blur-sm shadow-2xl">
+            <div className="relative rounded-[28px] overflow-hidden border border-white/5 bg-zinc-900/20 backdrop-blur-sm shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
               {/* Label */}
               <div className="absolute top-6 left-6 z-20">
                 <span className="px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/5 text-white/50 text-sm font-medium flex items-center gap-2 shadow-lg">
@@ -61,12 +61,12 @@ export function BeforeAfter() {
 
           {/* AFTER CARD (~55%) */}
           <div 
-            className="w-full md:w-[55%] relative group"
+            className="w-full md:w-[55%] relative group cursor-pointer hover:z-10"
           >
             {/* Glow behind card */}
             <div className="absolute -inset-2 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent rounded-[40px] blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-700" />
             
-            <div className="relative rounded-[32px] overflow-hidden border border-white/10 bg-zinc-900/30 backdrop-blur-md shadow-[0_0_60px_-15px_rgba(0,0,0,0.7)] group-hover:border-primary/30 transition-colors duration-500">
+            <div className="relative rounded-[32px] overflow-hidden border border-white/10 bg-zinc-900/30 backdrop-blur-md shadow-[0_0_60px_-15px_rgba(0,0,0,0.7)] group-hover:border-primary/30 transition-all duration-500 group-hover:scale-[1.02]">
               {/* Label */}
               <div className="absolute top-6 left-6 z-20">
                 <span className="px-4 py-2 rounded-full bg-primary/10 backdrop-blur-md border border-primary/20 text-primary text-sm font-bold flex items-center gap-2 shadow-[0_0_20px_-5px_var(--primary)]">
