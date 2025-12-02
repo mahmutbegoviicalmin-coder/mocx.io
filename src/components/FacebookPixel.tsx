@@ -16,6 +16,27 @@ export default function FacebookPixel() {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    // Listen for Lemon Squeezy events (Purchase)
+    const handleLemonSqueezyEvent = (event: any) => {
+      if (event.detail && event.detail.event === "Payment.Success") {
+        if ((window as any).fbq) {
+          (window as any).fbq("track", "Purchase");
+        }
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("LemonSqueezy.Event", handleLemonSqueezyEvent);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("LemonSqueezy.Event", handleLemonSqueezyEvent);
+      }
+    };
+  }, []);
+
   return (
     <>
       <Script
