@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -14,11 +14,10 @@ export default function PaymentSuccessPage() {
     if (typeof window !== 'undefined' && (window as any).fbq) {
       (window as any).fbq('track', 'Purchase', {
         currency: 'USD',
-        value: 0.00 // We can't easily get the exact value here without passing it in URL, but this triggers the 'Active' status
+        value: 0.00 
       });
     }
     
-    // Optional: Redirect to dashboard after 5 seconds
     const timeout = setTimeout(() => {
         router.push('/dashboard');
     }, 5000);
@@ -54,3 +53,10 @@ export default function PaymentSuccessPage() {
   );
 }
 
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0F0F0F]" />}>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
