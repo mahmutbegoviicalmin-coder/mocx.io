@@ -31,6 +31,26 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading && !uploading) {
+      setProgress(0);
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          // Slower progress as it gets higher to simulate real waiting
+          if (prev >= 90) return prev; 
+          const increment = prev < 50 ? 2 : prev < 80 ? 1 : 0.5;
+          return Math.min(prev + increment, 90);
+        });
+      }, 800);
+    } else {
+        setProgress(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading, uploading]);
+
   const { user } = useUser();
   const router = useRouter();
 
@@ -229,7 +249,7 @@ export default function DashboardPage() {
         clearInterval(pollInterval);
         setLoading(false);
         setError('Request timed out. Please check back later.');
-      }, 90000);
+      }, 180000); // Increased timeout to 3 minutes
 
     } catch (err: any) {
       console.error(err);
@@ -529,15 +549,43 @@ export default function DashboardPage() {
             )}
             
             {loading && (
-               <div className="absolute inset-0 bg-black/60 backdrop-blur-xl flex flex-col items-center justify-center z-30 transition-all">
+               <div className="absolute inset-0 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center z-30 transition-all p-8 text-center">
                  <div className="relative mb-8">
-                    <div className="w-32 h-32 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Wand2 className="w-10 h-10 text-primary animate-pulse" />
+                    {/* Progress Circle */}
+                    <div className="w-32 h-32 rounded-full border-4 border-white/5 relative flex items-center justify-center">
+                        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle
+                                cx="50"
+                                cy="50"
+                                r="46"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                className="text-white/5"
+                            />
+                            <circle
+                                cx="50"
+                                cy="50"
+                                r="46"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeDasharray="289.02"
+                                strokeDashoffset={289.02 - (289.02 * progress) / 100}
+                                className="text-primary transition-all duration-500 ease-out"
+                            />
+                        </svg>
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-bold text-white">{Math.round(progress)}%</span>
+                        </div>
                     </div>
                  </div>
-                 <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">{uploading ? 'Uploading Assets...' : 'Generating Mockup...'}</h3>
-                 <p className="text-white/40 text-sm animate-pulse">Creating your masterpiece in high resolution</p>
+                 <h3 className="text-2xl font-bold text-white mb-2 tracking-tight animate-pulse">
+                    {uploading ? 'Uploading Assets...' : 'Creating Masterpiece...'}
+                 </h3>
+                 <p className="text-white/40 text-sm max-w-xs mx-auto leading-relaxed">
+                    {progress > 50 ? 'Applying advanced lighting and textures...' : 'Analyzing prompt and composition...'}
+                 </p>
                </div>
             )}
           </div>
