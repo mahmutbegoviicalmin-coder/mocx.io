@@ -33,11 +33,12 @@ export async function POST(request: Request) {
             4. **Style**: Define the aesthetic (e.g. "photorealistic 8k", "minimalist architectural", "luxury editorial photography").
             5. **Context/Location**: Where is it? (e.g. "on a polished marble table", "floating in a dark void", "on a mossy rock in a forest").
             
-            **Rules:**
+            **CRITICAL RULES:**
+            - **DO NOT HALLUCINATE OBJECTS:** If the user input does not explicitly name the product (e.g. if they use "this picture", "it", "the item", "make it look fresh"), **DO NOT INVENT A SPECIFIC OBJECT** like "lemonade", "perfume", "bottle", or "cream". Instead, refer to it as "the central product" or "the main subject".
+            - Focus on describing the **surroundings, lighting, and atmosphere** around the product.
             - Keep the output under 60 words.
             - Output ONLY the raw prompt text.
             - Do not use quotes.
-            - If the user asks to "put logo on X", ensure the prompt describes the object clearly so the AI knows where to map it.
             - Focus on "Photorealism" and "Professional Product Photography" unless specified otherwise.
             `
           },

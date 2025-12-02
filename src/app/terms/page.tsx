@@ -20,9 +20,6 @@ export default function TermsPage() {
                 <p>
                   By creating an account, starting a subscription, or using Mocx in any way, you agree to be bound by these Terms. If you do not agree, you may not use the Service.
                 </p>
-                <p>
-                  Mocx (“Mocx”, “we”, “us”, “our”) is operated from Sarajevo, Bosnia and Herzegovina.
-                </p>
             </section>
 
             <section>
@@ -46,7 +43,7 @@ export default function TermsPage() {
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                     <li>keeping your login credentials confidential,</li>
                     <li>all activity that occurs under your account, and</li>
-                    <li>notifying us promptly at <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a> of any unauthorized access or security issue.</li>
+                    <li>notifying us promptly at <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a> of any unauthorized access or security issue.</li>
                 </ul>
                 <p className="mt-2">
                   We may suspend or terminate your account if we suspect any breach of these Terms.
@@ -54,30 +51,30 @@ export default function TermsPage() {
             </section>
 
             <section>
-                <h3 className="text-foreground font-semibold text-xl mb-4">4. Subscriptions, Billing & Paddle as Merchant of Record</h3>
+                <h3 className="text-foreground font-semibold text-xl mb-4">4. Subscriptions, Billing & Lemon Squeezy as Merchant of Record</h3>
                 
                 <h4 className="text-foreground font-medium text-lg mt-4 mb-2">1. Plans and billing</h4>
                 <p>
                   Mocx is offered on a subscription basis, including monthly and yearly (discounted) plans.
                   Current prices, features and limits of each plan are displayed on our Pricing page.
-                  By starting a paid subscription, you authorize our payment provider, Paddle, to charge the applicable fees in the currency shown at checkout, plus any applicable taxes.
+                  By starting a paid subscription, you authorize our payment provider, Lemon Squeezy, to charge the applicable fees in the currency shown at checkout, plus any applicable taxes.
                 </p>
 
-                <h4 className="text-foreground font-medium text-lg mt-4 mb-2">2. Paddle as Merchant of Record</h4>
+                <h4 className="text-foreground font-medium text-lg mt-4 mb-2">2. Lemon Squeezy as Merchant of Record</h4>
                 <p>
-                  All orders and payments for Mocx are handled by our online reseller and Merchant of Record, Paddle.com (which may include Paddle.com Market Limited, Paddle Payments Limited and/or Paddle.com Inc., depending on your location).
+                  All orders and payments for Mocx are handled by our online reseller and Merchant of Record, Lemon Squeezy.
                 </p>
                 <p>
-                  Paddle is responsible for processing your payment, billing, and invoicing.
+                  Lemon Squeezy is responsible for processing your payment, billing, and invoicing.
                   We do not handle or store your full payment card details on our servers.
-                  Your purchase is subject to Paddle’s buyer terms and privacy policy in addition to these Terms.
-                  For questions related to your payment, invoice or VAT, you may be directed to Paddle’s support.
+                  Your purchase is subject to Lemon Squeezy’s buyer terms and privacy policy in addition to these Terms.
+                  For questions related to your payment, invoice or VAT, you may be directed to Lemon Squeezy’s support.
                 </p>
 
                 <h4 className="text-foreground font-medium text-lg mt-4 mb-2">3. Auto-renewal</h4>
                 <p>
                   Subscriptions automatically renew at the end of each billing period (monthly or yearly), unless you cancel before the renewal date.
-                  By subscribing, you authorize Paddle to charge the recurring subscription fee using your chosen payment method until you cancel.
+                  By subscribing, you authorize Lemon Squeezy to charge the recurring subscription fee using your chosen payment method until you cancel.
                   You can cancel at any time via your account or by contacting support, but cancellation will apply to the next billing period and does not automatically entitle you to a refund (see Refund Policy).
                 </p>
 
@@ -148,7 +145,7 @@ export default function TermsPage() {
             <section>
                 <h3 className="text-foreground font-semibold text-xl mb-4">7. Third-Party Services</h3>
                 <p>
-                  Mocx may integrate with or rely on third-party services (such as authentication providers, analytics tools or payment processors like Paddle). Your use of those services is subject to the third party’s own terms and privacy policy.
+                  Mocx may integrate with or rely on third-party services (such as authentication providers, analytics tools or payment processors like Lemon Squeezy). Your use of those services is subject to the third party’s own terms and privacy policy.
                 </p>
                 <p>
                   We are not responsible for any third-party services and do not control how they operate.
@@ -244,10 +241,10 @@ export default function TermsPage() {
             <section>
                 <h3 className="text-foreground font-semibold text-xl mb-4">15. Governing Law</h3>
                 <p>
-                  These Terms are governed by the laws of Bosnia and Herzegovina, without regard to conflict of law principles.
+                  These Terms are governed by the laws of the jurisdiction in which we operate, without regard to conflict of law principles.
                 </p>
                 <p>
-                  Where legally allowed, any disputes arising out of or relating to these Terms or the Service shall be resolved by the competent courts located in Bosnia and Herzegovina.
+                  Where legally allowed, any disputes arising out of or relating to these Terms or the Service shall be resolved by the competent courts in that jurisdiction.
                 </p>
             </section>
 
@@ -257,10 +254,7 @@ export default function TermsPage() {
                   If you have any questions about these Terms, you can contact us at:
                 </p>
                 <p className="mt-2">
-                  Email: <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a>
-                </p>
-                <p>
-                  Location: Sarajevo, Bosnia and Herzegovina
+                  Email: <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a>
                 </p>
             </section>
         </div>

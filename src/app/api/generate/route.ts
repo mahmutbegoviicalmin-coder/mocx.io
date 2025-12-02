@@ -66,10 +66,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Deduct 1 credit upon successful API call
+    // Deduct 1 credit upon successful API call and track usage
+    const currentUsage = (user.publicMetadata.imagesGenerated as number) || 0;
+    
     await client.users.updateUserMetadata(userId, {
         publicMetadata: {
-            credits: credits - 1
+            credits: credits - 1,
+            imagesGenerated: currentUsage + 1
         }
     });
 

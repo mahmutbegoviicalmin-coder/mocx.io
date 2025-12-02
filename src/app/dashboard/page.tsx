@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap, Lock } from 'lucide-react';
+import { Upload, Link as LinkIcon, Info, Image as ImageIcon, X, Wand2, Layout, Square, Smartphone, Monitor, Zap, Lock, Download, Share2, Maximize2 } from 'lucide-react';
 import { TopUpModal } from '@/components/TopUpModal';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ASPECT_RATIOS = [
-  { label: 'Square', value: '1:1', icon: Square },
-  { label: 'Portrait', value: '9:16', icon: Smartphone },
-  { label: 'Landscape', value: '16:9', icon: Monitor },
-  { label: 'Standard', value: '4:3', icon: Layout },
+  { label: 'Social Post', sub: '1080x1080', value: '1:1', icon: Square },
+  { label: 'Story / Reel', sub: '1080x1920', value: '9:16', icon: Smartphone },
+  { label: 'Landscape', sub: '1920x1080', value: '16:9', icon: Monitor },
+  { label: 'Standard', sub: '4:3', value: '4:3', icon: Layout },
 ];
 
 export default function DashboardPage() {
@@ -19,7 +20,7 @@ export default function DashboardPage() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [refImageUrl, setRefImageUrl] = useState('');
   const [activeTab, setActiveTab] = useState<'website' | 'image'>('website');
-  const [aspectRatio, setAspectRatio] = useState('16:9');
+  const [aspectRatio, setAspectRatio] = useState('1:1'); // Default to Square for Social Media
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [lastUploadedImage, setLastUploadedImage] = useState<string | null>(null);
@@ -43,7 +44,6 @@ export default function DashboardPage() {
         setCredits(user.publicMetadata.credits as number);
         setIsCreditsLoaded(true);
     } else if (user) {
-        // If user is loaded but no credits metadata, default to 0
         setCredits(0);
         setIsCreditsLoaded(true);
     }
@@ -95,23 +95,36 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDownload = async () => {
+    if (!generatedImage) return;
+    try {
+        const response = await fetch(generatedImage);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `mocx-generated-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        console.error('Download failed', e);
+        window.open(generatedImage, '_blank');
+    }
+  };
+
   // Determine Max Credits based on plan name
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
-  
-  // Lock if Free Plan AND no credits (or null/loading)
-  // We strictly lock until we are sure about the credits
   const isLocked = !isCreditsLoaded || (planName === 'Free Plan' && (credits === null || credits < 1));
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isLocked) {
-       // Redirect free users to billing or show upgrade modal
        router.push('/dashboard/billing'); 
        return;
     }
     
-    // Check credits locally before starting
     if (credits !== null && credits < 1) {
         setShowTopUpModal(true);
         return;
@@ -126,7 +139,6 @@ export default function DashboardPage() {
       
       if (activeTab === 'image') {
         if (selectedFile) {
-          // 1. Upload file to Vercel Blob to get a public URL
           setUploading(true);
           try {
              const uploadRes = await fetch(`/api/upload?filename=${selectedFile.name}`, {
@@ -145,7 +157,6 @@ export default function DashboardPage() {
              setUploading(false);
           }
         } else if (refImageUrl) {
-          // Use provided URL
           finalImageUrls = [refImageUrl];
         } else {
             throw new Error("Please upload an image or provide a reference URL.");
@@ -154,11 +165,9 @@ export default function DashboardPage() {
         if (!websiteUrl) {
             throw new Error("Please provide a website URL.");
         }
-        // Automatically wrap website URL in a screenshot service proxy
         finalImageUrls = [`https://image.thum.io/get/width/1920/crop/1080/noanimate/${websiteUrl}`];
       }
 
-      // 2. Call Generation API with public URL
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -173,7 +182,6 @@ export default function DashboardPage() {
 
       if (!res.ok) {
          if (data.error && data.error.includes('credits')) {
-             // Handle server-side credit check failure
              setShowTopUpModal(true);
              setLoading(false);
              return;
@@ -184,24 +192,31 @@ export default function DashboardPage() {
       const taskId = data.data?.taskId;
 
       if (!taskId) {
-        console.error('API Response missing taskId:', data);
         throw new Error('No task ID received from API');
       }
 
-      // Poll for results
+      let timeoutId: NodeJS.Timeout;
+
       const pollInterval = setInterval(async () => {
         try {
             const statusRes = await fetch(`/api/status?taskId=${taskId}`);
+            
+            if (!statusRes.ok) {
+                console.warn('Status check returned not ok:', statusRes.status);
+                return;
+            }
+
             const statusData = await statusRes.json();
 
             if (statusData.status === 'completed' && statusData.result) {
                clearInterval(pollInterval);
+               clearTimeout(timeoutId);
                setGeneratedImage(statusData.result);
                setLoading(false);
-               // Decrement local credit count optimistically
                setCredits(prev => (prev !== null ? prev - 1 : null));
             } else if (statusData.status === 'failed') {
                clearInterval(pollInterval);
+               clearTimeout(timeoutId);
                setError(statusData.error || 'Generation failed on server.');
                setLoading(false);
             }
@@ -210,12 +225,10 @@ export default function DashboardPage() {
         }
       }, 2000);
 
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         clearInterval(pollInterval);
-        if (loading) {
-            setLoading(false);
-            setError('Request timed out. Please check back later.');
-        }
+        setLoading(false);
+        setError('Request timed out. Please check back later.');
       }, 90000);
 
     } catch (err: any) {
@@ -226,162 +239,160 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-10">
+    <div className="min-h-screen bg-[#0F0F0F] text-white p-4 lg:p-6 relative overflow-hidden font-sans">
       <TopUpModal isOpen={showTopUpModal} onClose={() => setShowTopUpModal(false)} />
       
-      <div className="container max-w-6xl mx-auto px-4 flex flex-col lg:flex-row gap-8">
+      {/* Background Ambient Glow */}
+      <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none opacity-50" />
+      <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-indigo-500/5 rounded-full blur-[150px] -z-10 pointer-events-none opacity-50" />
+
+      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 h-[calc(100vh-3rem)]">
         
         {/* Left Panel - Controls */}
-        <div className="w-full lg:w-1/3 space-y-6">
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <span className="bg-primary/10 text-primary p-2 rounded-lg">
-                  <ImageIcon className="w-5 h-5" />
-                </span>
-                Create Mockup
-              </h2>
+        <div className="w-full lg:w-[420px] flex flex-col gap-6 h-full overflow-y-auto no-scrollbar pb-20 lg:pb-0 shrink-0">
+          <div className="bg-[#1A1A1A]/80 backdrop-blur-xl border border-white/5 rounded-[24px] p-6 shadow-2xl flex flex-col gap-6">
+            
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="bg-gradient-to-br from-primary to-orange-600 p-2.5 rounded-xl shadow-lg shadow-primary/20">
+                        <Wand2 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-lg font-bold tracking-tight text-white">Create Mockup</h2>
+                        <p className="text-xs text-white/40 font-medium">Design your masterpiece</p>
+                    </div>
+                </div>
+                <div className="bg-white/5 px-3 py-1.5 rounded-full border border-white/5 flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5 text-yellow-400 fill-current" />
+                    <span className="text-xs font-bold text-white/80">{credits !== null ? credits : '-'} Credits</span>
+                </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex p-1 bg-muted/50 rounded-lg mb-6">
-              <button
-                onClick={() => setActiveTab('website')}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'website' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Scan Website
-              </button>
-              <button
-                onClick={() => setActiveTab('image')}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'image' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Upload Image
-              </button>
-            </div>
-
-            <form onSubmit={handleGenerate} className="space-y-4 relative">
-              {/* Block interactions for free users */}
+            <form onSubmit={handleGenerate} className="space-y-6 relative flex-1 flex flex-col">
               {isLocked && (
-                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center text-center p-6 rounded-xl border border-primary/20 shadow-2xl">
-                    <Lock className="w-10 h-10 text-primary mb-3" />
-                    <h3 className="text-lg font-bold text-white mb-1">Upgrade to Generate</h3>
-                    <p className="text-sm text-muted-foreground mb-4 max-w-[200px]">
-                      You need an active plan or credits to create mockups.
+                 <div className="absolute -inset-6 bg-black/80 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-6 rounded-[2rem] border border-primary/20 shadow-2xl">
+                    <div className="p-4 bg-primary/10 rounded-full mb-4 animate-pulse">
+                        <Lock className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Upgrade to Generate</h3>
+                    <p className="text-sm text-white/50 mb-6 max-w-[240px] leading-relaxed">
+                      Unlock professional features and generate unlimited mockups.
                     </p>
-                    <Link href="/dashboard/billing" className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full font-semibold text-sm transition-colors shadow-lg shadow-primary/20">
+                    <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105 active:scale-95">
                       View Plans
                     </Link>
                  </div>
               )}
 
-              {/* Inputs based on Tab */}
-              {activeTab === 'website' && (
-                <div className="animate-in fade-in slide-in-from-top-2">
-                  <label className="block text-sm font-medium mb-2 text-muted-foreground">
-                    Website URL
-                  </label>
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                    <input
-                      type="url"
-                      disabled={isLocked}
-                      value={websiteUrl}
-                      onChange={(e) => setWebsiteUrl(e.target.value)}
-                      placeholder="https://yourwebsite.com"
-                      className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
+              {/* Source Selection */}
+              <div className="space-y-3">
+                  <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Source</label>
+                  <div className="grid grid-cols-2 gap-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('website')}
+                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        activeTab === 'website' ? 'bg-[#2A2A2A] text-white shadow-lg border border-white/10' : 'text-white/40 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        <Monitor className="w-3.5 h-3.5" />
+                        Website
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('image')}
+                        className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        activeTab === 'image' ? 'bg-[#2A2A2A] text-white shadow-lg border border-white/10' : 'text-white/40 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        Upload
+                    </button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    We'll automatically capture a screenshot of this website.
-                  </p>
-                </div>
-              )}
+              </div>
 
-              {activeTab === 'image' && (
-                <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-muted-foreground">
-                       Upload Reference (Photo)
-                    </label>
-                    
-                    {!filePreview ? (
-                      <div className={`relative border-2 border-dashed border-border rounded-lg p-6 hover:border-primary/50 transition-colors text-center ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                        <input 
-                          type="file" 
-                          accept="image/*"
-                          disabled={isLocked}
-                          onChange={handleFileChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              {/* Inputs Area */}
+              <div className="min-h-[120px]">
+                {activeTab === 'website' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity rounded-xl" />
+                        <LinkIcon className="absolute left-4 top-3.5 w-4 h-4 text-white/30 group-focus-within:text-primary transition-colors z-10" />
+                        <input
+                        type="url"
+                        disabled={isLocked}
+                        value={websiteUrl}
+                        onChange={(e) => setWebsiteUrl(e.target.value)}
+                        placeholder="https://yourwebsite.com"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 transition-all relative z-10"
                         />
-                        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground font-medium">Click or drag to upload</p>
-                        <p className="text-xs text-muted-foreground/50 mt-1">JPG, PNG up to 5MB</p>
-                      </div>
-                    ) : (
-                      <div className="relative rounded-lg overflow-hidden border border-border group">
-                         <img src={filePreview} alt="Preview" className="w-full h-32 object-cover opacity-80" />
-                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              type="button"
-                              onClick={clearFile}
-                              disabled={isLocked}
-                              className="bg-red-500/80 text-white p-2 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                         </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Optional Reference URL fallback */}
-                  {!filePreview && (
-                    <div className="relative">
-                       <div className="relative flex items-center justify-center mb-2">
-                          <span className="bg-card px-2 text-xs text-muted-foreground uppercase">Or use URL</span>
-                       </div>
-                        <div className="relative">
-                            <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                            <input
-                            type="url"
-                            disabled={isLocked}
-                            value={refImageUrl}
-                            onChange={(e) => setRefImageUrl(e.target.value)}
-                            placeholder="https://example.com/image.jpg"
-                            className="w-full bg-muted/30 border border-border rounded-lg pl-10 pr-3 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
-                        </div>
                     </div>
-                  )}
-                </div>
-              )}
+                    </motion.div>
+                )}
 
-              {/* Aspect Ratio Selector */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-muted-foreground">
-                  Aspect Ratio
-                </label>
-                <div className="grid grid-cols-4 gap-2">
+                {activeTab === 'image' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                    <div>
+                        {!filePreview ? (
+                        <div className={`relative border-2 border-dashed border-white/10 rounded-xl p-8 hover:border-primary/50 hover:bg-white/5 transition-all text-center group cursor-pointer ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <input 
+                            type="file" 
+                            accept="image/*"
+                            disabled={isLocked}
+                            onChange={handleFileChange}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                            />
+                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-inner">
+                                <Upload className="w-5 h-5 text-white/50 group-hover:text-white" />
+                            </div>
+                            <p className="text-sm text-white font-medium">Drop your design here</p>
+                            <p className="text-xs text-white/30 mt-1">Supports JPG, PNG</p>
+                        </div>
+                        ) : (
+                        <div className="relative rounded-xl overflow-hidden border border-white/10 group shadow-2xl">
+                            <img src={filePreview} alt="Preview" className="w-full h-48 object-cover" />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+                                <button
+                                    type="button"
+                                    onClick={clearFile}
+                                    className="bg-white text-black px-4 py-2 rounded-lg font-bold text-xs hover:scale-105 transition-transform"
+                                >
+                                    Change Image
+                                </button>
+                            </div>
+                        </div>
+                        )}
+                    </div>
+                    </motion.div>
+                )}
+              </div>
+
+              {/* Aspect Ratio Grid */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Output Format</label>
+                <div className="grid grid-cols-2 gap-2">
                   {ASPECT_RATIOS.map((ratio) => {
                     const Icon = ratio.icon;
+                    const isSelected = aspectRatio === ratio.value;
                     return (
                       <button
                         key={ratio.value}
                         type="button"
                         disabled={isLocked}
                         onClick={() => setAspectRatio(ratio.value)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                          aspectRatio === ratio.value
-                            ? 'bg-primary/10 border-primary text-primary'
-                            : 'bg-muted/30 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left group ${
+                          isSelected
+                            ? 'bg-primary/10 border-primary/50 text-white shadow-[0_0_20px_-10px_var(--primary)]'
+                            : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:border-white/10 hover:text-white'
                         }`}
                       >
-                        <Icon className="w-5 h-5 mb-1" />
-                        <span className="text-[10px] font-medium">{ratio.label}</span>
+                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary text-white' : 'bg-black/20 text-white/40 group-hover:text-white'}`}>
+                            <Icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <div className="text-[11px] font-bold uppercase tracking-wide">{ratio.label}</div>
+                            <div className={`text-[10px] ${isSelected ? 'text-primary/80' : 'text-white/20'}`}>{ratio.sub}</div>
+                        </div>
                       </button>
                     );
                   })}
@@ -389,92 +400,144 @@ export default function DashboardPage() {
               </div>
 
               {/* Prompt Section */}
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-muted-foreground">
-                    Prompt
-                    </label>
+              <div className="flex-1 flex flex-col space-y-3">
+                <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Prompt Details</label>
                     <button
                     type="button"
                     onClick={handleEnhance}
                     disabled={!prompt || enhancing || isLocked}
-                    className="text-xs flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                    className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-primary hover:text-white transition-colors disabled:opacity-50 px-2 py-1 hover:bg-primary/10 rounded-lg"
                     >
                     <Wand2 className={`w-3 h-3 ${enhancing ? 'animate-spin' : ''}`} />
-                    {enhancing ? 'Enhancing...' : 'Enhance Prompt'}
+                    {enhancing ? 'Enhancing...' : 'AI Enhance'}
                     </button>
                 </div>
-                <textarea
-                  value={prompt}
-                  disabled={isLocked}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe your mockup (e.g. 'Modern laptop on a wooden desk with coffee')"
-                  className="w-full h-32 bg-muted/30 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                
-                {/* Uploaded Photo Preview (New) */}
-                {lastUploadedImage && (
-                  <div className="rounded-xl bg-zinc-900/50 border border-white/5 p-3 mt-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                    <img src={lastUploadedImage} alt="Thumbnail" className="w-12 h-12 rounded-lg object-cover bg-black/20" />
-                    <span className="text-sm text-white/70 font-medium">Uploaded Photo</span>
-                  </div>
-                )}
+                <div className="relative flex-1">
+                    <textarea
+                    value={prompt}
+                    disabled={isLocked}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Describe the scene... (e.g. 'Cosmetic bottle on a wet rock surface, waterfall background, cinematic lighting')"
+                    className="w-full h-full min-h-[120px] bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all leading-relaxed"
+                    />
+                </div>
               </div>
 
               <button 
                 type="submit"
                 disabled={loading || uploading || isLocked}
-                className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-semibold hover:brightness-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-4 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group active:scale-[0.98] relative overflow-hidden"
               >
-                {uploading ? (
-                  'Uploading Image...'
-                ) : loading ? (
-                  'Generating...'
-                ) : (
-                  <>
-                    Generate Mockup
-                    <span className="flex items-center gap-1 text-xs bg-white/20 px-2 py-0.5 rounded-full ml-1">
-                      <Zap className="w-3 h-3 fill-current" />
-                      1 Credit
-                    </span>
-                  </>
-                )}
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <div className="relative flex items-center gap-2">
+                    {uploading ? (
+                    'Uploading Assets...'
+                    ) : loading ? (
+                    'Generating...'
+                    ) : (
+                    <>
+                        Generate Mockup
+                        <span className="flex items-center gap-1 text-[10px] bg-black/20 px-2 py-0.5 rounded-full ml-1 text-white/90 border border-white/10">
+                        <Zap className="w-3 h-3 fill-current text-yellow-400" />
+                        1
+                        </span>
+                    </>
+                    )}
+                </div>
               </button>
             </form>
             
             {error && (
-              <div className="mt-4 text-red-500 text-sm bg-red-500/10 p-3 rounded-lg break-words">
+              <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 p-3 rounded-xl break-words flex items-start gap-2 animate-in fade-in slide-in-from-bottom-2">
+                <Info className="w-4 h-4 shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Panel - Canvas/Result */}
-        <div className="w-full lg:w-2/3">
-          <div className={`bg-card border border-border rounded-xl flex items-center justify-center relative overflow-hidden shadow-sm transition-all ${
-             aspectRatio === '1:1' ? 'aspect-square h-auto' : 'h-[600px]'
+        {/* Right Panel - Result */}
+        <div className="flex-1 h-full min-h-[500px]">
+          <div className={`w-full h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all group ${
+             generatedImage ? 'border-primary/20' : 'border-dashed border-white/5'
           }`}>
             {generatedImage ? (
-              <img src={generatedImage} alt="Generated Result" className="w-full h-full object-contain" />
-            ) : (
-              <div className="text-center text-muted-foreground">
-                <div className="bg-muted/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                   <ImageIcon className="w-10 h-10 opacity-50" />
+              <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                {/* Ambient Blur Background */}
+                <div className="absolute inset-0 z-0">
+                    <img src={generatedImage} className="w-full h-full object-cover blur-[100px] opacity-40 scale-125" />
+                    <div className="absolute inset-0 bg-black/20" />
                 </div>
-                <p className="text-lg font-medium">Ready to generate</p>
-                <p className="text-sm opacity-70 max-w-xs mx-auto mt-2">
-                  {activeTab === 'website' ? 'Enter a website URL' : 'Upload an image'} to get started.
+
+                {/* Main Image */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }} 
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative z-10 w-full h-full p-8 lg:p-12 flex items-center justify-center"
+                >
+                    <img 
+                        src={generatedImage} 
+                        alt="Generated Result" 
+                        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl shadow-black/50 ring-1 ring-white/10" 
+                    />
+                </motion.div>
+                
+                {/* Floating Action Dock */}
+                <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-[#1A1A1A]/80 backdrop-blur-2xl p-2 rounded-2xl border border-white/10 shadow-2xl shadow-black/50"
+                >
+                    <button 
+                        onClick={handleDownload} 
+                        className="bg-white text-black px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg"
+                    >
+                        <Download className="w-4 h-4" />
+                        Download High Res
+                    </button>
+                    <div className="w-px h-8 bg-white/10 mx-1" />
+                    <button 
+                        onClick={() => window.open(generatedImage, '_blank')}
+                        className="p-3 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-all"
+                        title="Open Fullscreen"
+                    >
+                        <Maximize2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                        onClick={() => setGeneratedImage(null)} 
+                        className="p-3 rounded-xl hover:bg-red-500/20 text-white/70 hover:text-red-400 transition-all"
+                        title="Close"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </motion.div>
+              </div>
+            ) : (
+              <div className="text-center relative z-10">
+                <div className="relative w-40 h-40 mx-auto mb-8 group cursor-default">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-orange-500/40 rounded-full blur-[60px] animate-pulse opacity-50" />
+                    <div className="bg-gradient-to-b from-white/10 to-transparent w-full h-full rounded-full flex items-center justify-center border border-white/10 relative z-10 shadow-2xl backdrop-blur-sm">
+                        <ImageIcon className="w-16 h-16 text-white/30 group-hover:text-white/50 transition-colors" />
+                    </div>
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-3 tracking-tight">Ready to Create</h3>
+                <p className="text-white/40 max-w-md mx-auto text-base leading-relaxed">
+                  Upload your design or website URL on the left,<br />describe the scene, and let AI create magic.
                 </p>
               </div>
             )}
             
             {loading && (
-               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
-                 <div className="text-center text-white">
-                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-4"></div>
-                   <p>{uploading ? 'Uploading your image...' : 'Creating your masterpiece...'}</p>
+               <div className="absolute inset-0 bg-black/60 backdrop-blur-xl flex flex-col items-center justify-center z-30 transition-all">
+                 <div className="relative mb-8">
+                    <div className="w-32 h-32 border-4 border-white/5 border-t-primary rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Wand2 className="w-10 h-10 text-primary animate-pulse" />
+                    </div>
                  </div>
+                 <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">{uploading ? 'Uploading Assets...' : 'Generating Mockup...'}</h3>
+                 <p className="text-white/40 text-sm animate-pulse">Creating your masterpiece in high resolution</p>
                </div>
             )}
           </div>

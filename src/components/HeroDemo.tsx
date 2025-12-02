@@ -76,7 +76,7 @@ export function HeroDemo() {
         <div className="w-full lg:w-[45%] flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 z-10">
           <div className="mb-8 space-y-6 w-full max-w-lg">
             <div>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-600/10 text-red-500 text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-4 border border-primary/20 shadow-[0_0_15px_-5px_var(--primary)]">
                 Example
               </span>
               <motion.h3 
@@ -97,14 +97,14 @@ export function HeroDemo() {
             </div>
 
             <motion.div 
-              className="relative w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40 backdrop-blur-xl group transition-all duration-500 cursor-default overflow-hidden"
+              className="relative w-full bg-black/40 hover:bg-black/50 border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/40 backdrop-blur-xl group transition-all duration-500 cursor-default overflow-hidden ring-1 ring-white/5"
               whileHover={{ scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
             >
               {/* Glass highlight */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               
               <div className="relative z-10">
-                <div className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed mb-8 min-h-[80px]">
+                <div className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed mb-8 min-h-[80px] drop-shadow-sm">
                   &quot;{displayPrompt}
                   {isTyping && (
                     <span className="inline-block w-0.5 h-6 md:h-8 bg-primary ml-1 align-middle animate-pulse" />
@@ -126,7 +126,10 @@ export function HeroDemo() {
                      </div>
                    ) : (
                      <div className="flex items-center gap-2 text-sm text-green-400 font-medium">
-                       <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                       <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
                        Ready
                      </div>
                    )}
@@ -138,7 +141,7 @@ export function HeroDemo() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="relative inline-flex items-center gap-3 bg-black/20 rounded-xl p-2 pr-4 border border-white/5"
+                    className="relative inline-flex items-center gap-3 bg-white/5 rounded-xl p-2 pr-4 border border-white/10 hover:bg-white/10 transition-colors"
                   >
                     <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-white/10">
                       <img 
@@ -148,8 +151,8 @@ export function HeroDemo() {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">Upload</span>
-                      <span className="text-xs text-white/80 font-medium">image.jpg</span>
+                      <span className="text-[10px] text-white/40 uppercase tracking-wider font-bold">Upload</span>
+                      <span className="text-xs text-white/90 font-medium">image.jpg</span>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -161,7 +164,7 @@ export function HeroDemo() {
 
         {/* Right Column: Image Preview (55%) */}
         <div className="w-full lg:w-[55%] order-1 lg:order-2 flex justify-center lg:justify-end">
-          <div className="relative w-full aspect-[4/3] md:aspect-auto md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/50 bg-[#050505] border border-white/5 ring-1 ring-white/5">
+          <div className="relative w-full aspect-[4/3] md:aspect-auto md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/80 bg-[#050505] border border-white/10 ring-1 ring-white/5">
             <AnimatePresence mode="wait">
               {showImage ? (
                 <motion.div

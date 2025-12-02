@@ -16,7 +16,10 @@ export function Hero() {
         
         {/* Headline */}
         <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl leading-[1.1]">
-          Create <span className="bg-[#FF5A5F] text-white px-3 md:px-5 inline-block transform -skew-x-2">photorealistic</span> <br />
+          Create <span className="relative inline-block px-4 mx-2">
+            <span className="absolute inset-0 bg-primary -rotate-2 rounded-xl shadow-[0_0_30px_-5px_rgba(255,84,0,0.4)]" />
+            <span className="relative z-10 text-white">photorealistic</span>
+          </span> <br />
           mockups in seconds.
         </h1>
         
@@ -29,7 +32,7 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 w-full max-w-md mx-auto">
           <Link 
             href="/sign-up" 
-            className="group relative w-full sm:w-auto px-10 py-5 bg-[#FF5A5F] text-white rounded-full font-bold text-xl tracking-tight overflow-hidden transition-all hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_rgba(255,90,95,0.6)] active:scale-95 border border-white/10"
+            className="group relative w-full sm:w-auto px-10 py-5 bg-primary text-white rounded-full font-bold text-xl tracking-tight overflow-hidden transition-all hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_rgba(255,84,0,0.6)] active:scale-95 border border-white/10"
           >
             <span className="relative z-10 flex items-center justify-center gap-3">
               Start Creating 

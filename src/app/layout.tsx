@@ -30,7 +30,7 @@ export default function RootLayout({
       appearance={{
         baseTheme: dark,
         variables: { 
-          colorPrimary: '#FF5A5F',
+          colorPrimary: '#ff5400',
           colorBackground: '#0F0F0F',
           colorInputBackground: '#1E1E1E', 
           colorText: '#F7F7F7',
@@ -44,8 +44,8 @@ export default function RootLayout({
           dividerLine: "bg-white/10",
           dividerText: "text-white/40",
           formFieldLabel: "text-white/80",
-          formFieldInput: "bg-white/5 border-white/10 text-white focus:border-[#FF5A5F] transition-colors",
-          footerActionLink: "text-[#FF5A5F] hover:text-[#FF4A4F]",
+          formFieldInput: "bg-white/5 border-white/10 text-white focus:border-[#ff5400] transition-colors",
+          footerActionLink: "text-[#ff5400] hover:text-[#e64d00]",
         }
       }}
     >

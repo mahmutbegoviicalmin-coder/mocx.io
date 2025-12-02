@@ -27,15 +27,15 @@ export default function RefundPage() {
             </section>
 
             <section>
-                <h3 className="text-foreground font-semibold text-xl mb-4">2. Payments via Paddle</h3>
+                <h3 className="text-foreground font-semibold text-xl mb-4">2. Payments via Lemon Squeezy</h3>
                 <p>
-                  All purchases and subscription payments for Mocx are processed by our online reseller and Merchant of Record, Paddle.com.
+                  All purchases and subscription payments for Mocx are processed by our online reseller and Merchant of Record, Lemon Squeezy.
                 </p>
                 <p>
-                  Paddle handles billing, payment security, invoices and applicable taxes.
+                  Lemon Squeezy handles billing, payment security, invoices and applicable taxes.
                 </p>
                 <p>
-                  In many cases, refunds will be processed by Paddle on our behalf, subject to both this Refund Policy and Paddle’s buyer terms.
+                  In many cases, refunds will be processed by Lemon Squeezy on our behalf, subject to both this Refund Policy and Lemon Squeezy’s buyer terms.
                 </p>
             </section>
 
@@ -59,7 +59,7 @@ export default function RefundPage() {
                 <p>We may issue a partial or full refund only if:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                     <li>The Mocx Service was not available or not functioning as described for you due to a technical issue on our side, and</li>
-                    <li>You contacted us at <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a> within a reasonable time (typically 7 days from the charge or from when you noticed the issue), and</li>
+                    <li>You contacted us at <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a> within a reasonable time (typically 7 days from the charge or from when you noticed the issue), and</li>
                     <li>Our support team was unable to resolve the problem or provide a suitable workaround.</li>
                 </ul>
                 <p className="mt-4 mb-2 font-medium text-white">Examples include:</p>
@@ -76,7 +76,7 @@ export default function RefundPage() {
                 <h3 className="text-foreground font-semibold text-xl mb-4">5. How to Request a Refund</h3>
                 <p>To request a refund:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>Email <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a> from the email associated with your Mocx account;</li>
+                    <li>Email <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a> from the email associated with your Mocx account;</li>
                     <li>Include:
                         <ul className="list-disc pl-5 mt-1">
                             <li>your name,</li>
@@ -87,7 +87,7 @@ export default function RefundPage() {
                     </li>
                 </ul>
                 <p className="mt-2">
-                  If your payment was processed by Paddle (most cases), we may coordinate with Paddle to review your request. If a refund is approved, it will be processed back to the original payment method used at checkout.
+                  If your payment was processed by Lemon Squeezy (most cases), we may coordinate with Lemon Squeezy to review your request. If a refund is approved, it will be processed back to the original payment method used at checkout.
                 </p>
             </section>
 
@@ -113,7 +113,7 @@ export default function RefundPage() {
                     <li>treat the dispute as a violation of these Terms if the charge is found to be valid.</li>
                 </ul>
                 <p className="mt-2">
-                  If you experience an issue, please contact us first at <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a> so we can help resolve it.
+                  If you experience an issue, please contact us first at <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a> so we can help resolve it.
                 </p>
             </section>
 

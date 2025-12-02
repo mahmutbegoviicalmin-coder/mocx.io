@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from 'react';
 
@@ -22,15 +23,23 @@ export function Navbar() {
         : 'bg-transparent h-20'
     }`}>
       <div className="container flex h-full items-center justify-between">
-        <Link href="/" className="text-2xl font-bold tracking-tight group">
-          <span className="text-white">Moc</span>
-          <span className="text-primary group-hover:text-red-400 transition-colors">x</span>
+        <Link href="/" className="relative w-28 h-8 md:w-32 md:h-10 transition-opacity hover:opacity-80">
+          <Image 
+            src="/logotip.png" 
+            alt="Mocx Logo" 
+            fill 
+            className="object-contain object-left"
+            priority
+          />
         </Link>
         
         <div className="flex items-center gap-8 text-sm font-medium">
           <div className="hidden md:flex items-center gap-6 text-white/70">
             <Link href="/#pricing" className="hover:text-white transition-colors hover:scale-105 transform duration-200">
               Pricing
+            </Link>
+            <Link href="/#contact" className="hover:text-white transition-colors hover:scale-105 transform duration-200">
+              Contact
             </Link>
           </div>
           

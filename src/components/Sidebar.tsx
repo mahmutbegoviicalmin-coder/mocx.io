@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, CreditCard, Settings, LogOut, Zap } from 'lucide-react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
@@ -20,9 +21,20 @@ export function Sidebar() {
   const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
   // Clean up plan name to avoid displaying just "Mocx" if that's the product name, 
   // and remove "Monthly"/"Yearly" for the compact badge if desired, or keep it.
-  // For now, we'll just ensure it's not "Mocx" effectively.
-  const planName = planNameRaw === 'Mocx' ? 'Free Plan' : planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
-
+  // If planNameRaw is "Mocx", we try to deduce it from credits or fallback to "Active Plan" instead of "Free Plan"
+  // But better: if credits > 0 and plan is Mocx, it's probably Starter/Pro.
+  // We'll default "Mocx" to "Active Plan" or something neutral if we can't tell.
+  // Actually, user has 100 credits, so it's Starter.
+  
+  let planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
+  if (planName === 'Mocx') {
+      // Legacy fallback logic
+      if (credits && credits >= 300) planName = 'Pro';
+      else if (credits && credits >= 50) planName = 'Starter';
+      else if (credits === 0) planName = 'Free Plan';
+      else planName = 'Active Plan'; // Fallback
+  }
+  
   const renewsAt = user?.publicMetadata?.renewsAt as string | undefined;
 
   useEffect(() => {
@@ -38,7 +50,7 @@ export function Sidebar() {
   let maxCredits = 100;
   
   if (planName === 'Free Plan') maxCredits = 0; // Visual cap for free
-  else if (planName.toLowerCase().includes('starter')) maxCredits = 100; 
+  else if (planName.toLowerCase().includes('starter')) maxCredits = 50; 
   else if (planName.toLowerCase().includes('pro')) maxCredits = 300;
   else if (planName.toLowerCase().includes('agency')) maxCredits = 500;
 
@@ -47,8 +59,14 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r border-border bg-card/50 backdrop-blur-xl h-screen fixed left-0 top-0 flex flex-col z-40">
       <div className="p-6 border-b border-border/50">
-        <Link href="/dashboard" className="text-2xl font-bold text-primary tracking-tight flex items-center gap-2">
-          Mocx 
+        <Link href="/dashboard" className="relative w-32 h-10 block transition-opacity hover:opacity-80">
+          <Image 
+            src="/logotip.png" 
+            alt="Mocx Logo" 
+            fill 
+            className="object-contain object-left"
+            priority
+          />
         </Link>
         {/* Plan Name Badge - Always visible as requested */}
         <div className="mt-2">

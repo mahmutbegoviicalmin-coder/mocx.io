@@ -32,10 +32,7 @@ export default function PrivacyPage() {
                   Mocx is an online service that generates mockups and visuals from screenshots, websites and images.
                 </p>
                 <p>
-                  Mocx is operated from Sarajevo, Bosnia and Herzegovina.
-                </p>
-                <p>
-                  If you have any questions about this Policy, you can contact us at <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a>.
+                  If you have any questions about this Policy, you can contact us at <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a>.
                 </p>
             </section>
 
@@ -49,7 +46,7 @@ export default function PrivacyPage() {
                     <li>people who contact us via email or support.</li>
                 </ul>
                 <p className="mt-2">
-                  It does not apply to third-party websites or services linked to from Mocx (including Paddle), which have their own privacy policies.
+                  It does not apply to third-party websites or services linked to from Mocx (including Lemon Squeezy), which have their own privacy policies.
                 </p>
             </section>
 
@@ -71,15 +68,15 @@ export default function PrivacyPage() {
 
                 <h4 className="text-foreground font-medium text-lg mt-4 mb-2">2. Subscription and billing information</h4>
                 <p>
-                  Payments for Mocx are processed by our reseller and Merchant of Record, Paddle. When you start a subscription:
+                  Payments for Mocx are processed by our reseller and Merchant of Record, Lemon Squeezy. When you start a subscription:
                 </p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>Paddle collects your payment details (e.g. card number, billing address, VAT number) and processes the transaction on our behalf.</li>
-                    <li>We receive limited information from Paddle, such as payment status, plan type, country, and partial billing information needed for account management and tax reporting.</li>
+                    <li>Lemon Squeezy collects your payment details (e.g. card number, billing address, VAT number) and processes the transaction on our behalf.</li>
+                    <li>We receive limited information from Lemon Squeezy, such as payment status, plan type, country, and partial billing information needed for account management and tax reporting.</li>
                     <li>We do not store or process your full payment card information on our servers.</li>
                 </ul>
                 <p className="mt-2">
-                  For details on how Paddle handles your data, please refer to Paddle’s own privacy policy.
+                  For details on how Lemon Squeezy handles your data, please refer to Lemon Squeezy’s own privacy policy.
                 </p>
 
                 <h4 className="text-foreground font-medium text-lg mt-4 mb-2">3. Usage data</h4>
@@ -146,7 +143,7 @@ export default function PrivacyPage() {
                     <div>
                         <strong className="text-white">To process payments and subscriptions</strong>
                         <ul className="list-disc pl-5 space-y-1 mt-1">
-                            <li>Manage billing through Paddle</li>
+                            <li>Manage billing through Lemon Squeezy</li>
                             <li>Notify you of subscription status, renewals or changes</li>
                         </ul>
                     </div>
@@ -206,7 +203,7 @@ export default function PrivacyPage() {
                     <div>
                         <strong className="text-white">Service providers</strong>
                         <ul className="list-disc pl-5 space-y-1 mt-1">
-                            <li>Payment processing (Paddle)</li>
+                            <li>Payment processing (Lemon Squeezy)</li>
                             <li>Authentication, hosting, logging, analytics, email delivery and customer support tools</li>
                         </ul>
                         <p className="mt-1 text-sm">These providers only process your data on our behalf and under appropriate data protection agreements.</p>
@@ -232,7 +229,7 @@ export default function PrivacyPage() {
             <section>
                 <h3 className="text-foreground font-semibold text-xl mb-4">8. International Transfers</h3>
                 <p>
-                  Because we and our service providers (including Paddle) may operate globally, your information may be transferred to and processed in countries outside your own, including countries that may not provide the same level of data protection.
+                  Because we and our service providers (including Lemon Squeezy) may operate globally, your information may be transferred to and processed in countries outside your own, including countries that may not provide the same level of data protection.
                 </p>
                 <p className="mt-2">
                   Where required by law, we implement appropriate safeguards (such as standard contractual clauses) to ensure your data remains protected.
@@ -254,7 +251,7 @@ export default function PrivacyPage() {
                     <li>Content you upload or generate may be deleted when you delete it or close your account, subject to backups and legal obligations.</li>
                 </ul>
                 <p className="mt-4">
-                  You can request deletion of your account and associated data by contacting <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a>. Some information may remain in backups for a limited time.
+                  You can request deletion of your account and associated data by contacting <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a>. Some information may remain in backups for a limited time.
                 </p>
             </section>
 
@@ -270,7 +267,7 @@ export default function PrivacyPage() {
                     <li>receive a copy of your data in a portable format.</li>
                 </ul>
                 <p className="mt-4">
-                  To exercise these rights, contact us at <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a>.
+                  To exercise these rights, contact us at <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a>.
                 </p>
                 <p className="mt-2">
                   We may ask you to verify your identity before responding.
@@ -321,10 +318,7 @@ export default function PrivacyPage() {
                   If you have any questions or concerns about this Privacy Policy or our data practices, you can contact us at:
                 </p>
                 <p className="mt-2">
-                  Email: <a href="mailto:support@mocx.io" className="text-primary hover:underline">support@mocx.io</a>
-                </p>
-                <p>
-                  Location: Sarajevo, Bosnia and Herzegovina
+                  Email: <a href="mailto:mocxsup@gmail.com" className="text-primary hover:underline">mocxsup@gmail.com</a>
                 </p>
             </section>
         </div>

@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { clerkClient } from '@clerk/nextjs/server';
 import { CREDIT_PACKS } from '@/config/credits';
+import { PLANS } from '@/config/plans';
+
+// Helper to get Plan Name from Variant ID
+const getPlanNameFromVariantId = (variantId: string | number) => {
+  const vId = String(variantId);
+  if (vId === String(PLANS.starter.monthly) || vId === String(PLANS.starter.yearly)) return 'Starter';
+  if (vId === String(PLANS.pro.monthly) || vId === String(PLANS.pro.yearly)) return 'Pro';
+  if (vId === String(PLANS.agency.monthly) || vId === String(PLANS.agency.yearly)) return 'Agency';
+  return null;
+};
 
 export async function POST(request: Request) {
   try {
@@ -60,14 +70,19 @@ export async function POST(request: Request) {
 
       // If not a credit pack, assume it's a subscription (grant access)
       const subscriptionId = data.id;
-      // Prefer variant_name (e.g. "Starter Monthly") over product_name (e.g. "Mocx")
-      const planName = attributes.variant_name || attributes.product_name || 'Unknown Plan';
+      
+      // Determine Plan Name strictly from Variant ID first, then fallback to variant_name
+      const subscriptionVariantId = attributes.variant_id;
+      const detectedPlanName = getPlanNameFromVariantId(subscriptionVariantId);
+      
+      const planName = detectedPlanName || attributes.variant_name || attributes.product_name || 'Unknown Plan';
+
       // Get customer portal URL if available (usually in data.attributes.urls.customer_portal)
       const customerPortalUrl = attributes.urls?.customer_portal;
       
       // Determine credits based on plan
       let credits = 100;
-      if (planName.toLowerCase().includes('starter')) credits = 100;
+      if (planName.toLowerCase().includes('starter')) credits = 50;
       else if (planName.toLowerCase().includes('pro')) credits = 300;
       else if (planName.toLowerCase().includes('agency')) credits = 500;
       
