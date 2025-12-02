@@ -4,6 +4,48 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { CREDIT_PACKS } from '@/config/credits';
 import { PLANS } from '@/config/plans';
 
+// Function to send Server-Side Event to Facebook Pixel (Conversions API)
+const sendFBPixelEvent = async (eventName: string, userData: any, eventData: any) => {
+  const PIXEL_ID = "1390563582447505";
+  const ACCESS_TOKEN = "EAATVZBc2PROMBQM4VQ0mxlIG3KyMFgU9tK1HZAumZAGxPytQcK3nzqpebVntjOiokpYZAVwGKfapXnGTHvZASjYumxCYXc21bdZC3flbH4tagvAQ2QOs04yNkW6YEbMqG29ZCDFNIJ9R1awYFslMp5OfTmWWaK65gZCKFBe9OZCemyqm69NZBXAUr15zXTteZA6nQZDZD";
+
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+
+  const payload = {
+    data: [
+      {
+        event_name: eventName,
+        event_time: currentTimestamp,
+        action_source: "website",
+        user_data: {
+          em: userData.email ? [crypto.createHash('sha256').update(userData.email.toLowerCase()).digest('hex')] : undefined,
+          client_user_agent: eventData.userAgent || "unknown",
+          client_ip_address: eventData.ip || "0.0.0.0"
+        },
+        custom_data: {
+          currency: eventData.currency || "USD",
+          value: eventData.value || 0.0
+        }
+      }
+    ]
+  };
+
+  try {
+    const response = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+    console.log(`[FB CAPI] Sent ${eventName} event. Result:`, result);
+  } catch (error) {
+    console.error('[FB CAPI] Failed to send event:', error);
+  }
+};
+
 // Helper to get Plan Name from Variant ID
 const getPlanNameFromVariantId = (variantId: string | number) => {
   const vId = String(variantId);
@@ -42,6 +84,19 @@ export async function POST(request: Request) {
 
     if (eventName === 'order_created' || eventName === 'subscription_created') {
       const attributes = data.attributes;
+      const userEmail = attributes.user_email;
+      const totalFormatted = attributes.total_formatted; // e.g. "$19.00"
+      const totalCents = attributes.total; // e.g. 1900
+      const currency = attributes.currency || "USD";
+      
+      // --- SEND EVENT TO FACEBOOK CAPI ---
+      await sendFBPixelEvent('Purchase', { email: userEmail }, {
+        value: totalCents / 100, // Convert cents to dollars
+        currency: currency,
+        userAgent: request.headers.get('user-agent'),
+        ip: request.headers.get('x-forwarded-for') || '0.0.0.0'
+      });
+      // -----------------------------------
       
       // Check if it's a credit pack purchase (order_created only, usually)
       // We check the first order item's variant_id

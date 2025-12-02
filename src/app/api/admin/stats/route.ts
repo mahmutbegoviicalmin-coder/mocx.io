@@ -40,8 +40,10 @@ export async function GET() {
         }
     }
 
-    // 3. Fetch NanoBanana API Balance
+    // 3. Fetch NanoBanana API Balance & Calculate Costs
     let apiBalance = null;
+    let totalCost = 0;
+
     if (process.env.NANOBANANA_API_KEY) {
         try {
             // Attempt to fetch user info/balance
@@ -65,10 +67,14 @@ export async function GET() {
             console.error('Failed to fetch NanoBanana balance', e);
         }
     }
-
-    // 4. Calculate Plan Counts
-    // Fetching up to 500 users to calculate stats. For larger scale, this should be indexed or cached.
+    
+    // Calculate estimated cost based on total images generated
+    // Cost per image is approx $0.09 (based on $5/1000 credits package where 1 image = 18 credits)
+    const COST_PER_IMAGE = 0.09;
+    
     const userList = await client.users.getUserList({ limit: 500 });
+    
+    let totalImagesGenerated = 0;
     
     const planCounts = {
         starter: 0,
@@ -79,7 +85,9 @@ export async function GET() {
 
     userList.data.forEach(u => {
         const plan = (String(u.publicMetadata.planName) || 'Free Plan').toLowerCase();
-        
+        const generated = Number(u.publicMetadata.imagesGenerated) || 0;
+        totalImagesGenerated += generated;
+
         if (plan.includes('starter') || plan.includes('mocx')) {
             planCounts.starter++;
         } else if (plan.includes('pro')) {
@@ -91,11 +99,15 @@ export async function GET() {
         }
     });
 
+    totalCost = totalImagesGenerated * COST_PER_IMAGE;
+
     return NextResponse.json({
         totalUsers,
         totalRevenue,
         planCounts,
-        apiBalance
+        apiBalance,
+        totalCost,
+        totalImagesGenerated
     });
   } catch (error) {
     console.error('[ADMIN_STATS_GET]', error);

@@ -33,6 +33,8 @@ interface Stats {
     totalRevenue: number;
     totalUsers: number;
     apiBalance?: number | null;
+    totalCost?: number;
+    totalImagesGenerated?: number;
     planCounts?: {
         starter: number;
         pro: number;
@@ -238,6 +240,11 @@ export default function AdminPage() {
                     <div>
                         <div className="text-sm text-white/50 font-medium uppercase tracking-wider">Total Earnings</div>
                         <div className="text-2xl font-bold text-white">${stats.totalRevenue.toFixed(2)}</div>
+                        {stats.totalCost !== undefined && (
+                             <div className="text-xs text-white/30 mt-1">
+                                Cost: ${stats.totalCost.toFixed(2)} ({(stats.totalCost / (stats.totalRevenue || 1) * 100).toFixed(1)}%)
+                             </div>
+                        )}
                     </div>
                 </div>
 
