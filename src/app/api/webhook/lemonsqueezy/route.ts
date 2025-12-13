@@ -138,8 +138,8 @@ export async function POST(request: Request) {
       // Determine credits based on plan
       let credits = 100;
       if (planName.toLowerCase().includes('starter')) credits = 50;
-      else if (planName.toLowerCase().includes('pro')) credits = 300;
-      else if (planName.toLowerCase().includes('agency')) credits = 500;
+      else if (planName.toLowerCase().includes('pro')) credits = 200;
+      else if (planName.toLowerCase().includes('agency')) credits = 400;
       
       if (userId) {
           await client.users.updateUserMetadata(userId, {

@@ -3,9 +3,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon, ShieldCheck, DollarSign, Bell } from 'lucide-react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+
+const ADMIN_EMAIL = 'mahmutbegoviic.almin@gmail.com';
+const AFFILIATE_EMAILS = [
+  'mahmutbegoviic.almin@gmail.com',
+  'stefanpusicic27@gmail.com',
+  'stefanpusicic27@protonmail.com'
+];
 
 const MENU_ITEMS = [
   { icon: LayoutDashboard, label: 'Create', href: '/dashboard' },
@@ -18,11 +25,17 @@ export function Sidebar() {
   const { user } = useUser();
   const [credits, setCredits] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false); // Mobile menu state
+  const [unreadCount, setUnreadCount] = useState(0);
   
   // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
+
+  // Check permissions
+  const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase().trim();
+  const isAdmin = userEmail === ADMIN_EMAIL.toLowerCase();
+  const isAffiliate = userEmail && AFFILIATE_EMAILS.some(e => e.toLowerCase() === userEmail);
 
   const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
   
@@ -43,6 +56,26 @@ export function Sidebar() {
         setCredits(0);
     }
   }, [user?.publicMetadata?.credits, user]);
+
+  const fetchNotifications = async () => {
+    if (!user) return;
+    try {
+      const res = await fetch('/api/notifications');
+      if (!res.ok) return;
+      const data = await res.json();
+      setUnreadCount(Number(data.unreadCount || 0));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   let maxCredits = 100;
   if (planName === 'Free Plan') maxCredits = 0; 
@@ -102,6 +135,56 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Notifications (Bell) */}
+        <Link
+          href="/dashboard/notifications"
+          className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all duration-200 group hover:scale-[1.02] active:scale-95 ${
+            pathname === '/dashboard/notifications'
+              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+              : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+          }`}
+        >
+          <span className="flex items-center gap-3 relative">
+            <div className="relative">
+              <Bell className={`w-5 h-5 ${pathname === '/dashboard/notifications' ? '' : 'opacity-70 group-hover:opacity-100'}`} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#0F0F0F]">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span className="font-medium">Notifications</span>
+          </span>
+        </Link>
+
+        {isAffiliate && (
+            <Link
+              href="/dashboard/affiliate"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group hover:scale-[1.02] active:scale-95 ${
+                pathname === '/dashboard/affiliate'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/20 shadow-lg shadow-green-500/10' 
+                  : 'text-green-400/70 hover:bg-green-500/10 hover:text-green-400'
+              }`}
+            >
+              <DollarSign className={`w-5 h-5`} />
+              <span className="font-bold">Affiliate</span>
+            </Link>
+        )}
+
+        {isAdmin && (
+            <Link
+              href="/dashboard/admin-secure"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group hover:scale-[1.02] active:scale-95 ${
+                pathname === '/dashboard/admin-secure'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/20 shadow-lg shadow-red-500/10' 
+                  : 'text-red-400/70 hover:bg-red-500/10 hover:text-red-400'
+              }`}
+            >
+              <ShieldCheck className={`w-5 h-5`} />
+              <span className="font-bold">Admin Panel</span>
+            </Link>
+        )}
       </div>
 
       <div className="p-4 border-t border-border/50 space-y-4">

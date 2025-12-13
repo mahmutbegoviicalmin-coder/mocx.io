@@ -1,57 +1,92 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { Particles } from './Particles';
+import { ArrowRight, Sparkles, Play, CheckCircle2 } from 'lucide-react';
 import { HeroDemo } from './HeroDemo';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-40 pb-20">
-      {/* Background with Particles */}
-      <div className="absolute inset-0 bg-[#0F0F0F] z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-background z-10" />
-        <Particles className="z-0 opacity-40" />
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden bg-[#0F0F0F]">
+      
+      {/* Background Effects */}
+      <div className="absolute inset-0 z-0">
+        {/* Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        {/* Radial Fade */}
+        <div className="absolute inset-0 bg-[#0F0F0F] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,transparent_70%,black_100%)]"></div>
+        {/* Top Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full opacity-20 pointer-events-none" />
       </div>
 
-      <div className="container relative z-20 max-w-6xl mx-auto text-center px-4 flex flex-col items-center">
+      <div className="container relative z-10 px-4 mx-auto flex flex-col items-center text-center">
         
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/70 mb-8 hover:bg-white/10 transition-colors cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </span>
+          v2.0 is now live
+        </div>
+
         {/* Headline */}
-        <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 drop-shadow-2xl leading-[1.1]">
-          Create <span className="relative inline-block px-4 mx-2">
-            <span className="absolute inset-0 bg-primary -rotate-2 rounded-xl shadow-[0_0_30px_-5px_rgba(255,84,0,0.4)]" />
-            <span className="relative z-10 text-white">photorealistic</span>
-          </span> <br />
-          mockups in seconds.
+        <h1 className="max-w-5xl mx-auto text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+          Make visuals that go <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">viral</span>. <br className="hidden md:block" />
+          Instantly.
         </h1>
-        
+
         {/* Subheadline */}
-        <p className="text-lg md:text-xl text-gray-400 font-light italic w-full max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 opacity-80 whitespace-nowrap md:whitespace-normal">
-          Turn your screenshots into stunning product showcases with one click.
+        <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 text-balance">
+          AI-powered thumbnails, mockups, and content visuals built for Instagram, TikTok, YouTube & ads.
         </p>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 w-full max-w-md mx-auto">
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-16 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
           <Link 
             href="/sign-up" 
-            className="group relative w-full sm:w-auto px-10 py-5 bg-primary text-white rounded-full font-bold text-xl tracking-tight overflow-hidden transition-all hover:scale-[1.02] hover:shadow-[0_0_50px_-10px_rgba(255,84,0,0.6)] active:scale-95 border border-white/10"
+            className="group relative h-12 px-8 flex items-center justify-center gap-2 bg-white text-black rounded-full font-semibold transition-all hover:bg-gray-200 active:scale-95"
           >
-            <span className="relative z-10 flex items-center justify-center gap-3">
-              Start Creating 
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
-            </span>
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            Start Creating
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          
+          <Link 
+            href="#demo"
+            className="h-12 px-8 flex items-center justify-center gap-2 bg-white/5 text-white border border-white/10 rounded-full font-medium hover:bg-white/10 transition-all active:scale-95"
+          >
+            <Play className="w-4 h-4 fill-current" />
+            Watch Demo
           </Link>
         </div>
 
-        {/* Floating UI Element (Interactive Demo) */}
-        <div className="mt-24 w-full relative max-w-[1400px] bg-gradient-to-b from-white/5 to-transparent rounded-3xl border border-white/10 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 shadow-2xl shadow-primary/10 overflow-hidden">
-          <div className="absolute inset-0 bg-primary/5 blur-3xl -z-10 rounded-full opacity-50" />
-          
-          {/* Interactive Demo Component */}
-          <HeroDemo />
-          
-          {/* Gradient overlay at bottom to blend with next section - adjusted for full height */}
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/50 to-transparent pointer-events-none z-30" />
+        {/* Social Proof Text */}
+        <div className="flex items-center gap-6 text-sm text-white/30 mb-20 animate-in fade-in zoom-in duration-700 delay-500">
+            <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-white/20" />
+                <span>Professional Quality</span>
+            </div>
+             <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-white/20" />
+                <span>Powered by AI</span>
+            </div>
+        </div>
+
+        {/* App Window Preview */}
+        <div className="relative w-full max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+           {/* Glow behind the app */}
+           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
+           
+           <div className="relative rounded-2xl border border-white/10 bg-[#0A0A0A] shadow-2xl overflow-hidden">
+              {/* Window Controls */}
+              <div className="h-10 border-b border-white/5 bg-white/[0.02] flex items-center px-4 gap-2">
+                 <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+                 <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+                 <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+              </div>
+              
+              {/* Content */}
+              <div className="p-1 md:p-2 bg-[#050505]">
+                 <HeroDemo />
+              </div>
+           </div>
         </div>
 
       </div>

@@ -17,9 +17,16 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+    <>
+    {/* Holiday Banner */}
+    <div className="fixed top-0 left-0 w-full h-8 bg-gradient-to-r from-[#8B0000] via-[#FF0000] to-[#8B0000] text-white z-[60] flex items-center justify-center text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-lg shadow-red-900/50 px-4">
+        <span className="md:hidden">HOLIDAY SALE: 34% OFF ALL PLANS</span>
+        <span className="hidden md:inline">HOLIDAY SALE: SAVE 34% ON ALL PLANS <span className="mx-2 opacity-50">|</span> LIMITED TIME OFFER</span>
+    </div>
+
+    <nav className={`fixed top-8 w-full z-50 transition-all duration-300 ${
       scrolled 
-        ? 'bg-black/50 backdrop-blur-xl border-b border-white/10 h-16' 
+        ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 h-16' 
         : 'bg-transparent h-20'
     }`}>
       <div className="container flex h-full items-center justify-between">
@@ -69,5 +76,6 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }

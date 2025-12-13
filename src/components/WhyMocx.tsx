@@ -67,7 +67,7 @@ export function WhyMocx() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold mb-8 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-red-600"
+            className="text-4xl md:text-5xl font-bold mb-8 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-500"
           >
             Why Mocx?
           </motion.h2>
@@ -79,7 +79,7 @@ export function WhyMocx() {
             className="text-2xl md:text-3xl font-medium text-white/90 leading-tight"
           >
             Create mockups that look real. <br />
-            Convert better and take seconds, <span className="bg-gradient-to-r from-primary to-red-600 text-transparent bg-clip-text">not hours</span>.
+            Convert better and take seconds, <span className="bg-gradient-to-r from-primary to-orange-500 text-transparent bg-clip-text">not hours</span>.
           </motion.p>
         </div>
 

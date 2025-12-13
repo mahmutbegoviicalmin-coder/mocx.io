@@ -25,42 +25,60 @@ export default function BillingPage() {
 
   const { renewsAt, endsAt, status: subscriptionStatus, customerPortalUrl } = subscriptionData; 
 
-  // Modal State
-  const [showBuyModal, setShowBuyModal] = useState(false);
-  const [selectedPackId, setSelectedPackId] = useState('pack-5');
+  const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const handleManageSubscription = async () => {
-      if (customerPortalUrl) {
-          window.open(customerPortalUrl, '_blank');
-      } else {
-          alert("Redirecting to subscription management...");
-          window.open('https://mocx.lemonsqueezy.com/billing', '_blank');
-      }
+  const handleCancelSubscription = async () => {
+    setCancelling(true);
+    try {
+        const res = await fetch('/api/subscription/cancel', {
+            method: 'POST',
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            alert('Subscription cancelled. You still have access until the end of the period.');
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to cancel subscription');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('An error occurred');
+    } finally {
+        setCancelling(false);
+        setShowCancelModal(false);
+    }
   };
+
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [selectedPackId, setSelectedPackId] = useState(CREDIT_PACKS[0]?.id || 'pack-1');
+  
+  const selectedPack = CREDIT_PACKS.find(p => p.id === selectedPackId) || CREDIT_PACKS[0];
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        if (user?.publicMetadata?.credits !== undefined) {
-             setCredits(user.publicMetadata.credits as number);
-        } else {
-             setCredits(0);
+        try {
+            const [creditsRes, subRes] = await Promise.all([
+                fetch('/api/credits'),
+                fetch('/api/subscription')
+            ]);
+            
+            if (creditsRes.ok) {
+                const data = await creditsRes.json();
+                setCredits(data.data);
+            }
+            
+            if (subRes.ok) {
+                const data = await subRes.json();
+                setSubscriptionData(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch data', error);
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error('Failed to fetch credits', error);
-      }
-
-      try {
-        const res = await fetch('/api/subscription');
-        if (res.ok) {
-            const data = await res.json();
-            setSubscriptionData(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch subscription', error);
-      } finally {
-        setLoading(false);
-      }
     };
 
     if (user) {
@@ -68,62 +86,61 @@ export default function BillingPage() {
     }
   }, [user]);
 
-  const handleSubscribe = (variantId: string) => {
-      if (!variantId) return;
-      
-      let checkoutUrl = variantId;
-      const hasParams = checkoutUrl.includes('?');
-      const appendChar = hasParams ? '&' : '?';
-      
-      if (!checkoutUrl.includes('embed=1')) {
-         checkoutUrl += `${appendChar}embed=1&media=0&logo=0&desc=0`;
-      }
+  const handleManageSubscription = () => {
+    if (customerPortalUrl) {
+        window.location.href = customerPortalUrl;
+    } else {
+        alert('Customer portal not available');
+    }
+  };
 
-      if (user) {
-         checkoutUrl += `&checkout[custom][userId]=${user.id}`;
-      }
-
-      // @ts-ignore
-      if (typeof window !== 'undefined' && window.LemonSqueezy) {
-         // @ts-ignore
-         window.LemonSqueezy.Url.Open(checkoutUrl);
-      } else {
-        const a = document.createElement('a');
-        a.href = checkoutUrl;
-        a.target = '_blank';
-        a.click();
+  const handleSubscribe = async (variantId: string) => {
+      try {
+          const res = await fetch('/api/subscription', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ variantId })
+          });
+          
+          const data = await res.json();
+          if (data.url) {
+              window.location.href = data.url;
+          } else {
+              alert('Failed to start subscription');
+          }
+      } catch (error) {
+          console.error(error);
+          alert('Error starting subscription');
       }
   };
 
-  const handleBuyCredits = () => {
-      const pack = CREDIT_PACKS.find(p => p.id === selectedPackId);
-      if (!pack) return;
-
-      const checkoutUrl = pack.checkoutUrl;
-      const urlWithUser = user 
-        ? `${checkoutUrl}&checkout[custom][userId]=${user.id}`
-        : checkoutUrl;
-
-      // @ts-ignore
-      if (typeof window !== 'undefined' && window.LemonSqueezy) {
-         // @ts-ignore
-         window.LemonSqueezy.Url.Open(urlWithUser);
-      } else {
-        window.open(urlWithUser, '_blank');
+  const handleBuyCredits = async () => {
+      try {
+          const res = await fetch('/api/credits', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ packId: selectedPackId })
+          });
+          
+          const data = await res.json();
+          if (data.url) {
+              window.location.href = data.url;
+          } else {
+              alert('Failed to initiate purchase');
+          }
+      } catch (error) {
+          console.error(error);
+          alert('Error purchasing credits');
       }
   };
 
-  const selectedPack = CREDIT_PACKS.find(p => p.id === selectedPackId) || CREDIT_PACKS[0];
-
-  const isCurrentPlan = (name: string) => {
-      return planName.toLowerCase().includes(name.toLowerCase());
+  const isCurrentPlan = (plan: string) => {
+      return planName === plan;
   };
 
   return (
     <div className="min-h-screen bg-background p-8 overflow-x-hidden relative">
-      {/* Background Elements */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none -z-10" />
+      {/* ... existing background elements ... */}
       
       <div className="max-w-6xl mx-auto space-y-16 relative z-10">
         
@@ -135,44 +152,51 @@ export default function BillingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-all duration-500 shadow-2xl shadow-black/20"
             >
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                    <Zap className="w-48 h-48 text-primary rotate-12 transform group-hover:scale-110 transition-transform duration-700" />
-                </div>
-
+                {/* ... existing status card content ... */}
                 <div className="relative z-10">
                     <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Current Plan</h2>
                     <div className="flex items-center gap-4 mb-8">
                         <h1 className="text-5xl font-bold text-white tracking-tight">{planName}</h1>
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-lg ${subscriptionStatus === 'active' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-green-900/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'}`}>
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-lg ${subscriptionStatus === 'active' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-green-900/20' : subscriptionStatus === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'}`}>
                             {subscriptionStatus || 'Active'}
                         </span>
                     </div>
                     
                     <div className="flex items-center gap-2 text-sm text-muted-foreground bg-black/20 w-fit px-4 py-2 rounded-full border border-white/5">
                         <Calendar className="w-4 h-4" />
-                        {renewsAt ? (
+                        {renewsAt && subscriptionStatus !== 'cancelled' ? (
                             <span>Renews on <span className="text-white font-medium">{new Date(renewsAt).toLocaleDateString()}</span></span>
                         ) : endsAt ? (
-                            <span>Ends on <span className="text-white font-medium">{new Date(endsAt).toLocaleDateString()}</span></span>
+                            <span>Access until <span className="text-white font-medium">{new Date(endsAt).toLocaleDateString()}</span></span>
                         ) : (
                             <span>Lifetime Access</span>
                         )}
                     </div>
                 </div>
 
-                {!isFreePlan && (
-                    <div className="mt-8 relative z-10">
+                {!isFreePlan && subscriptionStatus === 'active' && (
+                    <div className="mt-8 relative z-10 flex gap-4">
+                        {customerPortalUrl && (
+                            <button 
+                                onClick={handleManageSubscription}
+                                className="flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors hover:underline underline-offset-4 decoration-primary/50"
+                            >
+                                <CreditCard className="w-4 h-4" />
+                                Manage Billing
+                            </button>
+                        )}
                         <button 
-                            onClick={handleManageSubscription}
-                            className="flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors hover:underline underline-offset-4 decoration-primary/50"
+                            onClick={() => setShowCancelModal(true)}
+                            className="flex items-center gap-2 text-sm font-medium text-red-400/70 hover:text-red-400 transition-colors hover:underline underline-offset-4 decoration-red-500/50"
                         >
-                            <CreditCard className="w-4 h-4" />
-                            Manage Subscription
+                            <X className="w-4 h-4" />
+                            Cancel Subscription
                         </button>
                     </div>
                 )}
             </motion.div>
 
+            {/* ... Credits Card ... */}
             {/* Credits Card */}
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -208,6 +232,39 @@ export default function BillingPage() {
                 </div>
             </motion.div>
         </div>
+
+        {/* Cancel Modal */}
+        <AnimatePresence>
+            {showCancelModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                    <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        className="bg-[#0f0f11] border border-white/10 rounded-2xl w-full max-w-md p-6 relative"
+                    >
+                        <h3 className="text-xl font-bold text-white mb-2">Cancel Subscription?</h3>
+                        <p className="text-white/60 mb-6">Are you sure? You will lose access to premium features at the end of your billing period.</p>
+                        <div className="flex justify-end gap-3">
+                            <button 
+                                onClick={() => setShowCancelModal(false)}
+                                className="px-4 py-2 rounded-xl font-medium text-white/60 hover:text-white hover:bg-white/5"
+                            >
+                                Keep Plan
+                            </button>
+                            <button 
+                                onClick={handleCancelSubscription}
+                                disabled={cancelling}
+                                className="px-4 py-2 rounded-xl font-bold bg-red-500/10 text-red-500 hover:bg-red-500/20 flex items-center gap-2"
+                            >
+                                {cancelling && <Loader2 className="w-4 h-4 animate-spin" />}
+                                Confirm Cancel
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
 
         {/* Plans Section */}
         <div className="space-y-10">
@@ -259,7 +316,7 @@ export default function BillingPage() {
                     title="Pro"
                     price={annual ? 420 : 39}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "3600 Credits" : "300 Credits", "Fast Generation", "Priority Support", "High Resolution"]}
+                    features={[annual ? "2400 Credits" : "200 Credits", "Fast Generation", "Priority Support", "High Resolution"]}
                     variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Pro')}
@@ -270,7 +327,7 @@ export default function BillingPage() {
                     title="Agency"
                     price={annual ? 850 : 79}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "6000 Credits" : "500 Credits", "Max Speed", "API Access", "24/7 Support"]}
+                    features={[annual ? "4800 Credits" : "400 Credits", "Max Speed", "API Access", "24/7 Support"]}
                     variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Agency')}

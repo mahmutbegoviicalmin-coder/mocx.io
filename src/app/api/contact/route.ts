@@ -1,48 +1,32 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { db } from '@/db/sql';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, message } = await request.json();
+    const { userId } = await auth();
+    const { message, type = 'bug' } = await request.json();
 
-    // Validate input
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // Mock send if API key is missing (for development without keys)
-    if (!process.env.RESEND_API_KEY) {
-        console.log('RESEND_API_KEY missing. Contact form submission:', { name, email, message });
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return NextResponse.json({ success: true, mode: 'mock' });
+    let userEmail = 'anonymous';
+    if (userId) {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        userEmail = user.emailAddresses[0]?.emailAddress || 'unknown';
     }
 
-    const data = await resend.emails.send({
-      from: 'Mocx Contact <onboarding@resend.dev>', // Use your verified domain in production
-      to: ['mocxsup@gmail.com'],
-      subject: `New Contact: ${name}`,
-      replyTo: email,
-      text: `
-        Name: ${name}
-        Email: ${email}
-        
-        Message:
-        ${message}
-      `,
-    });
+    // Insert into DB
+    await db.sql`
+      INSERT INTO feedback (user_id, user_email, message, type)
+      VALUES (${userId || 'anon'}, ${userEmail}, ${message}, ${type})
+    `;
 
-    if (data.error) {
-        console.error('Resend error:', data.error);
-        return NextResponse.json({ error: 'Failed to send email via provider' }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Contact form error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Feedback error:', error);
+    return NextResponse.json({ error: 'Failed to submit feedback' }, { status: 500 });
   }
 }
-

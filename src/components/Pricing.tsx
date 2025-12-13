@@ -105,6 +105,7 @@ export function Pricing() {
           <PricingCard 
             title="Starter"
             price={annual ? 205 : 19}
+            originalPrice={annual ? 307 : 29}
             period={annual ? "/year" : "/mo"}
             features={[annual ? "600 Images/year" : "50 Images/mo", "Standard Speed", "Commercial License", "Basic Support"]}
             delay={0.1}
@@ -114,8 +115,9 @@ export function Pricing() {
           <PricingCard 
             title="Pro"
             price={annual ? 420 : 39}
+            originalPrice={annual ? 630 : 59}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "3600 Images/year" : "300 Images/mo", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
+            features={[annual ? "2400 Images/year" : "200 Images/mo", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
             highlighted
             delay={0.2}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
@@ -124,8 +126,9 @@ export function Pricing() {
           <PricingCard 
             title="Agency"
             price={annual ? 850 : 79}
+            originalPrice={annual ? 1275 : 119}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "6000 Images/year" : "500 Images/mo", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
+            features={[annual ? "4800 Images/year" : "400 Images/mo", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
             delay={0.3}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
           />
@@ -147,7 +150,7 @@ export function Pricing() {
   );
 }
 
-function PricingCard({ title, price, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
+function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -200,32 +203,54 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
       transition={{ duration: 0.5, delay }}
       whileHover={{ 
         y: highlighted ? -12 : -8,
-        scale: highlighted ? 1.08 : 1.02,
         transition: { duration: 0.3, ease: "easeOut" }
       }}
-      className={`relative rounded-3xl p-8 border backdrop-blur-xl transition-all duration-300 group flex flex-col ${
+      className={`relative rounded-[2rem] p-8 lg:p-10 transition-all duration-300 group flex flex-col h-full ${
         highlighted 
-          ? 'bg-white/10 border-primary/50 shadow-[0_0_50px_-10px_rgba(255,90,95,0.4)] z-20 scale-105 md:scale-110 min-h-[540px]' 
-          : 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_0_20px_-5px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_-5px_rgba(0,0,0,0.4)] min-h-[480px]'
+          ? 'bg-gradient-to-b from-[#1a1a1a] to-black border border-white/10 shadow-2xl shadow-primary/10 z-20 scale-100 lg:scale-110' 
+          : 'bg-[#0A0A0A]/50 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-[#0A0A0A]/80'
       }`}
     >
+      {highlighted && (
+        <div className="absolute -top-px left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+      )}
+      
       {highlighted && (
         <motion.div 
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-red-600 text-white px-6 py-1.5 rounded-full text-xs font-bold shadow-lg uppercase tracking-wide z-20 whitespace-nowrap"
+          className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-lg shadow-primary/20 z-20 whitespace-nowrap"
         >
           Most Popular
         </motion.div>
       )}
 
-      {/* Glow Effect on Hover */}
-      <div className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none ${highlighted ? 'bg-primary/10' : 'bg-white/5'}`} />
+      {/* Glow Effect */}
+      <div className={`absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${highlighted ? 'bg-primary/5' : 'bg-white/5'}`} />
 
-      <div className="mb-8 relative z-10">
-        <h3 className={`text-lg font-medium mb-4 ${highlighted ? 'text-primary' : 'text-muted-foreground'}`}>{title}</h3>
+      <div className="mb-8 relative z-10 flex flex-col items-start w-full">
+        <div className="flex items-center justify-between w-full mb-6">
+            <h3 className={`text-lg font-medium ${highlighted ? 'text-white' : 'text-white/70'}`}>{title}</h3>
+            
+            <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 ${
+                highlighted 
+                ? 'bg-primary/20 text-primary border border-primary/20' 
+                : 'bg-white/5 text-white/50 border border-white/5'
+            }`}>
+                {highlighted && <span className="w-1 h-1 rounded-full bg-primary animate-pulse" />}
+                Save 34%
+            </div>
+        </div>
+
+        <div className="flex flex-col items-start gap-1">
+            {originalPrice && (
+              <span className="text-sm text-white/30 line-through decoration-white/30 decoration-1 font-medium ml-1">
+                  ${originalPrice} {period}
+              </span>
+            )}
+            
         <div className="flex items-baseline gap-1">
-          <span className={`font-bold text-white tracking-tight ${highlighted ? 'text-6xl' : 'text-5xl'}`}>
+                <span className={`font-bold text-white tracking-tighter ${highlighted ? 'text-5xl lg:text-6xl' : 'text-4xl lg:text-5xl'}`}>
             <AnimatePresence mode="wait">
               <motion.span
                 key={price}
@@ -238,35 +263,38 @@ function PricingCard({ title, price, period = "/mo", features, highlighted = fal
               </motion.span>
             </AnimatePresence>
           </span>
-          <span className="text-muted-foreground font-medium">{period}</span>
+                <span className="text-white/40 font-medium text-sm">{period}</span>
+            </div>
         </div>
       </div>
 
-      <ul className="space-y-4 mb-8 flex-1 relative z-10">
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
+
+      <ul className="space-y-5 mb-10 flex-1 relative z-10">
         {features.map((feature, idx) => (
           <motion.li 
             key={idx} 
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ delay: delay + (idx * 0.1) }}
-            className="flex items-start gap-3 text-sm text-gray-300/90"
+            className="flex items-center gap-3 text-sm"
           >
-            <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted ? 'bg-primary text-white' : 'bg-white/10 text-white group-hover:bg-white/20 transition-colors'}`}>
-              <Check className="w-3 h-3" />
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/10 text-white/70'}`}>
+              <Check className="w-3 h-3" strokeWidth={3} />
             </div>
-            <span className="leading-tight">{feature}</span>
+            <span className={`${highlighted ? 'text-white' : 'text-white/60'}`}>{feature}</span>
           </motion.li>
         ))}
       </ul>
 
       <motion.button 
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={handleCheckout}
-        className={`w-full py-4 rounded-xl font-semibold text-sm transition-all relative z-10 cursor-pointer ${
+        className={`w-full py-4 rounded-2xl font-semibold text-sm transition-all duration-300 relative z-10 cursor-pointer ${
           highlighted 
-            ? 'bg-gradient-to-r from-primary to-red-600 text-white hover:shadow-[0_0_30px_rgba(255,90,95,0.6)] hover:brightness-110 shadow-lg' 
-            : 'bg-white/10 text-white hover:bg-white/20 hover:text-white border border-white/10 hover:border-white/20 hover:shadow-xl'
+            ? 'bg-white text-black hover:bg-white/90 shadow-xl shadow-white/5' 
+            : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 hover:border-white/10'
         }`}
       >
         Get {title}

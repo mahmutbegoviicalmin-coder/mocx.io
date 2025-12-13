@@ -59,8 +59,14 @@ export async function GET() {
                 const balanceData = await balanceRes.json();
                 console.log('NanoBanana Balance Data:', balanceData);
                 
-                if (balanceData.code === 200 && balanceData.data !== undefined) {
+                // Check correct path to credit value based on API docs or response
+                // Assuming data.data or data.credit based on previous logs
+                if (balanceData.data?.credit !== undefined) {
+                    apiBalance = balanceData.data.credit;
+                } else if (typeof balanceData.data === 'number') {
                     apiBalance = balanceData.data;
+                } else if (balanceData.credit !== undefined) {
+                    apiBalance = balanceData.credit;
                 }
             }
         } catch (e) {
@@ -84,16 +90,29 @@ export async function GET() {
     };
 
     userList.data.forEach(u => {
-        const plan = (String(u.publicMetadata.planName) || 'Free Plan').toLowerCase();
+        let plan = (String(u.publicMetadata.planName) || 'Free Plan');
+        
+        // Normalize backend side as well
+        if (plan.includes('Mocx')) {
+            if (plan.toLowerCase().includes('pro')) plan = 'Pro';
+            else if (plan.toLowerCase().includes('agency')) plan = 'Agency';
+            else if (plan.toLowerCase().includes('starter')) plan = 'Starter';
+            else plan = plan.replace('Mocx', '').trim() || 'Starter';
+        }
+        if (plan.includes('Starter') && plan.includes('Pro')) plan = 'Pro';
+        if (plan.includes('Starter') && plan.includes('Agency')) plan = 'Agency';
+
+        const planLower = plan.toLowerCase();
+
         const generated = Number(u.publicMetadata.imagesGenerated) || 0;
         totalImagesGenerated += generated;
 
-        if (plan.includes('starter') || plan.includes('mocx')) {
-            planCounts.starter++;
-        } else if (plan.includes('pro')) {
+        if (planLower.includes('pro')) {
             planCounts.pro++;
-        } else if (plan.includes('agency')) {
+        } else if (planLower.includes('agency')) {
             planCounts.agency++;
+        } else if (planLower.includes('starter')) {
+            planCounts.starter++;
         } else {
             planCounts.free++;
         }
