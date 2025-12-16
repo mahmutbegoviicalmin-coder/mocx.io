@@ -52,8 +52,8 @@ export async function GET(request: Request) {
         }
 
         // Apply destructive effects to make image unusable but visible
-        image.pixelate(5);      // Strong pixelation
-        image.quality(10);      // Extremely low JPEG quality
+        image.pixelate(3);      // Moderate pixelation (was 5)
+        image.quality(20);      // 20% Quality (was 10%)
 
         const watermarkedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
 
