@@ -7,6 +7,7 @@ import { BeforeAfter } from "@/components/BeforeAfter";
 import { WhyMocx } from "@/components/WhyMocx";
 import { Trust } from "@/components/Trust";
 import { FAQ } from "@/components/FAQ";
+import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
       <Trust />
       <Pricing />
       <FAQ />
+      <FreeTrialCTA />
       
           <footer className="py-8 border-t border-border mt-auto">
             <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">

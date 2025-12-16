@@ -58,14 +58,15 @@ export function Hero() {
         </div>
 
         {/* Free Trial Badge */}
-        <div className="flex items-center gap-2.5 mb-16 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-            </span>
-            <p className="text-xs font-medium text-purple-200">
-                New: <span className="text-white">Start your 2-day free trial</span> today.
+        <div className="flex items-center gap-3 mb-16 px-5 py-2.5 rounded-full bg-amber-500/10 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 group cursor-default hover:bg-amber-500/20 transition-colors shadow-[0_0_20px_-5px_rgba(245,158,11,0.3)]">
+            <div className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </div>
+            <p className="text-sm font-medium text-amber-100">
+                New: <span className="text-white font-bold border-b border-amber-500/50">Start your 2-day free trial</span> today.
             </p>
+            <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
         </div>
 
         {/* Social Proof Text */}
