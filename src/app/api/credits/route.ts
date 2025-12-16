@@ -61,10 +61,16 @@ export async function POST(request: Request) {
                     checkout_data: {
                         custom: {
                             userId: userId,
-                            credits: pack.credits, // Pass credits amount to webhook
+                            credits: pack.credits,
                             packId: pack.id
                         },
                         email: userEmail
+                    },
+                    product_options: {
+                        enabled_variants: [Number(pack.variantId)], // Only enable this credit pack
+                        redirect_url: 'https://mocx.io/dashboard/billing',
+                        receipt_button_text: 'Go back to Billing',
+                        receipt_thank_you_note: 'Thank you for purchasing credits!'
                     }
                 },
                 relationships: {

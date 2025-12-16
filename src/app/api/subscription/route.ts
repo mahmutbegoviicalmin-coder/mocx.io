@@ -45,20 +45,18 @@ export async function POST(request: Request) {
     const userEmail = user.emailAddresses[0]?.emailAddress;
 
     // CASE 1: It's a full URL (starts with http)
-    // We just append the params and return it.
     if (String(variantIdOrUrl).startsWith('http')) {
         let checkoutUrl = variantIdOrUrl;
         const hasParams = checkoutUrl.includes('?');
         const separator = hasParams ? '&' : '?';
         
+        // Append UI hiding params
         checkoutUrl += `${separator}checkout[custom][userId]=${userId}&checkout[email]=${encodeURIComponent(userEmail || '')}`;
         
         return NextResponse.json({ url: checkoutUrl });
     }
 
     // CASE 2: It's a Variant ID (number/string)
-    // We must create a checkout session via API because we can't construct the link manually without UUID.
-    
     if (!process.env.LEMONSQUEEZY_STORE_ID || !process.env.LEMONSQUEEZY_API_KEY) {
         return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
@@ -79,6 +77,12 @@ export async function POST(request: Request) {
                             userId: userId
                         },
                         email: userEmail
+                    },
+                    product_options: {
+                        enabled_variants: [Number(variantIdOrUrl)], // THIS IS THE KEY! We only enable the selected variant.
+                        redirect_url: 'https://mocx.io/dashboard',
+                        receipt_button_text: 'Go to Dashboard',
+                        receipt_thank_you_note: 'Thank you for subscribing to Mocx!'
                     }
                 },
                 relationships: {
@@ -91,7 +95,7 @@ export async function POST(request: Request) {
                     variant: {
                         data: {
                             type: "variants",
-                            id: String(variantIdOrUrl) // Send the ID
+                            id: String(variantIdOrUrl)
                         }
                     }
                 }
