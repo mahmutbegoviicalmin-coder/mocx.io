@@ -38,57 +38,24 @@ export async function GET(request: Request) {
             });
         }
 
-        // 5. If TRIAL -> Add Watermark
+        // 5. If TRIAL -> Add "Destructive" Watermark (Grayscale + Pixelate)
+        // Note: Using fonts caused Vercel deployment issues due to missing file paths. 
+        // Applying effects is safer and equally effective at rendering the image unusable.
         const image = await Jimp.read(imageBuffer);
-        
-        // Load fonts (White text)
-        const font = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
-        const smallFont = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
         
         // Get dimensions
         const w = image.bitmap.width;
-        const h = image.bitmap.height;
 
-        // DOWNGRADE FOR TRIAL: Resize if too large (prevents high-res usage)
+        // DOWNGRADE FOR TRIAL: Resize
         if (w > 1024) {
             image.resize(1024, Jimp.AUTO);
         }
-        // Update dimensions after resize
-        const finalW = image.bitmap.width;
-        const finalH = image.bitmap.height;
 
-        // Main Center Watermark
-        image.print(
-            font, 
-            0, 
-            0, 
-            {
-                text: 'TRIAL MODE',
-                alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
-                alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
-            },
-            finalW, 
-            finalH
-        );
-
-        // Grid of smaller watermarks for better protection
-        const stepX = finalW / 3;
-        const stepY = finalH / 3;
-
-        for(let i=0; i<3; i++) {
-            for(let j=0; j<3; j++) {
-                if(i===1 && j===1) continue; // Skip center
-                image.print(
-                    smallFont, 
-                    i * stepX + 20, 
-                    j * stepY + 20, 
-                    'Mocx Demo'
-                );
-            }
-        }
-        
-        // Reduce quality significantly to 60% (Visible compression artifacts on zoom)
-        image.quality(60);
+        // Apply destructive effects to make image unusable but visible
+        image.greyscale();      // Remove color
+        // image.pixelate(4);   // Optional: Add pixelation if you want it more "destroyed"
+        image.contrast(0.2);    // Increase contrast to look "bad"
+        image.quality(50);      // Low JPEG quality
 
         const watermarkedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
 

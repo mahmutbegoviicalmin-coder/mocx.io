@@ -90,6 +90,8 @@ export default function ThumbnailPage() {
   const displayImageUrl = generatedImage 
       ? `/api/image-proxy?url=${encodeURIComponent(generatedImage)}` 
       : null;
+      
+  const COST_PER_IMAGE = 5;
 
   const handleOriginalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
