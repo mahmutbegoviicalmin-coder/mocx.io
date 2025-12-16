@@ -33,66 +33,28 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { variantId } = await request.json();
+    const { variantId } = await request.json(); // Note: In the frontend, we are passing the Checkout URL as 'variantId'
 
     if (!variantId) {
-        return NextResponse.json({ error: 'Variant ID is required' }, { status: 400 });
-    }
-
-    if (!process.env.LEMONSQUEEZY_STORE_ID || !process.env.LEMONSQUEEZY_API_KEY) {
-        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+        return NextResponse.json({ error: 'Plan URL is required' }, { status: 400 });
     }
 
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     const userEmail = user.emailAddresses[0]?.emailAddress;
 
-    // Create Checkout via Lemon Squeezy API
-    // We strictly link to the specific Variant ID
-    const response = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
-            'Accept': 'application/vnd.api+json',
-            'Content-Type': 'application/vnd.api+json'
-        },
-        body: JSON.stringify({
-            data: {
-                type: "checkouts",
-                attributes: {
-                    checkout_data: {
-                        custom: {
-                            userId: userId
-                        },
-                        email: userEmail
-                    }
-                },
-                relationships: {
-                    store: {
-                        data: {
-                            type: "stores",
-                            id: process.env.LEMONSQUEEZY_STORE_ID
-                        }
-                    },
-                    variant: {
-                        data: {
-                            type: "variants",
-                            id: String(variantId) // This locks the checkout to this specific variant
-                        }
-                    }
-                }
-            }
-        })
-    });
+    // Construct the checkout URL with user data parameters
+    // We use the provided URL (which is specific to a variant) and append user info
+    let checkoutUrl = variantId;
+    
+    // Check if URL already has query params
+    const hasParams = checkoutUrl.includes('?');
+    const separator = hasParams ? '&' : '?';
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        console.error('Lemon Squeezy Checkout Error:', JSON.stringify(data, null, 2));
-        return NextResponse.json({ error: 'Failed to create checkout' }, { status: 500 });
-    }
-
-    const checkoutUrl = data.data?.attributes?.url;
+    // Append custom data for webhook processing and prefill email
+    // checkout[custom][userId] -> passes userId to webhook
+    // checkout[email] -> prefills user email
+    checkoutUrl += `${separator}checkout[custom][userId]=${userId}&checkout[email]=${encodeURIComponent(userEmail || '')}`;
 
     return NextResponse.json({ url: checkoutUrl });
 
