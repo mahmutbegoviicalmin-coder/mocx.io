@@ -57,6 +57,17 @@ export function Hero() {
           </Link>
         </div>
 
+        {/* Free Trial Badge */}
+        <div className="flex items-center gap-2.5 mb-16 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+            </span>
+            <p className="text-xs font-medium text-purple-200">
+                New: <span className="text-white">Start your 2-day free trial</span> today.
+            </p>
+        </div>
+
         {/* Social Proof Text */}
         <div className="flex items-center gap-6 text-sm text-white/30 mb-20 animate-in fade-in zoom-in duration-700 delay-500">
             <div className="flex items-center gap-2">

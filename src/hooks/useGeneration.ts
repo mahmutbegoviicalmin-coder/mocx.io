@@ -48,11 +48,14 @@ export function useGeneration() {
         finalImageUrls = [];
         
         for (const file of imageFiles) {
-            const uploadRes = await fetch(`/api/upload?filename=${file.name}`, {
+            const uploadRes = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
                 method: 'POST',
                 body: file,
             });
-            if (!uploadRes.ok) throw new Error('Failed to upload image');
+            if (!uploadRes.ok) {
+                const errData = await uploadRes.json().catch(() => ({}));
+                throw new Error(errData.error || errData.details || 'Failed to upload image');
+            }
             const blob = await uploadRes.json();
             finalImageUrls.push(blob.url);
         }

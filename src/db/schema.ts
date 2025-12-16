@@ -19,4 +19,13 @@ export const generations = pgTable('generations', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-
+export const payoutRequests = pgTable('payout_requests', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  userEmail: text('user_email').notNull(),
+  amount: text('amount').notNull(),
+  method: text('method').notNull(), // western_union, paypal, bank_transfer
+  details: text('details').notNull(), // JSON string containing full details
+  status: text('status').default('pending'), // pending, paid, rejected
+  createdAt: timestamp('created_at').defaultNow(),
+});

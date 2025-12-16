@@ -80,15 +80,19 @@ export default function ThumbnailPage() {
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
   
   // RESTRICTION LOGIC:
-  // Must be Pro or Agency plan to use this feature
-  const isPro = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
-  const isLocked = !isPro;
+  // Must be a paid plan to use this feature
+  const isAllowed = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency') || planName.toLowerCase().includes('starter');
+  const isLocked = !isAllowed;
   
   const COST_PER_IMAGE = 5;
 
   const handleOriginalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 4 * 1024 * 1024) {
+          alert('Image is too large. Max size is 4MB.');
+          return;
+      }
       setOriginalThumb(file);
       setOriginalPreview(URL.createObjectURL(file));
     }
@@ -97,6 +101,13 @@ export default function ThumbnailPage() {
   const handleFaceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
+
+    for (const f of files) {
+        if (f.size > 4 * 1024 * 1024) {
+            alert(`File ${f.name} is too large (>4MB).`);
+            return;
+        }
+    }
 
     let newFiles = [...faceFiles, ...files];
     if (newFiles.length > 2) newFiles = newFiles.slice(0, 2);
@@ -204,9 +215,9 @@ export default function ThumbnailPage() {
                     <div className="p-4 bg-primary/10 rounded-full mb-4 animate-pulse">
                         <Lock className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Pro Plan Required</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">Paid Plan Required</h3>
                     <p className="text-white/40 text-sm max-w-xs mb-6">
-                        The Thumbnail Recreator is exclusively available for Pro and Agency plan members.
+                        The Thumbnail Recreator is available for Starter, Pro and Agency plan members.
                     </p>
                     <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105">
                       Upgrade to Pro

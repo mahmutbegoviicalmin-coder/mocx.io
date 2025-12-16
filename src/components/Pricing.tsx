@@ -1,6 +1,6 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -107,9 +107,10 @@ export function Pricing() {
             price={annual ? 205 : 19}
             originalPrice={annual ? 307 : 29}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "600 Images/year" : "50 Images/mo", "Standard Speed", "Commercial License", "Basic Support"]}
+            features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
             delay={0.1}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
+            hasTrial={true}
           />
 
           <PricingCard 
@@ -117,7 +118,7 @@ export function Pricing() {
             price={annual ? 420 : 39}
             originalPrice={annual ? 630 : 59}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
+            features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
             highlighted
             delay={0.2}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
@@ -128,7 +129,7 @@ export function Pricing() {
             price={annual ? 850 : 79}
             originalPrice={annual ? 1275 : 119}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
+            features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
             delay={0.3}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
           />
@@ -150,7 +151,7 @@ export function Pricing() {
   );
 }
 
-function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
+function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId, hasTrial = false }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string, hasTrial?: boolean }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -271,34 +272,54 @@ function PricingCard({ title, price, originalPrice, period = "/mo", features, hi
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
 
       <ul className="space-y-5 mb-10 flex-1 relative z-10">
-        {features.map((feature, idx) => (
-          <motion.li 
-            key={idx} 
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: delay + (idx * 0.1) }}
-            className="flex items-center gap-3 text-sm"
-          >
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/10 text-white/70'}`}>
-              <Check className="w-3 h-3" strokeWidth={3} />
-            </div>
-            <span className={`${highlighted ? 'text-white' : 'text-white/60'}`}>{feature}</span>
-          </motion.li>
-        ))}
+        {features.map((feature, idx) => {
+          const isCrossed = feature.startsWith('~');
+          const text = isCrossed ? feature.slice(1) : feature;
+          return (
+            <motion.li 
+                key={idx} 
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: delay + (idx * 0.1) }}
+                className="flex items-center gap-3 text-sm"
+            >
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted && !isCrossed ? 'bg-primary text-white shadow-lg shadow-primary/20' : isCrossed ? 'bg-white/5 text-white/20' : 'bg-white/10 text-white/70'}`}>
+                {isCrossed ? <X className="w-3 h-3" strokeWidth={3} /> : <Check className="w-3 h-3" strokeWidth={3} />}
+                </div>
+                <span className={`${highlighted && !isCrossed ? 'text-white' : isCrossed ? 'text-white/20 line-through decoration-white/20 decoration-2' : 'text-white/60'}`}>{text}</span>
+            </motion.li>
+          );
+        })}
       </ul>
 
       <motion.button 
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleCheckout}
-        className={`w-full py-4 rounded-2xl font-semibold text-sm transition-all duration-300 relative z-10 cursor-pointer ${
+        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 relative z-10 cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
           highlighted 
             ? 'bg-white text-black hover:bg-white/90 shadow-xl shadow-white/5' 
             : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 hover:border-white/10'
         }`}
       >
-        Get {title}
+        {hasTrial ? (
+            <>
+                <span>Start 2-Day Free Trial</span>
+                <span className={`text-[10px] font-medium ${highlighted ? 'text-black/50' : 'text-white/40'}`}>
+                    Then ${price}{period}
+                </span>
+            </>
+        ) : (
+            <span>Get {title}</span>
+        )}
       </motion.button>
+      
+      {hasTrial && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-medium text-white/30">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            Cancel anytime during trial
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -172,14 +172,24 @@ export default function BillingPage() {
                     <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Current Plan</h2>
                     <div className="flex items-center gap-4 mb-8">
                         <h1 className="text-5xl font-bold text-white tracking-tight">{planName}</h1>
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-lg ${subscriptionStatus === 'active' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-green-900/20' : subscriptionStatus === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'}`}>
-                            {subscriptionStatus || 'Active'}
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-lg ${
+                            subscriptionStatus === 'active' 
+                                ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-green-900/20' 
+                                : subscriptionStatus === 'on_trial'
+                                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 shadow-purple-900/20'
+                                    : subscriptionStatus === 'cancelled' 
+                                        ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                                        : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                        }`}>
+                            {subscriptionStatus === 'on_trial' ? 'Trial Active' : (subscriptionStatus || 'Active')}
                         </span>
                     </div>
                     
                     <div className="flex items-center gap-2 text-sm text-muted-foreground bg-black/20 w-fit px-4 py-2 rounded-full border border-white/5">
                         <Calendar className="w-4 h-4" />
-                        {renewsAt && subscriptionStatus !== 'cancelled' ? (
+                        {subscriptionStatus === 'on_trial' && renewsAt ? (
+                             <span>Trial ends on <span className="text-white font-medium">{new Date(renewsAt).toLocaleDateString()}</span></span>
+                        ) : renewsAt && subscriptionStatus !== 'cancelled' ? (
                             <span>Renews on <span className="text-white font-medium">{new Date(renewsAt).toLocaleDateString()}</span></span>
                         ) : endsAt ? (
                             <span>Access until <span className="text-white font-medium">{new Date(endsAt).toLocaleDateString()}</span></span>
@@ -321,7 +331,7 @@ export default function BillingPage() {
                     title="Starter"
                     price={annual ? 205 : 19}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "600 Credits" : "50 Credits", "Standard Speed", "Commercial License", "Basic Support"]}
+                    features={[annual ? "600 Credits" : "50 Credits", "AI Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
                     variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Starter')}
@@ -331,7 +341,7 @@ export default function BillingPage() {
                     title="Pro"
                     price={annual ? 420 : 39}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "2400 Credits" : "200 Credits", "Thumbnail Recreator", "Fast Generation", "Priority Support", "High Resolution"]}
+                    features={[annual ? "2400 Credits" : "200 Credits", "AI Thumbnail Recreator", "Fast Generation", "High Res Downloads", "Priority Support", "AI Art Generator", "Mockup Studio"]}
                     variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Pro')}
@@ -342,7 +352,7 @@ export default function BillingPage() {
                     title="Agency"
                     price={annual ? 850 : 79}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "4800 Credits" : "400 Credits", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support"]}
+                    features={[annual ? "4800 Credits" : "400 Credits", "AI Thumbnail Recreator", "Max Speed (Queue Skip)", "API Access", "Dedicated 24/7 Support", "AI Art Generator", "Mockup Studio"]}
                     variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Agency')}
@@ -499,14 +509,19 @@ function BillingPlanCard({
             <div className={`w-full h-px mb-8 ${popular ? 'bg-gradient-to-r from-transparent via-amber-500/30 to-transparent' : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'}`} />
 
             <ul className="space-y-5 mb-10 flex-1 relative z-10">
-                {features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm text-white/70 group-hover:text-white transition-colors duration-300">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${popular ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_-2px_rgba(245,158,11,0.4)]' : 'bg-white/10 text-white/40'}`}>
-                            <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
-                        <span className="font-medium leading-relaxed">{feature}</span>
-                    </li>
-                ))}
+                {features.map((feature, idx) => {
+                    const isCrossed = feature.startsWith('~');
+                    const text = isCrossed ? feature.slice(1) : feature;
+                    
+                    return (
+                        <li key={idx} className={`flex items-start gap-3 text-sm transition-colors duration-300 ${isCrossed ? 'text-white/20' : 'text-white/70 group-hover:text-white'}`}>
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${popular && !isCrossed ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_-2px_rgba(245,158,11,0.4)]' : isCrossed ? 'bg-white/5 text-white/20' : 'bg-white/10 text-white/40'}`}>
+                                {isCrossed ? <X className="w-3 h-3 stroke-[3]" /> : <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                            <span className={`font-medium leading-relaxed ${isCrossed ? 'line-through decoration-white/20 decoration-2' : ''}`}>{text}</span>
+                        </li>
+                    );
+                })}
             </ul>
 
             <button 

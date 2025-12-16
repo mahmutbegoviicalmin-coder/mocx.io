@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2, Zap, MessageSquare, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2, Zap, MessageSquare, AlertTriangle, ShieldCheck, ChevronLeft, ChevronRight, Globe, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
@@ -21,12 +21,19 @@ interface UserData {
     planName?: string;
     credits?: number;
     imagesGenerated?: number;
+    affiliateStats?: {
+        starter: number;
+        pro: number;
+        agency: number;
+        free: number;
+    };
   };
   privateMetadata: {
     renewsAt?: string;
     endsAt?: string;
     status?: string;
   };
+  lastActiveSessionId?: string;
 }
 
 interface Stats {
@@ -49,6 +56,17 @@ interface FeedbackItem {
     user_email: string;
     message: string;
     type: string;
+    status: string;
+    created_at: string;
+}
+
+interface PayoutRequest {
+    id: number;
+    user_id: string;
+    user_email: string;
+    amount: string;
+    method: string;
+    details: string;
     status: string;
     created_at: string;
 }
@@ -113,35 +131,84 @@ export default function AdminPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'users' | 'feedback' | 'notifications'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'feedback' | 'notifications' | 'payouts'>('users');
   const [users, setUsers] = useState<UserData[]>([]);
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
   const [adminNotifs, setAdminNotifs] = useState<any[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
   const [stats, setStats] = useState<Stats>({ totalRevenue: 0, totalUsers: 0 });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showTrialsOnly, setShowTrialsOnly] = useState(false);
   const [notifTitle, setNotifTitle] = useState('');
   const [notifBody, setNotifBody] = useState('');
   const [sendingNotif, setSendingNotif] = useState(false);
   
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const ITEMS_PER_PAGE = 30;
+
   // Editing State
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [editForm, setEditForm] = useState({ credits: 0, plan: '' });
   const [saving, setSaving] = useState(false);
 
+  // Affiliate State
+  const [editingAffiliate, setEditingAffiliate] = useState<UserData | null>(null);
+  const [affiliateForm, setAffiliateForm] = useState({ starter: 0, pro: 0, agency: 0, free: 0 });
+
+  const handleAffiliateClick = (u: UserData) => {
+    setEditingAffiliate(u);
+    const stats = u.publicMetadata.affiliateStats || { starter: 0, pro: 0, agency: 0, free: 0 };
+    setAffiliateForm({
+        starter: stats.starter || 0,
+        pro: stats.pro || 0,
+        agency: stats.agency || 0,
+        free: stats.free || 0
+    });
+  };
+
+  const handleSaveAffiliate = async () => {
+    if (!editingAffiliate) return;
+    setSaving(true);
+    try {
+        const res = await fetch('/api/admin/users/update-affiliate', {
+            method: 'POST',
+            body: JSON.stringify({ targetUserId: editingAffiliate.id, stats: affiliateForm })
+        });
+        if (!res.ok) throw new Error('Failed');
+        await fetchData();
+        setEditingAffiliate(null);
+    } catch (e) {
+        console.error(e);
+        alert('Failed to save affiliate stats');
+    } finally {
+        setSaving(false);
+    }
+  };
+
   const fetchData = async () => {
       try {
-        const [usersRes, statsRes, feedbackRes, notifRes] = await Promise.all([
-            fetch('/api/admin/users'),
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+        
+        const [usersRes, statsRes, feedbackRes, notifRes, payoutsRes] = await Promise.all([
+            fetch(`/api/admin/users?limit=${ITEMS_PER_PAGE}&offset=${offset}`),
             fetch('/api/admin/stats'),
             fetch('/api/admin/feedback'),
-            fetch('/api/admin/notifications')
+            fetch('/api/admin/notifications'),
+            fetch('/api/admin/payouts')
         ]);
 
-        if (usersRes.ok) setUsers(await usersRes.json());
+        if (usersRes.ok) {
+            const data = await usersRes.json();
+            setUsers(data.users);
+            setTotalUsers(data.totalCount);
+        }
         if (statsRes.ok) setStats(await statsRes.json());
         if (feedbackRes.ok) setFeedbackList(await feedbackRes.json());
         if (notifRes.ok) setAdminNotifs(await notifRes.json());
+        if (payoutsRes.ok) setPayouts(await payoutsRes.json());
         
         setLoading(false);
       } catch (err) {
@@ -180,7 +247,8 @@ export default function AdminPage() {
       }
       fetchData();
     }
-  }, [isLoaded, user, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, user, router, currentPage]);
 
   const handleEditClick = (u: UserData) => {
     setEditingUser(u);
@@ -233,6 +301,32 @@ export default function AdminPage() {
     }
   };
 
+  const handlePayoutStatus = async (id: number, status: string) => {
+    if(!confirm(`Mark request as ${status}?`)) return;
+    try {
+        const res = await fetch('/api/admin/payouts/update', {
+            method: 'POST',
+            body: JSON.stringify({ id, status })
+        });
+        if(res.ok) {
+            await fetchData(); 
+        } else {
+            alert('Failed to update status');
+        }
+    } catch(e) { 
+        console.error(e);
+        alert('Error updating status');
+    }
+  };
+
+  const getPlanBadgeStyle = (plan: string) => {
+    const p = (plan || '').toLowerCase();
+    if (p.includes('agency')) return 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]';
+    if (p.includes('pro')) return 'bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]';
+    if (p.includes('starter')) return 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]';
+    return 'bg-white/5 text-white/50 border border-white/10';
+  };
+
   if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -241,25 +335,33 @@ export default function AdminPage() {
     );
   }
 
-  const filteredUsers = users.filter(u => 
-    u.email.toLowerCase().includes(search.toLowerCase()) ||
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = u.email.toLowerCase().includes(search.toLowerCase()) ||
     (u.firstName && u.firstName.toLowerCase().includes(search.toLowerCase())) ||
-    (u.lastName && u.lastName.toLowerCase().includes(search.toLowerCase()))
-  );
+    (u.lastName && u.lastName.toLowerCase().includes(search.toLowerCase()));
+    
+    // Check trial status (could be in public or private metadata depending on sync)
+    const isTrial = u.publicMetadata?.subscriptionStatus === 'on_trial' || 
+                    u.privateMetadata?.status === 'on_trial';
+
+    if (showTrialsOnly && !isTrial) return false;
+
+    return matchesSearch;
+  });
   
-  const totalGenerated = users.reduce((acc, u) => acc + (u.publicMetadata.imagesGenerated || 0), 0);
+  // const totalGenerated = users.reduce((acc, u) => acc + (u.publicMetadata.imagesGenerated || 0), 0); // Removed local calc
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] p-4 lg:p-8 text-white relative">
         <div className="max-w-7xl mx-auto space-y-8">
             
             {/* Header */}
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
                 <div>
                     <h1 className="text-3xl font-bold mb-2 text-[#ff5400]">Admin Panel</h1>
                     <p className="text-white/50">Manage users, plans, and credits.</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <button 
                         onClick={() => setActiveTab('users')}
                         className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
@@ -286,6 +388,15 @@ export default function AdminPage() {
                         <Zap className="w-4 h-4" />
                         Notifications
                     </button>
+                    <button 
+                        onClick={() => setActiveTab('payouts')}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                            activeTab === 'payouts' ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:text-white'
+                        }`}
+                    >
+                        <DollarSign className="w-4 h-4" />
+                        Payouts
+                    </button>
                 </div>
             </div>
 
@@ -307,7 +418,7 @@ export default function AdminPage() {
                     <div>
                         <div className="text-sm text-white/50 font-medium uppercase tracking-wider">Nano Costs</div>
                         <div className="text-2xl font-bold text-white">
-                            ${((totalGenerated * 0.09)).toFixed(2)}
+                            ${(stats.totalCost || 0).toFixed(2)}
                         </div>
                     </div>
                 </div>
@@ -326,7 +437,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                         <div className="text-sm text-white/50 font-medium uppercase tracking-wider">Generated</div>
-                        <div className="text-2xl font-bold text-white">{totalGenerated}</div>
+                        <div className="text-2xl font-bold text-white">{stats.totalImagesGenerated || 0}</div>
                     </div>
                 </div>
                 
@@ -343,7 +454,7 @@ export default function AdminPage() {
                     </div>
                 </div>
                 
-                <div className="md:col-span-3 bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-between gap-4">
+                <div className="md:col-span-3 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4">
                     <div className="flex items-center gap-2">
                          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/50">
                              <ShieldCheck className="w-5 h-5" />
@@ -351,7 +462,7 @@ export default function AdminPage() {
                          <div className="text-sm font-bold uppercase text-white/50 tracking-wider">Plan Distribution</div>
                     </div>
                     
-                    <div className="flex gap-6">
+                    <div className="grid grid-cols-4 gap-4 w-full sm:w-auto">
                          <div className="text-center">
                              <div className="text-xl font-bold text-white">{stats.planCounts?.free || 0}</div>
                              <div className="text-[10px] text-white/40 uppercase font-bold">Free</div>
@@ -374,10 +485,10 @@ export default function AdminPage() {
 
             {/* TAB CONTENT: USERS */}
             {activeTab === 'users' && (
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center">
+                <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h2 className="text-xl font-bold">User Management</h2>
-                        <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-2 w-64 focus-within:border-primary/50 transition-colors">
+                        <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-2 w-full sm:w-64 focus-within:border-primary/50 transition-colors">
                             <Search className="w-4 h-4 text-white/50" />
                             <input 
                                 type="text" 
@@ -387,60 +498,121 @@ export default function AdminPage() {
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
+                        <button 
+                            onClick={() => setShowTrialsOnly(!showTrialsOnly)}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all whitespace-nowrap ${
+                                showTrialsOnly 
+                                ? 'bg-purple-500 text-white border-purple-500 shadow-lg shadow-purple-500/20' 
+                                : 'bg-white/5 text-white/50 border-white/10 hover:text-white'
+                            }`}
+                        >
+                            Trial Only
+                        </button>
                     </div>
 
-                    <div className="grid gap-4">
-                        <div className="hidden md:grid bg-white/5 border border-white/10 rounded-t-xl p-4 grid-cols-12 text-xs font-bold uppercase tracking-wider text-white/40 items-center">
-                            <div className="col-span-3">User</div>
-                            <div className="col-span-2">Last Seen</div>
+                    <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
+                        {/* Table Header (Desktop) */}
+                        <div className="hidden md:grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-white/40 items-center p-4 bg-white/5">
+                            <div className="col-span-4">User</div>
+                            <div className="col-span-3">Last Seen</div>
                             <div className="col-span-1">Plan</div>
-                            <div className="col-span-1 text-center">Credits</div>
-                            <div className="col-span-1 text-center">Gen</div>
-                            <div className="col-span-1 text-center">Status</div>
-                            <div className="col-span-2">Renewal</div>
+                            <div className="col-span-1 text-center">Stats</div>
+                            <div className="col-span-2 text-center">Renewal</div>
                             <div className="col-span-1 text-right">Action</div>
                         </div>
 
-                        {filteredUsers.map((user) => {
-                            let planName = user.publicMetadata.planName || 'Free Plan';
-                            if (planName.includes('Mocx')) planName = planName.replace('Mocx', '').trim() || 'Starter';
-                            planName = planName.replace(/\(.*\)/, '').trim(); 
+                        <div className="divide-y divide-white/5">
+                            {filteredUsers.map((user) => {
+                                let planName = user.publicMetadata.planName || 'Free Plan';
+                                if (planName.includes('Mocx')) planName = planName.replace('Mocx', '').trim() || 'Starter';
+                                planName = planName.replace(/\(.*\)/, '').trim(); 
 
-                            return (
-                            <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                key={user.id}
-                                className="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col md:grid md:grid-cols-12 items-start md:items-center gap-4 md:gap-0 hover:border-white/10 transition-colors group relative"
-                            >
-                                <div className="col-span-3 flex items-center gap-3 overflow-hidden w-full md:w-auto">
-                                    <UserAvatar url={user.imageUrl} alt={user.email} />
-                                    <div className="min-w-0">
-                                        <div className="font-bold text-white truncate">{user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'User'}</div>
-                                        <div className="text-xs text-white/50 truncate">{user.email}</div>
+                                return (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    key={user.id}
+                                    className="p-4 flex flex-col md:grid md:grid-cols-12 items-start md:items-center gap-4 md:gap-0 hover:bg-white/5 transition-colors group relative"
+                                >
+                                    {/* User Info */}
+                                    <div className="col-span-4 flex items-center gap-3 w-full md:w-auto">
+                                        <UserAvatar url={user.imageUrl} alt={user.email} />
+                                        <div className="min-w-0 flex-1">
+                                            <div className="font-bold text-white truncate text-sm">{user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'User'}</div>
+                                            <div className="text-xs text-white/50 truncate">{user.email}</div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="hidden md:flex col-span-2 text-xs text-white/60 items-center gap-2">
-                                    <Clock className="w-3 h-3 text-white/30" />
-                                    {user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : 'Never'}
-                                </div>
+                                    {/* Last Seen */}
+                                    <div className="hidden md:flex col-span-3 flex-col justify-center text-xs text-white/60">
+                                        <div className="flex items-center gap-2 text-white/80">
+                                            <Clock className="w-3 h-3 text-primary" />
+                                            {user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : 'Never'}
+                                        </div>
+                                        {user.lastSignInAt && (
+                                            <div className="text-[10px] text-white/30 ml-5">
+                                                {new Date(user.lastSignInAt).toLocaleTimeString()}
+                                            </div>
+                                        )}
+                                    </div>
 
-                                <div className="hidden md:block col-span-1">
-                                    <span className="px-2 py-1 rounded-lg text-xs font-bold bg-white/5 border border-white/10 text-white/70">{planName}</span>
-                                </div>
+                                    {/* Plan */}
+                                    <div className="hidden md:block col-span-1">
+                                        <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide ${getPlanBadgeStyle(planName)}`}>{planName}</span>
+                                    </div>
 
-                                <div className="hidden md:block col-span-1 text-center font-bold">{user.publicMetadata.credits || 0}</div>
-                                <div className="hidden md:block col-span-1 text-center text-white/50">{user.publicMetadata.imagesGenerated || 0}</div>
-                                <div className="hidden md:block col-span-1 text-center text-xs uppercase font-bold text-white/40">{user.privateMetadata.status || 'FREE'}</div>
-                                <div className="hidden md:block col-span-2"><RenewalDate dateStr={user.privateMetadata.renewsAt} /></div>
+                                    {/* Stats (Credits/Gen) */}
+                                    <div className="hidden md:block col-span-1 text-center">
+                                        <div className="text-xs font-bold text-white">{user.publicMetadata.credits || 0} <span className="text-white/30 font-normal">cr</span></div>
+                                        <div className="text-[10px] text-white/40">{user.publicMetadata.imagesGenerated || 0} gen</div>
+                                    </div>
 
-                                <div className="hidden md:flex col-span-1 text-right justify-end gap-2">
-                                    <button onClick={() => handleEditClick(user)} className="p-2 hover:bg-white/10 rounded-lg text-white/50 hover:text-white"><Edit2 className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDeleteClick(user.id, user.email)} className="p-2 hover:bg-red-500/10 rounded-lg text-white/50 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
-                                </div>
-                            </motion.div>
-                        )})}
+                                    {/* Renewal */}
+                                    <div className="hidden md:block col-span-2 text-center">
+                                        <RenewalDate dateStr={user.privateMetadata.renewsAt} />
+                                    </div>
+
+                                    {/* Action */}
+                                    <div className="flex md:hidden w-full mt-2 pt-2 border-t border-white/5 justify-between items-center text-xs text-white/50">
+                                        <div className="flex gap-4">
+                                            <span>{user.publicMetadata.credits || 0} credits</span>
+                                            <span>{planName}</span>
+                                        </div>
+                                        <div>{user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : 'Never'}</div>
+                                    </div>
+
+                                    <div className="flex md:justify-end gap-2 col-span-1 ml-auto md:ml-0 mt-2 md:mt-0">
+                                        <button onClick={() => handleAffiliateClick(user)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white/50 hover:text-green-400 transition-colors" title="Manage Affiliate"><Users className="w-4 h-4" /></button>
+                                        <button onClick={() => handleEditClick(user)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-colors"><Edit2 className="w-4 h-4" /></button>
+                                        <button onClick={() => handleDeleteClick(user.id, user.email)} className="p-2 bg-white/5 hover:bg-red-500/10 rounded-lg text-white/50 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                    </div>
+                                </motion.div>
+                            )})}
+                        </div>
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="flex justify-between items-center pt-2">
+                        <div className="text-sm text-white/40">
+                            Showing <span className="text-white font-bold">{users.length}</span> of <span className="text-white font-bold">{totalUsers}</span> users
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button 
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 text-white transition-colors"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <span className="text-sm font-bold text-white px-2">Page {currentPage}</span>
+                            <button 
+                                onClick={() => setCurrentPage(p => p + 1)}
+                                disabled={currentPage * ITEMS_PER_PAGE >= totalUsers}
+                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-white/5 text-white transition-colors"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -539,6 +711,81 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+
+            {/* TAB CONTENT: PAYOUTS */}
+            {activeTab === 'payouts' && (
+                <div className="space-y-4">
+                    <h2 className="text-xl font-bold">Payout Requests</h2>
+                    <div className="grid gap-4">
+                        {payouts.length === 0 ? (
+                            <div className="text-center py-12 text-white/30 italic">No payout requests.</div>
+                        ) : (
+                            payouts.map((req) => (
+                                <motion.div 
+                                    key={req.id}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="bg-black/40 border border-white/5 rounded-xl p-6 flex flex-col gap-4 relative"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20 text-green-500">
+                                                <DollarSign className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <div className="text-lg font-bold text-white">${parseFloat(req.amount).toFixed(2)}</div>
+                                                <div className="text-sm text-white/50">{req.user_email}</div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 items-center">
+                                            {req.status === 'pending' && (
+                                                <>
+                                                    <button 
+                                                        onClick={() => handlePayoutStatus(req.id, 'paid')}
+                                                        className="px-3 py-1 bg-green-500/10 hover:bg-green-500/20 text-green-500 rounded-lg text-xs font-bold transition-colors"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handlePayoutStatus(req.id, 'declined')}
+                                                        className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-xs font-bold transition-colors"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </>
+                                            )}
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                                                req.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' : 
+                                                req.status === 'paid' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                                            }`}>
+                                                {req.status}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white/5 p-4 rounded-xl space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-white/40">Method:</span>
+                                            <span className="text-white font-medium uppercase">{req.method}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-white/40">Date:</span>
+                                            <span className="text-white font-medium">{new Date(req.created_at).toLocaleString()}</span>
+                                        </div>
+                                        
+                                        <div className="pt-2 border-t border-white/10 mt-2">
+                                            <div className="text-xs font-bold text-white/40 uppercase mb-2">Details</div>
+                                            <pre className="text-xs text-white/70 whitespace-pre-wrap font-mono overflow-auto">
+                                                {JSON.stringify(typeof req.details === 'string' ? JSON.parse(req.details) : req.details, null, 2)}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* Edit Modal */}
@@ -573,6 +820,53 @@ export default function AdminPage() {
                         <div className="mt-8 flex justify-end gap-3">
                             <button onClick={() => setEditingUser(null)} className="px-4 py-2 rounded-xl text-sm font-bold text-white/60 hover:text-white hover:bg-white/5">Cancel</button>
                             <button onClick={handleSave} disabled={saving} className="px-6 py-2 rounded-xl text-sm font-bold bg-primary text-white hover:brightness-110 shadow-lg shadow-primary/20 flex items-center gap-2">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </AnimatePresence>
+
+        {/* Affiliate Modal */}
+        <AnimatePresence>
+            {editingAffiliate && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-[#0f0f11] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+                        <button onClick={() => setEditingAffiliate(null)} className="absolute top-4 right-4 text-white/30 hover:text-white"><X className="w-5 h-5" /></button>
+                        <h2 className="text-xl font-bold text-white mb-6">Manage Affiliate Stats</h2>
+                        <p className="text-white/50 text-sm mb-4">Set the manual counts for this user's affiliate dashboard.</p>
+                        
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-white/60 uppercase tracking-wider mb-2">Active Starters</label>
+                                    <input type="number" value={affiliateForm.starter} onChange={(e) => setAffiliateForm({...affiliateForm, starter: parseInt(e.target.value) || 0})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-green-500/50" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/60 uppercase tracking-wider mb-2">Active Pros</label>
+                                    <input type="number" value={affiliateForm.pro} onChange={(e) => setAffiliateForm({...affiliateForm, pro: parseInt(e.target.value) || 0})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-green-500/50" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/60 uppercase tracking-wider mb-2">Active Agencies</label>
+                                    <input type="number" value={affiliateForm.agency} onChange={(e) => setAffiliateForm({...affiliateForm, agency: parseInt(e.target.value) || 0})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-green-500/50" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-white/60 uppercase tracking-wider mb-2">Free Users</label>
+                                    <input type="number" value={affiliateForm.free} onChange={(e) => setAffiliateForm({...affiliateForm, free: parseInt(e.target.value) || 0})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white outline-none focus:border-green-500/50" />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white/5 p-4 rounded-xl">
+                                <div className="text-xs font-bold text-white/40 uppercase mb-2">Estimated Earnings</div>
+                                <div className="text-2xl font-bold text-white">
+                                    ${((affiliateForm.starter * 19 + affiliateForm.pro * 39 + affiliateForm.agency * 79) * 0.15).toFixed(2)}
+                                </div>
+                                <p className="text-[10px] text-white/30 mt-1">Based on 15% commission</p>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 flex justify-end gap-3">
+                            <button onClick={() => setEditingAffiliate(null)} className="px-4 py-2 rounded-xl text-sm font-bold text-white/60 hover:text-white hover:bg-white/5">Cancel</button>
+                            <button onClick={handleSaveAffiliate} disabled={saving} className="px-6 py-2 rounded-xl text-sm font-bold bg-green-500 text-white hover:brightness-110 shadow-lg shadow-green-500/20 flex items-center gap-2">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Stats</button>
                         </div>
                     </div>
                 </div>

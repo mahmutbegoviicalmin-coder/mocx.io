@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Palette, Layers, Youtube, ArrowRight } from 'lucide-react';
+import { Palette, Layers, Youtube, ArrowRight, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUser } from '@clerk/nextjs';
 
 const TOOLS = [
   {
@@ -12,7 +13,8 @@ const TOOLS = [
     icon: Palette,
     href: '/dashboard/art',
     color: 'from-purple-500 to-indigo-600',
-    delay: 0.1
+    delay: 0.1,
+    minPlan: 'pro'
   },
   {
     id: 'mockup',
@@ -21,7 +23,8 @@ const TOOLS = [
     icon: Layers,
     href: '/dashboard/mockup',
     color: 'from-orange-500 to-red-600',
-    delay: 0.2
+    delay: 0.2,
+    minPlan: 'pro'
   },
   {
     id: 'thumbnail',
@@ -30,11 +33,25 @@ const TOOLS = [
     icon: Youtube,
     href: '/dashboard/thumbnail',
     color: 'from-blue-500 to-cyan-500',
-    delay: 0.3
+    delay: 0.3,
+    minPlan: 'starter'
   }
 ];
 
 export default function DashboardHome() {
+  const { user } = useUser();
+  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
+  
+  const isPro = planName.toLowerCase().includes('pro');
+  const isAgency = planName.toLowerCase().includes('agency');
+  const isStarter = planName.toLowerCase().includes('starter');
+
+  const hasAccess = (minPlan: string) => {
+      if (minPlan === 'starter') return isStarter || isPro || isAgency;
+      if (minPlan === 'pro') return isPro || isAgency;
+      return true;
+  };
+
   return (
     <div className="min-h-screen bg-[#0F0F0F] text-white p-6 lg:p-12 relative overflow-hidden font-sans">
        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none opacity-30" />
@@ -48,6 +65,8 @@ export default function DashboardHome() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {TOOLS.map((tool) => {
                 const Icon = tool.icon;
+                const locked = !hasAccess(tool.minPlan || 'free');
+
                 return (
                     <Link key={tool.id} href={tool.href}>
                         <motion.div 
@@ -62,7 +81,18 @@ export default function DashboardHome() {
                             {/* Icon Blob */}
                             <div className={`absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br ${tool.color} rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity`} />
 
-                            <div className="relative h-full p-8 flex flex-col justify-between z-10">
+                            {locked && (
+                                <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center transition-opacity">
+                                    <div className="bg-black/40 p-3 rounded-full border border-white/10 mb-2">
+                                        <Lock className="w-6 h-6 text-white/50" />
+                                    </div>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-white/50 border border-white/10 px-3 py-1 rounded-full bg-black/40">
+                                        {tool.minPlan === 'pro' ? 'Pro Plan' : 'Paid Plan'}
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className={`relative h-full p-8 flex flex-col justify-between z-10 ${locked ? 'opacity-40 blur-[1px]' : ''}`}>
                                 <div>
                                     <div className={`w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6 border border-white/5 group-hover:scale-110 transition-transform duration-300`}>
                                         <Icon className="w-7 h-7 text-white/80" />

@@ -35,13 +35,44 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
   const [enhancing, setEnhancing] = useState(false);
 
   const { generate, loading, uploading, progress, error, generatedImage } = useGeneration();
+  
+  // Use Proxy URL to enforce watermark if on trial
+  const displayImageUrl = generatedImage 
+      ? `/api/image-proxy?url=${encodeURIComponent(generatedImage)}` 
+      : null;
+      
   const { user } = useUser();
+  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
+  const isTrial = subscriptionStatus === 'on_trial';
+  
   const router = useRouter();
 
   // Credits Check
   const credits = user?.publicMetadata?.credits ? Number(user.publicMetadata.credits) : 0;
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
-  const isLocked = (!credits && planName === 'Free Plan');
+  
+  // Restriction Logic
+  const isProOrAgency = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
+  
+  let isLocked = false;
+
+  if (isTrial) {
+      // Trial User: Only 'thumbnail' allowed
+      if (mode !== 'thumbnail') {
+          isLocked = true;
+      }
+  } else {
+      // Regular User: Art & Mockup require Pro/Agency
+      if (mode === 'art' || mode === 'mockup') {
+          if (!isProOrAgency) isLocked = true;
+      }
+      // For 'thumbnail' mode in regular plans, usually Starter is enough, so we don't lock it here if paid.
+      // But if plan is 'Free Plan' (and not trial), everything is effectively locked by credit check, 
+      // but let's lock UI too for clarity.
+      if (planName === 'Free Plan') {
+          isLocked = true;
+      }
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -194,7 +225,15 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
                     <div className="p-4 bg-primary/10 rounded-full mb-4 animate-pulse">
                         <Lock className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Upgrade to Generate</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                        {isTrial && mode !== 'thumbnail' ? 'Trial Restriction' : 'Pro Plan Required'}
+                    </h3>
+                    <p className="text-white/40 text-sm max-w-xs mb-6">
+                        {isTrial && mode !== 'thumbnail' 
+                            ? 'During the trial period, only the Thumbnail Creator is available. Upgrade to access Art & Mockup Studio.'
+                            : 'This tool is exclusively available for Pro and Agency plan members.'
+                        }
+                    </p>
                     <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105">
                       View Plans
                     </Link>
@@ -339,17 +378,33 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
           <div className={`w-full h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all ${
              generatedImage ? 'border-primary/20' : 'border-dashed border-white/5'
           }`}>
-            {generatedImage ? (
-              <div className="relative w-full h-full flex items-center justify-center">
-                <img src={generatedImage} className="max-w-full max-h-full object-contain p-4 lg:p-12 shadow-2xl relative z-10" />
+            {displayImageUrl ? (
+              <div 
+                className="relative w-full h-full flex items-center justify-center select-none"
+                onContextMenu={(e) => e.preventDefault()} // Block Right Click context menu globally on container
+              >
+                <img 
+                    src={displayImageUrl} 
+                    className={`max-w-full max-h-full object-contain p-4 lg:p-12 shadow-2xl relative z-10 ${isTrial ? 'pointer-events-none' : ''}`} // Disable dragging if trial
+                    onContextMenu={(e) => e.preventDefault()} // Extra safety
+                    draggable={!isTrial}
+                />
+                
+                {/* Background Blur */}
                 <div className="absolute inset-0 z-0">
-                    <img src={generatedImage} className="w-full h-full object-cover blur-[100px] opacity-30" />
+                    <img src={displayImageUrl} className="w-full h-full object-cover blur-[100px] opacity-30" />
                 </div>
                 
                 <div className="absolute bottom-8 flex gap-2 z-20 bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10">
-                    <button onClick={() => window.open(generatedImage, '_blank')} className="bg-white text-black px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2">
-                        <Download className="w-4 h-4" /> Download
-                    </button>
+                    {isTrial ? (
+                        <Link href="/dashboard/billing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:brightness-110 shadow-lg shadow-amber-900/20">
+                             <Lock className="w-4 h-4" /> Unlock to Download
+                        </Link>
+                    ) : (
+                        <button onClick={() => window.open(displayImageUrl, '_blank')} className="bg-white text-black px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-gray-200 transition-colors">
+                            <Download className="w-4 h-4" /> Download
+                        </button>
+                    )}
                 </div>
               </div>
             ) : (

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 const ADMIN_EMAIL = 'mahmutbegoviic.almin@gmail.com';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await auth();
     const userId = session.userId;
@@ -20,9 +20,15 @@ export async function GET() {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
-    // Fetch all users (limit to 100 for now)
+    const { searchParams } = new URL(req.url);
+    const limit = parseInt(searchParams.get('limit') || '30');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    // Fetch users with pagination
     const userList = await client.users.getUserList({
-      limit: 100,
+      limit,
+      offset,
+      orderBy: '-created_at'
     });
 
     const users = userList.data.map((u) => ({
@@ -35,9 +41,14 @@ export async function GET() {
       createdAt: u.createdAt,
       publicMetadata: u.publicMetadata,
       privateMetadata: u.privateMetadata,
+      // Attempt to infer location/IP if possible in future or via client-side enrichment
+      // lastActiveSessionId removed due to TS error
     }));
 
-    return NextResponse.json(users);
+    return NextResponse.json({
+        users,
+        totalCount: userList.totalCount
+    });
   } catch (error) {
     console.error('[ADMIN_USERS_GET]', error);
     return new NextResponse('Internal Error', { status: 500 });

@@ -33,9 +33,9 @@ export async function POST(request: Request) {
 
     // Check Plan Restriction for Thumbnail Mode
     if (mode === 'thumbnail') {
-        const isPro = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
-        if (!isPro) {
-             return NextResponse.json({ error: 'Thumbnail Recreator is exclusively available for Pro and Agency plans.' }, { status: 403 });
+        const isAllowed = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency') || planName.toLowerCase().includes('starter');
+        if (!isAllowed) {
+             return NextResponse.json({ error: 'Thumbnail Recreator is exclusively available for paid plans.' }, { status: 403 });
         }
     }
 

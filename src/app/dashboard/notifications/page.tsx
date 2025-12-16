@@ -11,7 +11,7 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/notifications');
+      const res = await fetch('/api/notifications', { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       setNotifications(data.notifications || []);
@@ -37,6 +37,7 @@ export default function NotificationsPage() {
             body: JSON.stringify({ action: 'markAllRead' }),
         });
         fetchNotifications();
+        window.dispatchEvent(new Event('notificationsUpdated'));
     } catch (e) {
         console.error(e);
     }
@@ -55,6 +56,7 @@ export default function NotificationsPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ notificationId }),
         });
+        window.dispatchEvent(new Event('notificationsUpdated'));
     } catch (e) {
         console.error(e);
     }

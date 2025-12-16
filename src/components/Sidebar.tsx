@@ -38,6 +38,7 @@ export function Sidebar() {
   const isAffiliate = userEmail && AFFILIATE_EMAILS.some(e => e.toLowerCase() === userEmail);
 
   const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
+  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
   
   let planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
   if (planName === 'Mocx') {
@@ -60,7 +61,7 @@ export function Sidebar() {
   const fetchNotifications = async () => {
     if (!user) return;
     try {
-      const res = await fetch('/api/notifications');
+      const res = await fetch('/api/notifications', { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       setUnreadCount(Number(data.unreadCount || 0));
@@ -73,7 +74,15 @@ export function Sidebar() {
     if (!user) return;
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+    
+    // Listen for updates from other components
+    const handleUpdate = () => fetchNotifications();
+    window.addEventListener('notificationsUpdated', handleUpdate);
+
+    return () => {
+        clearInterval(interval);
+        window.removeEventListener('notificationsUpdated', handleUpdate);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -113,7 +122,7 @@ export function Sidebar() {
              <div className="relative flex items-center gap-1.5 px-3 py-1 bg-black/40 border border-white/10 rounded-full shadow-lg">
                 <Crown className="w-3 h-3 text-amber-400" />
                 <span className="text-[10px] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 uppercase">
-                  {planName}
+                  {planName} {subscriptionStatus === 'on_trial' && '(TRIAL)'}
                 </span>
              </div>
         </div>
@@ -153,7 +162,7 @@ export function Sidebar() {
             <div className="relative">
               <Bell className={`w-5 h-5 ${pathname === '/dashboard/notifications' ? '' : 'opacity-70 group-hover:opacity-100'}`} />
               {unreadCount > 0 && (
-                <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#0F0F0F]">
+                <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#0F0F0F] animate-pulse">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}

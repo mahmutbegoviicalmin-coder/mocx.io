@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { db } from '@/db/sql';
 
+export const dynamic = 'force-dynamic';
+
 const ADMIN_EMAIL = 'mahmutbegoviic.almin@gmail.com';
 
 async function assertAdmin() {
