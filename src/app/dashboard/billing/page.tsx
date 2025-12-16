@@ -463,7 +463,7 @@ function BillingPlanCard({
                 y: -8,
                 transition: { duration: 0.3, ease: "easeOut" }
             }}
-            className={`relative rounded-[2rem] p-8 flex flex-col h-full transition-all duration-500 group overflow-hidden ${
+            className={`relative rounded-[2rem] p-8 flex flex-col h-full transition-all duration-500 group ${
                 popular 
                     ? 'bg-[#0F0F0F] border border-amber-500/40 shadow-[0_0_60px_-20px_rgba(245,158,11,0.25)] z-10 scale-105' 
                     : 'bg-[#0A0A0A] border border-white/5 hover:border-white/10 hover:bg-[#0F0F0F] shadow-xl'
@@ -481,7 +481,7 @@ function BillingPlanCard({
                         <div className="relative flex items-center gap-2 px-4 py-1.5 bg-[#0F0F0F] border border-amber-500/30 rounded-full shadow-xl">
                             <Crown className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" fill="currentColor" fillOpacity={0.2} />
                             <span className="text-[10px] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 uppercase whitespace-nowrap">
-                                Most Popular
+                                Best Value
                             </span>
                         </div>
                     </div>
