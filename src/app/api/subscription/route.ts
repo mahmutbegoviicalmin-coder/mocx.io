@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     const userEmail = user.emailAddresses[0]?.emailAddress;
 
     // Create Checkout via Lemon Squeezy API
+    // We strictly link to the specific Variant ID
     const response = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
         method: 'POST',
         headers: {
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
                     variant: {
                         data: {
                             type: "variants",
-                            id: String(variantId) // Ensure string
+                            id: String(variantId) // This locks the checkout to this specific variant
                         }
                     }
                 }
