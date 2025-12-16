@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Zap, Calendar, CreditCard, Loader2, X } from 'lucide-react';
+import { Check, Zap, Calendar, CreditCard, Loader2, X, Crown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { CREDIT_PACKS } from '@/config/credits';
 import { PLANS } from '@/config/plans';
@@ -190,11 +190,11 @@ export default function BillingPage() {
                 </div>
 
                 {!isFreePlan && subscriptionStatus === 'active' && (
-                    <div className="mt-8 relative z-10 flex gap-4">
+                    <div className="mt-8 relative z-20 flex gap-4">
                         {customerPortalUrl && (
                             <button 
                                 onClick={handleManageSubscription}
-                                className="flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors hover:underline underline-offset-4 decoration-primary/50"
+                                className="flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition-colors hover:underline underline-offset-4 decoration-primary/50 cursor-pointer relative z-20"
                             >
                                 <CreditCard className="w-4 h-4" />
                                 Manage Billing
@@ -202,7 +202,7 @@ export default function BillingPage() {
                         )}
                         <button 
                             onClick={() => setShowCancelModal(true)}
-                            className="flex items-center gap-2 text-sm font-medium text-red-400/70 hover:text-red-400 transition-colors hover:underline underline-offset-4 decoration-red-500/50"
+                            className="flex items-center gap-2 text-sm font-medium text-red-400/70 hover:text-red-400 transition-colors hover:underline underline-offset-4 decoration-red-500/50 cursor-pointer relative z-20"
                         >
                             <X className="w-4 h-4" />
                             Cancel Subscription
@@ -470,9 +470,16 @@ function BillingPlanCard({
             } ${current ? 'ring-2 ring-primary ring-offset-4 ring-offset-background' : ''}`}
         >
             {popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-red-600 text-white px-5 py-1.5 rounded-full text-xs font-bold shadow-lg uppercase tracking-wide flex items-center gap-2">
-                    <Zap className="w-3 h-3 fill-current" />
-                    Most Popular
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
+                    <div className="relative group cursor-default">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur opacity-40 group-hover:opacity-75 transition duration-500"></div>
+                        <div className="relative flex items-center gap-2 px-4 py-1.5 bg-[#0F0F0F] border border-amber-500/30 rounded-full shadow-xl">
+                            <Crown className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" fill="currentColor" fillOpacity={0.2} />
+                            <span className="text-[10px] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 uppercase whitespace-nowrap">
+                                Most Popular
+                            </span>
+                        </div>
+                    </div>
                 </div>
             )}
 
