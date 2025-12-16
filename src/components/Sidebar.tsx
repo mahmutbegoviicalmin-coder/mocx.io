@@ -223,7 +223,7 @@ export function Sidebar() {
         {showTrial && (
             <button
                onClick={handleStartTrial}
-               className="w-full mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:brightness-110 transition-all flex items-center justify-center gap-2 group animate-in fade-in zoom-in duration-500"
+               className="w-full mt-6 bg-gradient-to-r from-amber-500 to-orange-600 text-white p-3.5 rounded-xl font-bold text-sm shadow-lg shadow-amber-900/20 hover:shadow-amber-900/40 hover:brightness-110 transition-all flex items-center justify-center gap-2 group animate-in fade-in zoom-in duration-500"
             >
                <Rocket className="w-4 h-4 fill-white/20 group-hover:scale-110 transition-transform" />
                Start Free Trial

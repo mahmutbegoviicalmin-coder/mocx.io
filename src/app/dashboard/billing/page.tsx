@@ -541,7 +541,7 @@ function BillingPlanCard({
                     current && !isTrial
                         ? 'bg-emerald-500/10 text-emerald-400 cursor-default border border-emerald-500/20 shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]'
                         : isTrial && current
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:brightness-110 shadow-purple-500/30 hover:shadow-purple-500/50 cursor-pointer'
+                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 cursor-pointer'
                             : popular
                                 ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20 cursor-pointer'
                                 : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10 cursor-pointer'
