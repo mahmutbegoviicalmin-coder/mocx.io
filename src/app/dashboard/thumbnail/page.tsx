@@ -174,7 +174,7 @@ export default function ThumbnailPage() {
                             Thumbnail Recreator
                         </h2>
                         <div className="flex items-center gap-2">
-                            <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/20">PRO</span>
+                            <span className="bg-gradient-to-r from-primary via-orange-500 to-primary bg-[length:200%_auto] animate-gradient text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-[0_0_12px_-2px_rgba(255,84,0,0.6)] border border-white/10 tracking-widest uppercase">PRO</span>
                             <p className="text-xs text-white/40 font-medium">Recreate with AI Styles</p>
                         </div>
                     </div>
