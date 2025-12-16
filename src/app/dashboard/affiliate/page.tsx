@@ -8,7 +8,6 @@ import { motion } from 'framer-motion';
 
 const ALLOWED_EMAILS = [
   'mahmutbegoviic.almin@gmail.com',
-  'dragomijatovic141@gmail.com',
   'stefanpusicic27@protonmail.com',
   'stefanpusicic27@gmail.com'
 ];
