@@ -65,7 +65,7 @@ export function Pricing() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-muted-foreground max-w-2xl mx-auto"
           >
-            Choose the plan that fits your creative needs. Cancel anytime.
+            Start with <span className="text-white font-bold">5 free credits</span> on sign up. No credit card required.
           </motion.p>
           
           <motion.div 
@@ -110,7 +110,6 @@ export function Pricing() {
             features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
             delay={0.1}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
-            hasTrial={true}
           />
 
           <PricingCard 
@@ -151,7 +150,7 @@ export function Pricing() {
   );
 }
 
-function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId, hasTrial = false }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string, hasTrial?: boolean }) {
+function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -302,24 +301,8 @@ function PricingCard({ title, price, originalPrice, period = "/mo", features, hi
             : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 hover:border-white/10'
         }`}
       >
-        {hasTrial ? (
-            <>
-                <span>Start 2-Day Free Trial</span>
-                <span className={`text-[10px] font-medium ${highlighted ? 'text-black/50' : 'text-white/40'}`}>
-                    Then ${price}{period}
-                </span>
-            </>
-        ) : (
-            <span>Get {title}</span>
-        )}
+        <span>Get {title}</span>
       </motion.button>
-      
-      {hasTrial && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-medium text-white/30">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Cancel anytime during trial
-        </div>
-      )}
     </motion.div>
   );
 }

@@ -44,7 +44,7 @@ export function Hero() {
             href="/sign-up" 
             className="group relative h-12 px-8 flex items-center justify-center gap-2 bg-white text-black rounded-full font-semibold transition-all hover:bg-gray-200 active:scale-95"
           >
-            Start Creating
+            Try for Free (5 Credits)
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           
@@ -64,7 +64,7 @@ export function Hero() {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
             </div>
             <p className="text-sm font-medium text-amber-100">
-                New: <span className="text-white font-bold border-b border-amber-500/50">Start your 2-day free trial</span> today.
+                New: <span className="text-white font-bold border-b border-amber-500/50">Free credits on sign up</span> available now.
             </p>
             <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
         </div>

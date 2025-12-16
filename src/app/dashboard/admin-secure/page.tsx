@@ -140,7 +140,6 @@ export default function AdminPage() {
   const [stats, setStats] = useState<Stats>({ totalRevenue: 0, totalUsers: 0 });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [showTrialsOnly, setShowTrialsOnly] = useState(false);
   const [notifTitle, setNotifTitle] = useState('');
   const [notifBody, setNotifBody] = useState('');
   const [sendingNotif, setSendingNotif] = useState(false);
@@ -341,12 +340,6 @@ export default function AdminPage() {
     (u.firstName && u.firstName.toLowerCase().includes(search.toLowerCase())) ||
     (u.lastName && u.lastName.toLowerCase().includes(search.toLowerCase()));
     
-    // Check trial status (could be in public or private metadata depending on sync)
-    const isTrial = u.publicMetadata?.subscriptionStatus === 'on_trial' || 
-                    u.privateMetadata?.status === 'on_trial';
-
-    if (showTrialsOnly && !isTrial) return false;
-
     return matchesSearch;
   });
   
@@ -499,16 +492,6 @@ export default function AdminPage() {
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
-                        <button 
-                            onClick={() => setShowTrialsOnly(!showTrialsOnly)}
-                            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all whitespace-nowrap ${
-                                showTrialsOnly 
-                                ? 'bg-purple-500 text-white border-purple-500 shadow-lg shadow-purple-500/20' 
-                                : 'bg-white/5 text-white/50 border-white/10 hover:text-white'
-                            }`}
-                        >
-                            Trial Only
-                        </button>
                     </div>
 
                     <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">

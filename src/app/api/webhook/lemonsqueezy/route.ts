@@ -138,14 +138,10 @@ export async function POST(request: Request) {
       // Determine credits based on plan
       let credits = 100;
 
-      // TRIAL LOGIC: Limit to 10 credits (2 generations of thumbnails at 5 credits each)
-      if (attributes.status === 'on_trial') {
-          credits = 10;
-      } else {
-          if (planName.toLowerCase().includes('starter')) credits = 50;
-          else if (planName.toLowerCase().includes('pro')) credits = 200;
-          else if (planName.toLowerCase().includes('agency')) credits = 400;
-      }
+      // REMOVED TRIAL LOGIC
+      if (planName.toLowerCase().includes('starter')) credits = 50;
+      else if (planName.toLowerCase().includes('pro')) credits = 200;
+      else if (planName.toLowerCase().includes('agency')) credits = 400;
       
       if (userId) {
           await client.users.updateUserMetadata(userId, {
