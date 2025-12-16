@@ -8,7 +8,9 @@ import { motion } from 'framer-motion';
 
 const ALLOWED_EMAILS = [
   'mahmutbegoviic.almin@gmail.com',
-  'dragomijatovic141@gmail.com'
+  'dragomijatovic141@gmail.com',
+  'stefanpusicic27@protonmail.com',
+  'stefanpusicic27@gmail.com'
 ];
 
 interface Stats {
@@ -30,7 +32,9 @@ export default function AffiliatePage() {
 
   useEffect(() => {
     if (isLoaded) {
-      if (!user || !ALLOWED_EMAILS.includes(user.emailAddresses[0].emailAddress)) {
+      const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase().trim();
+      
+      if (!userEmail || !ALLOWED_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
         router.push('/dashboard');
         return;
       }
