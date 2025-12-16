@@ -436,6 +436,13 @@ export default function ThumbnailPage() {
                      <div className="absolute inset-0 z-0">
                         <img src={displayImageUrl} className="w-full h-full object-cover blur-[100px] opacity-20" />
                      </div>
+                     
+                     {isTrial && (
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full text-[10px] text-white/70 font-medium flex items-center gap-2 whitespace-nowrap z-20">
+                            <Info className="w-3 h-3 text-yellow-400" />
+                            Low resolution preview. Upgrade for 4K result.
+                        </div>
+                     )}
                 </div>
                 
                 <div className="h-20 bg-[#1A1A1A] border-t border-white/10 flex items-center justify-between px-6 shrink-0">
