@@ -80,8 +80,8 @@ export function Sidebar() {
   let maxCredits = 100;
   if (planName === 'Free Plan') maxCredits = 0; 
   else if (planName.toLowerCase().includes('starter')) maxCredits = 50; 
-  else if (planName.toLowerCase().includes('pro')) maxCredits = 300;
-  else if (planName.toLowerCase().includes('agency')) maxCredits = 500;
+  else if (planName.toLowerCase().includes('pro')) maxCredits = 200;
+  else if (planName.toLowerCase().includes('agency')) maxCredits = 400;
 
   const progress = maxCredits > 0 && credits ? Math.min((credits / maxCredits) * 100, 100) : 0;
 
