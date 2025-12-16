@@ -2,60 +2,60 @@
 
 import { useState } from 'react';
 import { 
-  Upload, Info, Image as ImageIcon, X, Wand2, Youtube, 
+  Upload, Info, Image as ImageIcon, X, Youtube, 
   Monitor, Square, Smartphone, Zap, Lock, Download, ArrowLeft,
-  Flame, Mic, Briefcase, Swords, Sparkles, RefreshCw, User
+  RefreshCw, User, Layout, 
+  Flame, Mic, Briefcase, Swords, Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import { useGeneration } from '@/hooks/useGeneration';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { TopUpModal } from '@/components/TopUpModal';
-import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
 
 const PRESETS = [
   {
     id: 'viral',
-    label: 'Viral',
+    label: 'Viral / MrBeast',
     icon: Flame,
-    description: 'High contrast, exaggerated expressions, bold colors.',
-    prompt: 'Maximize emotional impact, Exaggerate expressions, High contrast, bold colors, Designed for max CTR'
+    description: 'High contrast, shocked expressions, saturated colors.',
+    prompt: 'Viral YouTube Thumbnail style, High contrast, Exaggerated emotional expressions, Saturated bold colors, MrBeast style lighting'
   },
   {
     id: 'podcast',
     label: 'Podcast',
     icon: Mic,
-    description: 'Cinematic studio lighting, professional look.',
-    prompt: 'Premium studio lighting, Cinematic, professional podcast look, Focus on faces + microphones'
+    description: 'Professional studio setup, microphone focus.',
+    prompt: 'High-end Podcast Thumbnail, Cinematic studio lighting, Professional focus, 4k crisp detail, Microphone visible'
   },
   {
     id: 'business',
-    label: 'Business',
+    label: 'Business / Finance',
     icon: Briefcase,
-    description: 'Clean, minimal, authoritative, trust-focused.',
-    prompt: 'Authority and trust, Reduced saturation, Clean, minimal, professional'
+    description: 'Trustworthy, clean, minimal, authoritative.',
+    prompt: 'Business Professional Thumbnail, Clean minimal background, Authority and trust, Blue and white tones, High key lighting'
   },
   {
     id: 'drama',
-    label: 'Drama',
+    label: 'Drama / Commentary',
     icon: Swords,
-    description: 'High tension, strong contrast, versus energy.',
-    prompt: 'Strong contrast between subjects, Tension, debate, versus energy'
+    description: 'Darker tones, high tension, mysterious.',
+    prompt: 'Drama Commentary Thumbnail, High tension, Darker moody lighting, Mystery, Strong rim lighting'
   },
   {
     id: 'clean',
-    label: 'Clean',
+    label: 'Clean / Tech',
     icon: Sparkles,
-    description: 'Minimal, Apple-style, soft lighting.',
-    prompt: 'Minimal, Apple-style, Soft lighting, reduced noise'
-  },
-  {
-    id: 'shorts',
-    label: 'Shorts',
-    icon: Smartphone,
-    description: 'Mobile-first, large faces, bright & vertical.',
-    prompt: 'Mobile-first, Faces larger, High brightness and contrast, Optimized for vertical viewing'
+    description: 'Apple-style minimalism, soft gradients.',
+    prompt: 'Tech Review Thumbnail, Clean minimal aesthetic, Soft gradients, Bright, Apple-style product photography'
   }
+];
+
+const ASPECT_RATIOS = [
+    { label: 'YouTube', sub: '1920x1080', value: '16:9', icon: Monitor },
+    { label: 'Shorts / TikTok', sub: '1080x1920', value: '9:16', icon: Smartphone },
+    { label: 'Instagram', sub: '1080x1080', value: '1:1', icon: Square },
+    { label: 'Portrait', sub: '4:5', value: '4:5', icon: Layout },
 ];
 
 export default function ThumbnailPage() {
@@ -67,6 +67,8 @@ export default function ThumbnailPage() {
   const [preserveIdentity, setPreserveIdentity] = useState(true);
   
   const [selectedPresetId, setSelectedPresetId] = useState<string>('viral');
+  const [prompt, setPrompt] = useState('');
+  const [aspectRatio, setAspectRatio] = useState('16:9');
   
   const [showTopUpModal, setShowTopUpModal] = useState(false);
 
@@ -76,7 +78,13 @@ export default function ThumbnailPage() {
 
   const credits = user?.publicMetadata?.credits ? Number(user.publicMetadata.credits) : 0;
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
-  const isLocked = (!credits && planName === 'Free Plan');
+  
+  // RESTRICTION LOGIC:
+  // Must be Pro or Agency plan to use this feature
+  const isPro = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
+  const isLocked = !isPro;
+  
+  const COST_PER_IMAGE = 5;
 
   const handleOriginalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,11 +114,14 @@ export default function ThumbnailPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (isLocked) {
+        // Redirect or show modal is handled by the overlay, but if they click somehow:
         router.push('/dashboard/billing');
         return;
     }
-    if (credits < 1) {
+
+    if (credits < COST_PER_IMAGE) {
         setShowTopUpModal(true);
         return;
     }
@@ -122,19 +133,19 @@ export default function ThumbnailPage() {
     const preset = PRESETS.find(p => p.id === selectedPresetId);
     if (!preset) return;
 
-    // Construct Enhanced Prompt
-    let finalPrompt = `${preset.prompt}. Preserve facial identity, Ignore original clothing and logos, Remove visual clutter.`;
+    // Construct Final Prompt
+    let finalPrompt = `${preset.prompt}. `;
+    if (prompt.trim()) {
+        finalPrompt += `${prompt}. `;
+    }
+    finalPrompt += `Preserve facial identity, Ignore original clothing and logos, Remove visual clutter.`;
     
-    // Combine files: Original Thumb first, then Faces
     const allFiles = [originalThumb, ...faceFiles];
-    
-    // Determine Aspect Ratio based on Preset or Default (16:9 for most, 9:16 for Shorts)
-    const ratio = selectedPresetId === 'shorts' ? '9:16' : '16:9';
     
     generate({ 
       prompt: finalPrompt, 
       imageFiles: allFiles, 
-      aspectRatio: ratio, 
+      aspectRatio, 
       mode: 'thumbnail' 
     });
   };
@@ -162,7 +173,10 @@ export default function ThumbnailPage() {
                             <Youtube className="w-5 h-5 text-red-500" />
                             Thumbnail Recreator
                         </h2>
-                        <p className="text-xs text-white/40 font-medium">Enhance CTR with AI presets</p>
+                        <div className="flex items-center gap-2">
+                            <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/20">PRO</span>
+                            <p className="text-xs text-white/40 font-medium">Recreate with AI Styles</p>
+                        </div>
                     </div>
                 </div>
                 <div className="bg-white/5 px-3 py-1.5 rounded-full border border-white/5 flex items-center gap-2">
@@ -171,14 +185,20 @@ export default function ThumbnailPage() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8 flex-1 flex flex-col">
+            <form onSubmit={handleSubmit} className="space-y-8 flex-1 flex flex-col relative">
               
+              {/* LOCK OVERLAY FOR NON-PRO */}
               {isLocked && (
-                 <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col items-center justify-center text-center p-6 rounded-[2rem] border border-primary/20 shadow-2xl">
-                    <Lock className="w-8 h-8 text-primary mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Upgrade to Generate</h3>
-                    <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20">
-                      View Plans
+                 <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col items-center justify-center text-center p-6 rounded-[2rem] border border-primary/20 shadow-2xl h-full">
+                    <div className="p-4 bg-primary/10 rounded-full mb-4 animate-pulse">
+                        <Lock className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Pro Plan Required</h3>
+                    <p className="text-white/40 text-sm max-w-xs mb-6">
+                        The Thumbnail Recreator is exclusively available for Pro and Agency plan members.
+                    </p>
+                    <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105">
+                      Upgrade to Pro
                     </Link>
                  </div>
               )}
@@ -255,49 +275,103 @@ export default function ThumbnailPage() {
                  )}
               </div>
 
-              {/* SECTION 3: PRESETS */}
-              <div className="space-y-3 flex-1">
-                <label className="text-xs font-bold text-white/60 uppercase tracking-wider flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px] font-bold">3</span>
-                    Choose Style
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {PRESETS.map((preset) => {
-                    const Icon = preset.icon;
-                    const isSelected = selectedPresetId === preset.id;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => setSelectedPresetId(preset.id)}
-                        className={`flex flex-col items-start p-3 rounded-xl border transition-all relative overflow-hidden text-left h-24 ${
-                          isSelected
-                            ? 'bg-primary/10 border-primary/50 text-white shadow-[0_0_15px_-5px_var(--primary)]'
-                            : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1.5 w-full">
-                            <Icon className={`w-4 h-4 ${isSelected ? 'text-primary' : ''}`} />
-                            <span className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-white/80'}`}>{preset.label}</span>
+               {/* SECTION 3: THUMBNAIL TYPE & PLATFORM */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* TYPE */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-white/60 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px] font-bold">3</span>
+                            Thumbnail Type
+                        </label>
+                        <div className="space-y-2">
+                            {PRESETS.map((preset) => {
+                                const isSelected = selectedPresetId === preset.id;
+                                const Icon = preset.icon;
+                                return (
+                                    <button
+                                        key={preset.id}
+                                        type="button"
+                                        onClick={() => setSelectedPresetId(preset.id)}
+                                        className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left group ${
+                                            isSelected 
+                                            ? 'bg-purple-500/10 border-purple-500/50 shadow-[0_0_15px_-5px_rgba(168,85,247,0.4)]' 
+                                            : 'bg-white/5 border-white/5 hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/50 group-hover:text-white'}`}>
+                                            <Icon className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <div className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-white/70 group-hover:text-white'}`}>
+                                                {preset.label}
+                                            </div>
+                                            <div className="text-[10px] text-white/30 line-clamp-1">{preset.description}</div>
+                                        </div>
+                                    </button>
+                                )
+                            })}
                         </div>
-                        <p className="text-[10px] leading-3 opacity-60 line-clamp-2">
-                            {preset.description}
-                        </p>
-                        {isSelected && (
-                            <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-primary/20 to-transparent -mr-4 -mt-4 rounded-full blur-xl pointer-events-none" />
-                        )}
-                      </button>
-                    );
-                  })}
+                    </div>
+
+                    {/* PLATFORM */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold text-white/60 uppercase tracking-wider flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-[10px] font-bold">4</span>
+                            Platform
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {ASPECT_RATIOS.map((ratio) => {
+                                const Icon = ratio.icon;
+                                const isSelected = aspectRatio === ratio.value;
+                                return (
+                                <button
+                                    key={ratio.value}
+                                    type="button"
+                                    onClick={() => setAspectRatio(ratio.value)}
+                                    className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all gap-1.5 h-[72px] ${
+                                    isSelected
+                                        ? 'bg-primary/10 border-primary/50 text-white shadow-[0_0_15px_-5px_var(--primary)]'
+                                        : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                                    }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    <span className="text-[9px] font-bold text-center leading-tight">{ratio.label}</span>
+                                </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+               </div>
+
+              {/* SECTION 5: CUSTOM INSTRUCTIONS */}
+              <div className="flex-1 flex flex-col space-y-3">
+                <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">
+                    <span className="w-5 h-5 rounded-full bg-orange-500/20 text-orange-400 inline-flex items-center justify-center text-[10px] font-bold mr-2">5</span>
+                    Specific Details / Text <span className="text-white/20 font-normal normal-case">(Optional)</span>
+                </label>
+                <div className="relative">
+                    <textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="E.g. 'Add text saying $1 VS $1,000,000', 'Make the background explosion red', 'Subject holding a stack of cash'..."
+                        className="w-full h-24 bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 resize-none transition-all"
+                    />
                 </div>
               </div>
 
               <button 
                 type="submit"
                 disabled={loading || uploading || isLocked}
-                className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-red-500/20 disabled:opacity-50 mt-auto"
+                className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-red-500/20 disabled:opacity-50 mt-auto flex items-center justify-center gap-2"
               >
-                 {loading ? 'Enhancing for maximum CTR…' : uploading ? 'Uploading...' : 'Recreate Thumbnail'}
+                 {loading ? 'Recreating Thumbnail...' : uploading ? 'Uploading...' : (
+                    <>
+                        Recreate Thumbnail 
+                        <span className="bg-black/20 text-white/80 text-[10px] px-2 py-0.5 rounded flex items-center gap-1">
+                            <Zap className="w-3 h-3 text-yellow-400 fill-current" /> 5
+                        </span>
+                    </>
+                 )}
               </button>
             </form>
             
@@ -315,20 +389,19 @@ export default function ThumbnailPage() {
           <div className={`w-full h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all ${
              generatedImage ? 'border-primary/20' : 'border-dashed border-white/5'
           }`}>
-            {generatedImage && originalPreview ? (
+            {generatedImage ? (
               <div className="relative w-full h-full flex flex-col">
                 <div className="flex-1 relative flex items-center justify-center p-4 lg:p-12">
-                     {/* Compare Slider */}
-                    <div className="relative w-full h-full max-h-[800px] shadow-2xl rounded-xl overflow-hidden border border-white/10">
-                         <ReactCompareSlider
-                            itemOne={<ReactCompareSliderImage src={originalPreview} alt="Original" />}
-                            itemTwo={<ReactCompareSliderImage src={generatedImage} alt="Enhanced" />}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                            className="bg-black/50"
-                        />
-                         <div className="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-full text-[10px] font-bold text-white/50 backdrop-blur-md pointer-events-none border border-white/5">Original</div>
-                         <div className="absolute top-4 right-4 bg-primary/20 px-3 py-1 rounded-full text-[10px] font-bold text-primary backdrop-blur-md pointer-events-none border border-primary/20">Enhanced</div>
-                    </div>
+                     <img 
+                        src={generatedImage} 
+                        className="max-w-full max-h-full object-contain shadow-2xl rounded-xl relative z-10" 
+                        alt="Generated Result"
+                     />
+                     
+                     {/* Blurred Background */}
+                     <div className="absolute inset-0 z-0">
+                        <img src={generatedImage} className="w-full h-full object-cover blur-[100px] opacity-20" />
+                     </div>
                 </div>
                 
                 <div className="h-20 bg-[#1A1A1A] border-t border-white/10 flex items-center justify-between px-6 shrink-0">
@@ -356,8 +429,8 @@ export default function ThumbnailPage() {
                 <h3 className="text-2xl font-bold text-white mb-2">Thumbnail Recreator</h3>
                 <p className="text-white/40 max-w-sm mx-auto text-sm">
                   1. Upload Reference<br/>
-                  2. Choose Style<br/>
-                  3. Get Viral Result
+                  2. Select Type & Platform<br/>
+                  3. Add Custom Details (Optional)
                 </p>
               </div>
             )}
@@ -365,7 +438,7 @@ export default function ThumbnailPage() {
             {loading && (
                <div className="absolute inset-0 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center z-30">
                  <div className="w-20 h-20 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-6" />
-                 <h3 className="text-xl font-bold text-white animate-pulse">{uploading ? 'Uploading Assets...' : 'Enhancing for maximum CTR…'}</h3>
+                 <h3 className="text-xl font-bold text-white animate-pulse">{uploading ? 'Uploading Assets...' : 'Recreating Thumbnail...'}</h3>
                  <p className="text-white/40 text-sm mt-2">{Math.round(progress)}% Complete</p>
                </div>
             )}

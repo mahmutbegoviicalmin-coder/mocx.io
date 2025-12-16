@@ -117,7 +117,7 @@ export function Pricing() {
             price={annual ? 420 : 39}
             originalPrice={annual ? 630 : 59}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "2400 Images/year" : "200 Images/mo", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
+            features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution"]}
             highlighted
             delay={0.2}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
@@ -128,7 +128,7 @@ export function Pricing() {
             price={annual ? 850 : 79}
             originalPrice={annual ? 1275 : 119}
             period={annual ? "/year" : "/mo"}
-            features={[annual ? "4800 Images/year" : "400 Images/mo", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
+            features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
             delay={0.3}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
           />

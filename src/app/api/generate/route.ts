@@ -12,22 +12,33 @@ export async function POST(request: Request) {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     
+    const { prompt, imageUrls, aspectRatio, mode } = await request.json();
+
     // Default to 0 credits if undefined to prevent free usage
     const credits = user.publicMetadata.credits !== undefined ? (user.publicMetadata.credits as number) : 0;
     const planName = (user.publicMetadata.planName as string) || 'Free Plan';
 
+    // Determine Cost
+    const COST = mode === 'thumbnail' ? 5 : 1;
+
     // Strict check: If Free Plan and no credits, block.
-    // This matches the frontend "isLocked" logic.
     if (planName === 'Free Plan' && credits < 1) {
         return NextResponse.json({ error: 'Upgrade to a paid plan or top up credits to generate.' }, { status: 403 });
     }
 
-    if (credits < 1) {
-        return NextResponse.json({ error: 'Insufficient credits. Please top up.' }, { status: 403 });
+    // Check Balance
+    if (credits < COST) {
+        return NextResponse.json({ error: `Insufficient credits. This action requires ${COST} credits.` }, { status: 403 });
     }
 
-    const { prompt, imageUrls, aspectRatio } = await request.json();
-    
+    // Check Plan Restriction for Thumbnail Mode
+    if (mode === 'thumbnail') {
+        const isPro = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
+        if (!isPro) {
+             return NextResponse.json({ error: 'Thumbnail Recreator is exclusively available for Pro and Agency plans.' }, { status: 403 });
+        }
+    }
+
     if (!process.env.NANOBANANA_API_KEY) {
         return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
     }
@@ -101,12 +112,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Deduct 1 credit upon successful API call and track usage
+    // Deduct credits upon successful API call and track usage
     const currentUsage = (user.publicMetadata.imagesGenerated as number) || 0;
     
     await client.users.updateUserMetadata(userId, {
         publicMetadata: {
-            credits: credits - 1,
+            credits: credits - COST,
             imagesGenerated: currentUsage + 1
         }
     });

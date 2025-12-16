@@ -94,8 +94,23 @@ export default function BillingPage() {
     }
   };
 
-  const handleSubscribe = async (variantId: string) => {
+  const handleSubscribe = async (planUrlOrId: string) => {
       try {
+          let variantId = planUrlOrId;
+          
+          // Extract variant ID from URL if it's a Lemon Squeezy URL
+          if (planUrlOrId.includes('http')) {
+              try {
+                  const url = new URL(planUrlOrId);
+                  const enabledParam = url.searchParams.get('enabled');
+                  if (enabledParam) {
+                      variantId = enabledParam;
+                  }
+              } catch (e) {
+                  console.error('Failed to parse plan URL', e);
+              }
+          }
+
           const res = await fetch('/api/subscription', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -106,7 +121,7 @@ export default function BillingPage() {
           if (data.url) {
               window.location.href = data.url;
           } else {
-              alert('Failed to start subscription');
+              alert(data.error || 'Failed to start subscription');
           }
       } catch (error) {
           console.error(error);
@@ -316,7 +331,7 @@ export default function BillingPage() {
                     title="Pro"
                     price={annual ? 420 : 39}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "2400 Credits" : "200 Credits", "Fast Generation", "Priority Support", "High Resolution"]}
+                    features={[annual ? "2400 Credits" : "200 Credits", "Thumbnail Recreator", "Fast Generation", "Priority Support", "High Resolution"]}
                     variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Pro')}
@@ -327,7 +342,7 @@ export default function BillingPage() {
                     title="Agency"
                     price={annual ? 850 : 79}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "4800 Credits" : "400 Credits", "Max Speed", "API Access", "24/7 Support"]}
+                    features={[annual ? "4800 Credits" : "400 Credits", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support"]}
                     variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Agency')}

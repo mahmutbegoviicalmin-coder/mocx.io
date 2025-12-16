@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { prompt } = await request.json();
+    const { prompt, type } = await request.json();
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
@@ -12,18 +12,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'OpenAI API Key missing' }, { status: 500 });
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini", // Fast and cheap, good for this
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert prompt engineer for the "NanoBanana" AI model, specializing in high-end product mockups.
+    let systemPrompt = '';
+
+    if (type === 'thumbnail') {
+      systemPrompt = `You are an expert YouTube Thumbnail Strategist and Prompt Engineer.
+      
+      Your goal is to rewrite the user's prompt into a highly effective image generation prompt for a YouTube Thumbnail.
+      
+      **CRITICAL INSTRUCTIONS:**
+      1. **PRESERVE IDENTITY:** You MUST emphasize that the facial features of the subject are preserved perfectly. Do NOT suggest changing the face, age, or key identity markers.
+      2. **NO CLUTTER:** Keep the background and composition clean and focused. Avoid adding unnecessary random objects.
+      3. **CTR FOCUS:** Use keywords that drive clicks (e.g., "high contrast", "emotive expression", "4k", "detailed texture", "dramatic lighting").
+      4. **ACCURACY:** Stick to the core concept the user provided. Do not invent a completely different scene. Just make the existing idea look professional and "viral".
+
+      Output ONLY the raw enhanced prompt. Keep it under 50 words.`;
+    } else {
+      // Default / Mockup context
+      systemPrompt = `You are an expert prompt engineer for the "NanoBanana" AI model, specializing in high-end product mockups.
             
             Your goal is to take a simple user idea and expand it into a professional prompt following these NanoBanana best practices:
             
@@ -40,11 +45,25 @@ export async function POST(request: Request) {
             - Output ONLY the raw prompt text.
             - Do not use quotes.
             - Focus on "Photorealism" and "Professional Product Photography" unless specified otherwise.
-            `
+            `;
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
           },
           {
             role: "user",
-            content: `Enhance this prompt for a mockup: "${prompt}"`
+            content: `Enhance this prompt: "${prompt}"`
           }
         ],
         max_tokens: 150,
