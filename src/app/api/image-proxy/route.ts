@@ -52,10 +52,8 @@ export async function GET(request: Request) {
         }
 
         // Apply destructive effects to make image unusable but visible
-        // image.greyscale();   // Removed: Keep color
-        // image.pixelate(10);  // Removed: Too strong
-        // image.blur(2);       // Removed: Too strong
-        image.quality(30);      // 30% Quality (Visible compression artifacts)
+        image.pixelate(5);      // Strong pixelation
+        image.quality(10);      // Extremely low JPEG quality
 
         const watermarkedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
 
