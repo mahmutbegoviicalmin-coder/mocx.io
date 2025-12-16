@@ -102,7 +102,7 @@ export default function AffiliatePage() {
                     <Users className="w-5 h-5 text-primary" />
                     Active Plans Overview
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -133,6 +133,17 @@ export default function AffiliatePage() {
                     >
                         <div className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Agency Plan</div>
                         <div className="text-5xl font-bold text-white mb-1">{stats.planCounts.agency}</div>
+                        <div className="text-xs text-white/30">Active Users</div>
+                    </motion.div>
+
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[160px]"
+                    >
+                        <div className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">Free Plan</div>
+                        <div className="text-5xl font-bold text-white mb-1">{stats.planCounts.free}</div>
                         <div className="text-xs text-white/30">Active Users</div>
                     </motion.div>
                 </div>
