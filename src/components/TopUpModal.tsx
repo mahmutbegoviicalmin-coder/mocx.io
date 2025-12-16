@@ -38,8 +38,8 @@ export function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
               window.location.href = data.url;
             }
         } else {
-            console.error('No URL returned');
-            alert('Failed to initiate purchase');
+            console.error('No URL returned', data);
+            alert(data.error || 'Failed to initiate purchase');
         }
     } catch (error) {
         console.error(error);

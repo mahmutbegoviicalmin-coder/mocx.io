@@ -60,16 +60,16 @@ export async function POST(request: Request) {
                 attributes: {
                     checkout_data: {
                         custom: {
-                            userId: userId,
-                            credits: pack.credits,
-                            packId: pack.id
+                            userId: String(userId),
+                            credits: String(pack.credits),
+                            packId: String(pack.id)
                         },
                         email: userEmail
                     },
                     product_options: {
                         enabled_variants: [Number(pack.variantId)], // Only enable this credit pack
-                        redirect_url: 'https://mocx.io/dashboard/billing',
-                        receipt_button_text: 'Go back to Billing',
+                        redirect_url: 'https://mocx.io/dashboard',
+                        receipt_button_text: 'Go to Dashboard',
                         receipt_thank_you_note: 'Thank you for purchasing credits!'
                     }
                 },
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
                     store: {
                         data: {
                             type: "stores",
-                            id: process.env.LEMONSQUEEZY_STORE_ID
+                            id: String(process.env.LEMONSQUEEZY_STORE_ID)
                         }
                     },
                     variant: {
@@ -95,7 +95,8 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
         console.error('Lemon Squeezy Checkout Error:', JSON.stringify(data, null, 2));
-        return NextResponse.json({ error: 'Failed to create checkout' }, { status: 500 });
+        const errorMessage = data.errors?.[0]?.detail || 'Failed to create checkout';
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
     const checkoutUrl = data.data?.attributes?.url;
