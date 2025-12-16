@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         // 4. If NOT Trial, return original image immediately (faster)
         // Check both 'on_trial' status OR if user has very few credits/is free plan (extra safety)
         if (subscriptionStatus !== 'on_trial') {
-             return new NextResponse(imageBuffer, {
+             return new NextResponse(imageBuffer as unknown as BodyInit, {
                 headers: {
                     'Content-Type': response.headers['content-type'] || 'image/png',
                     'Cache-Control': 'public, max-age=31536000, immutable'
@@ -92,7 +92,7 @@ export async function GET(request: Request) {
 
         const watermarkedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
 
-        return new NextResponse(watermarkedBuffer, {
+        return new NextResponse(watermarkedBuffer as unknown as BodyInit, {
             headers: {
                 'Content-Type': 'image/jpeg',
                 'Cache-Control': 'no-store'

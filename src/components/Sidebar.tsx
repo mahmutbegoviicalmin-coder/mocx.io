@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon, ShieldCheck, DollarSign, Bell, Crown } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon, ShieldCheck, DollarSign, Bell, Crown, Rocket } from 'lucide-react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+import { PLANS } from '@/config/plans';
 
 const ADMIN_EMAIL = 'mahmutbegoviic.almin@gmail.com';
 const AFFILIATE_EMAILS = [
@@ -40,7 +41,27 @@ export function Sidebar() {
   const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
   const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
   
-  let planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
+  const planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
+  
+  // Show trial button ONLY if on Free Plan and NOT currently on trial
+  const showTrial = (planName === 'Free Plan' || planName === 'Mocx') && subscriptionStatus !== 'on_trial';
+
+  const handleStartTrial = async () => {
+    try {
+        const res = await fetch('/api/subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ variantId: PLANS.starter.monthly })
+        });
+        const data = await res.json();
+        if (data.url) {
+            window.location.href = data.url;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+  };
+
   if (planName === 'Mocx') {
       if (credits && credits >= 300) planName = 'Pro';
       else if (credits && credits >= 50) planName = 'Starter';
@@ -197,6 +218,16 @@ export function Sidebar() {
               <ShieldCheck className={`w-5 h-5`} />
               <span className="font-bold">Admin Panel</span>
             </Link>
+        )}
+
+        {showTrial && (
+            <button
+               onClick={handleStartTrial}
+               className="w-full mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:brightness-110 transition-all flex items-center justify-center gap-2 group animate-in fade-in zoom-in duration-500"
+            >
+               <Rocket className="w-4 h-4 fill-white/20 group-hover:scale-110 transition-transform" />
+               Start Free Trial
+            </button>
         )}
       </div>
 

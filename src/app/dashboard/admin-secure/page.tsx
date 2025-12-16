@@ -17,10 +17,11 @@ interface UserData {
   imageUrl: string;
   lastSignInAt: number | null;
   createdAt: number;
-  publicMetadata: {
+    publicMetadata: {
     planName?: string;
     credits?: number;
     imagesGenerated?: number;
+    subscriptionStatus?: string;
     affiliateStats?: {
         starter: number;
         pro: number;
