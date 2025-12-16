@@ -16,23 +16,34 @@ export function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
 
   if (!isOpen) return null;
 
-  const handleBuyCredits = () => {
+  const handleBuyCredits = async () => {
     const pack = CREDIT_PACKS.find(p => p.id === selectedPackId);
     if (!pack) return;
 
-    const checkoutUrl = pack.checkoutUrl;
-    
-    // Add user ID to checkout URL for webhook matching
-    const urlWithUser = user 
-      ? `${checkoutUrl}&checkout[custom][userId]=${user.id}`
-      : checkoutUrl;
-
-    // @ts-ignore
-    if (typeof window !== 'undefined' && window.LemonSqueezy) {
-       // @ts-ignore
-       window.LemonSqueezy.Url.Open(urlWithUser);
-    } else {
-      window.open(urlWithUser, '_blank');
+    try {
+        const res = await fetch('/api/credits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packId: selectedPackId })
+        });
+        
+        const data = await res.json();
+        
+        if (data.url) {
+            // @ts-ignore
+            if (typeof window !== 'undefined' && window.LemonSqueezy) {
+               // @ts-ignore
+               window.LemonSqueezy.Url.Open(data.url);
+            } else {
+              window.location.href = data.url;
+            }
+        } else {
+            console.error('No URL returned');
+            alert('Failed to initiate purchase');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error purchasing credits');
     }
   };
 
