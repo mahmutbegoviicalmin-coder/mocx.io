@@ -5,7 +5,7 @@ import {
   Upload, Info, Image as ImageIcon, X, Youtube, 
   Monitor, Square, Smartphone, Zap, Lock, Download, ArrowLeft,
   RefreshCw, User, Layout, 
-  Flame, Mic, Briefcase, Swords, Sparkles
+  Flame, Mic, Briefcase, Swords, Sparkles, Crown
 } from 'lucide-react';
 import Link from 'next/link';
 import { useGeneration } from '@/hooks/useGeneration';
@@ -174,7 +174,18 @@ export default function ThumbnailPage() {
                             Thumbnail Recreator
                         </h2>
                         <div className="flex items-center gap-2">
-                            <span className="bg-gradient-to-r from-primary via-orange-500 to-primary bg-[length:200%_auto] animate-gradient text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-[0_0_12px_-2px_rgba(255,84,0,0.6)] border border-white/10 tracking-widest uppercase">PRO</span>
+                            <div className="relative group cursor-default ml-2">
+                                {/* Glow Effect */}
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
+                                
+                                {/* Badge Content */}
+                                <div className="relative flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl group-hover:border-amber-500/30 transition-colors">
+                                    <Crown className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" fill="currentColor" fillOpacity={0.2} />
+                                    <span className="text-[10px] font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 uppercase drop-shadow-sm">
+                                        PRO
+                                    </span>
+                                </div>
+                            </div>
                             <p className="text-xs text-white/40 font-medium">Recreate with AI Styles</p>
                         </div>
                     </div>
