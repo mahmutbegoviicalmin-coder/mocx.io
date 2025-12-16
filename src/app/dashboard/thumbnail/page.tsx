@@ -78,13 +78,18 @@ export default function ThumbnailPage() {
 
   const credits = user?.publicMetadata?.credits ? Number(user.publicMetadata.credits) : 0;
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
+  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
+  const isTrial = subscriptionStatus === 'on_trial';
   
   // RESTRICTION LOGIC:
   // Must be a paid plan to use this feature
   const isAllowed = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency') || planName.toLowerCase().includes('starter');
   const isLocked = !isAllowed;
   
-  const COST_PER_IMAGE = 5;
+  // Use Proxy URL to enforce watermark if on trial
+  const displayImageUrl = generatedImage 
+      ? `/api/image-proxy?url=${encodeURIComponent(generatedImage)}` 
+      : null;
 
   const handleOriginalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -411,18 +416,23 @@ export default function ThumbnailPage() {
           <div className={`w-full h-full bg-[#050505] border border-white/10 rounded-[24px] relative overflow-hidden shadow-2xl flex items-center justify-center transition-all ${
              generatedImage ? 'border-primary/20' : 'border-dashed border-white/5'
           }`}>
-            {generatedImage ? (
-              <div className="relative w-full h-full flex flex-col">
+            {displayImageUrl ? (
+              <div 
+                className="relative w-full h-full flex flex-col select-none"
+                onContextMenu={(e) => e.preventDefault()}
+              >
                 <div className="flex-1 relative flex items-center justify-center p-4 lg:p-12">
                      <img 
-                        src={generatedImage} 
-                        className="max-w-full max-h-full object-contain shadow-2xl rounded-xl relative z-10" 
+                        src={displayImageUrl} 
+                        className={`max-w-full max-h-full object-contain shadow-2xl rounded-xl relative z-10 ${isTrial ? 'pointer-events-none' : ''}`}
                         alt="Generated Result"
+                        draggable={!isTrial}
+                        onContextMenu={(e) => e.preventDefault()}
                      />
                      
                      {/* Blurred Background */}
                      <div className="absolute inset-0 z-0">
-                        <img src={generatedImage} className="w-full h-full object-cover blur-[100px] opacity-20" />
+                        <img src={displayImageUrl} className="w-full h-full object-cover blur-[100px] opacity-20" />
                      </div>
                 </div>
                 
@@ -435,12 +445,18 @@ export default function ThumbnailPage() {
                             <RefreshCw className="w-4 h-4" /> Regenerate
                         </button>
                     </div>
-                    <button 
-                        onClick={() => window.open(generatedImage, '_blank')} 
-                        className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-white/90 transition-colors"
-                    >
-                        <Download className="w-4 h-4" /> Download Result
-                    </button>
+                    {isTrial ? (
+                        <Link href="/dashboard/billing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:brightness-110 shadow-lg shadow-amber-900/20">
+                             <Lock className="w-4 h-4" /> Unlock to Download
+                        </Link>
+                    ) : (
+                        <button 
+                            onClick={() => window.open(displayImageUrl, '_blank')} 
+                            className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-white/90 transition-colors"
+                        >
+                            <Download className="w-4 h-4" /> Download Result
+                        </button>
+                    )}
                 </div>
               </div>
             ) : (

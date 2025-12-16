@@ -41,7 +41,7 @@ export function Sidebar() {
   const planNameRaw = (user?.publicMetadata?.planName as string) || 'Free Plan'; 
   const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
   
-  const planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
+  let planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
   
   // Show trial button ONLY if on Free Plan and NOT currently on trial
   const showTrial = (planName === 'Free Plan' || planName === 'Mocx') && subscriptionStatus !== 'on_trial';
