@@ -16,11 +16,11 @@ export default function Home() {
       <Hero />
       <ThumbnailsShowcase />
       <BeforeAfter />
+      <FreeTrialCTA />
       <WhyMocx />
       <Trust />
       <Pricing />
       <FAQ />
-      <FreeTrialCTA />
       
           <footer className="py-8 border-t border-border mt-auto">
             <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
