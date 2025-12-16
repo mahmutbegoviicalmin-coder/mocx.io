@@ -512,17 +512,26 @@ function BillingPlanCard({
             <button 
                 disabled={current}
                 onClick={() => onSubscribe(variantId)}
-                className={`w-full py-4 rounded-xl font-bold text-sm transition-all relative overflow-hidden group/btn shadow-xl cursor-pointer z-20 ${
+                className={`w-full py-4 rounded-xl font-bold text-sm transition-all relative overflow-hidden group/btn shadow-xl z-20 ${
                     current 
-                        ? 'bg-white/5 text-white/40 cursor-default border border-white/5'
+                        ? 'bg-emerald-500/10 text-emerald-400 cursor-default border border-emerald-500/20 shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]'
                         : popular
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20'
-                            : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10'
+                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20 cursor-pointer'
+                            : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10 cursor-pointer'
                 }`}
             >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                    {current ? 'Current Plan' : 'Upgrade Now'}
-                    {!current && <Zap className={`w-4 h-4 ${popular ? 'fill-white/50 text-white' : 'text-white/50'}`} />}
+                    {current ? (
+                        <>
+                            <Check className="w-4 h-4" strokeWidth={3} />
+                            Active Plan
+                        </>
+                    ) : (
+                        <>
+                            Upgrade Now
+                            <Zap className={`w-4 h-4 ${popular ? 'fill-white/50 text-white' : 'text-white/50'}`} />
+                        </>
+                    )}
                 </span>
                 {!current && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
