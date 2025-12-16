@@ -333,8 +333,16 @@ export default function BillingPage() {
                     period={annual ? "/year" : "/mo"}
                     features={[annual ? "600 Credits" : "50 Credits", "AI Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
                     variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
-                    onSubscribe={handleSubscribe}
+                    onSubscribe={(id) => {
+                        if (isCurrentPlan('Starter') && subscriptionStatus === 'on_trial') {
+                            if (customerPortalUrl) window.location.href = customerPortalUrl;
+                            else alert('Billing portal not available');
+                        } else {
+                            handleSubscribe(id);
+                        }
+                    }}
                     current={isCurrentPlan('Starter')}
+                    isTrial={isCurrentPlan('Starter') && subscriptionStatus === 'on_trial'}
                     delay={0.1}
                 />
                 <BillingPlanCard 
@@ -451,6 +459,7 @@ function BillingPlanCard({
     variantId, 
     onSubscribe, 
     current, 
+    isTrial,
     popular,
     delay = 0 
 }: { 
@@ -461,6 +470,7 @@ function BillingPlanCard({
     variantId: string, 
     onSubscribe: (id: string) => void,
     current?: boolean,
+    isTrial?: boolean,
     popular?: boolean,
     delay?: number
 }) {
@@ -525,21 +535,28 @@ function BillingPlanCard({
             </ul>
 
             <button 
-                disabled={current}
+                disabled={current && !isTrial}
                 onClick={() => onSubscribe(variantId)}
                 className={`w-full py-4 rounded-xl font-bold text-sm transition-all relative overflow-hidden group/btn shadow-xl z-20 ${
-                    current 
+                    current && !isTrial
                         ? 'bg-emerald-500/10 text-emerald-400 cursor-default border border-emerald-500/20 shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]'
-                        : popular
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20 cursor-pointer'
-                            : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10 cursor-pointer'
+                        : isTrial && current
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:brightness-110 shadow-purple-500/30 hover:shadow-purple-500/50 cursor-pointer'
+                            : popular
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20 cursor-pointer'
+                                : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10 cursor-pointer'
                 }`}
             >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                    {current ? (
+                    {current && !isTrial ? (
                         <>
                             <Check className="w-4 h-4" strokeWidth={3} />
                             Active Plan
+                        </>
+                    ) : isTrial && current ? (
+                        <>
+                            Pay Now to Unlock
+                            <Zap className="w-4 h-4 text-yellow-300 fill-current" />
                         </>
                     ) : (
                         <>
@@ -548,7 +565,7 @@ function BillingPlanCard({
                         </>
                     )}
                 </span>
-                {!current && (
+                {(!current || isTrial) && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                 )}
             </button>
