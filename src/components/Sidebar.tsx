@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon, ShieldCheck, DollarSign, Bell } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Settings, LogOut, Zap, Menu, X as XIcon, ShieldCheck, DollarSign, Bell, Crown } from 'lucide-react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 
@@ -108,10 +108,14 @@ export function Sidebar() {
             </button>
         </div>
         
-        <div className="mt-2">
-             <span className="text-[11px] uppercase tracking-widest font-bold text-white/90 bg-gradient-to-r from-primary/80 to-primary/40 px-3 py-1 rounded-full shadow-[0_0_15px_-3px_rgba(255,90,95,0.6)] border border-primary/50">
-               {planName}
-             </span>
+        <div className="mt-3 relative group w-fit">
+             <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full blur opacity-20 group-hover:opacity-50 transition duration-500"></div>
+             <div className="relative flex items-center gap-1.5 px-3 py-1 bg-black/40 border border-white/10 rounded-full shadow-lg">
+                <Crown className="w-3 h-3 text-amber-400" />
+                <span className="text-[10px] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 uppercase">
+                  {planName}
+                </span>
+             </div>
         </div>
       </div>
 
