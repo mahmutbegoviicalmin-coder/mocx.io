@@ -290,9 +290,9 @@ export default function BillingPage() {
                 </div>
 
                 {/* Enhanced Monthly/Yearly Toggle */}
-                <div className="relative bg-black/40 p-1.5 rounded-full backdrop-blur-md border border-white/10 flex items-center cursor-pointer shadow-inner w-fit" onClick={() => setAnnual(!annual)}>
+                <div className="relative bg-black/40 p-1.5 rounded-full backdrop-blur-xl border border-white/10 flex items-center cursor-pointer shadow-2xl w-fit" onClick={() => setAnnual(!annual)}>
                     <motion.div 
-                        className="absolute top-1.5 bottom-1.5 bg-primary rounded-full shadow-lg z-0"
+                        className="absolute top-1.5 bottom-1.5 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full shadow-lg shadow-amber-900/20 z-0"
                         layout
                         initial={false}
                         animate={{ 
@@ -311,7 +311,7 @@ export default function BillingPage() {
                         className={`relative z-10 px-8 py-2.5 rounded-full text-sm font-bold transition-colors duration-300 w-36 ${annual ? 'text-white' : 'text-white/50 hover:text-white'}`}
                         onClick={(e) => { e.stopPropagation(); setAnnual(true); }}
                     >
-                        Yearly <span className="absolute -top-3 -right-2 bg-[#32D74B] text-black text-[9px] px-1.5 py-0.5 rounded-full font-bold shadow-sm tracking-tight">-10%</span>
+                        Yearly <span className="absolute -top-3 -right-2 bg-gradient-to-r from-green-400 to-emerald-600 text-black text-[9px] px-2 py-0.5 rounded-full font-black shadow-lg tracking-wide border border-white/20">-10%</span>
                     </button>
                 </div>
             </div>
@@ -463,12 +463,17 @@ function BillingPlanCard({
                 y: -8,
                 transition: { duration: 0.3, ease: "easeOut" }
             }}
-            className={`relative rounded-[2rem] p-8 backdrop-blur-xl flex flex-col h-full transition-all duration-300 group ${
+            className={`relative rounded-[2rem] p-8 flex flex-col h-full transition-all duration-500 group overflow-hidden ${
                 popular 
-                    ? 'bg-gradient-to-b from-white/10 to-black/40 border border-primary/50 shadow-[0_0_60px_-15px_rgba(255,84,0,0.2)] z-10' 
-                    : 'bg-white/5 border border-white/10 hover:border-white/20 shadow-xl hover:shadow-2xl hover:shadow-black/40'
-            } ${current ? 'ring-2 ring-primary ring-offset-4 ring-offset-background' : ''}`}
+                    ? 'bg-[#0F0F0F] border border-amber-500/40 shadow-[0_0_60px_-20px_rgba(245,158,11,0.25)] z-10 scale-105' 
+                    : 'bg-[#0A0A0A] border border-white/5 hover:border-white/10 hover:bg-[#0F0F0F] shadow-xl'
+            } backdrop-blur-2xl`}
         >
+            {/* Glow Effect for Popular Plan */}
+            {popular && (
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-50 pointer-events-none" />
+            )}
+
             {popular && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
                     <div className="relative group cursor-default">
@@ -483,23 +488,23 @@ function BillingPlanCard({
                 </div>
             )}
 
-            <div className="mb-8 relative">
-                <h3 className={`text-lg font-bold mb-4 ${popular ? 'text-primary' : 'text-white/70'}`}>{title}</h3>
+            <div className="mb-8 relative z-10">
+                <h3 className={`text-sm font-bold mb-3 tracking-widest uppercase ${popular ? 'text-amber-400' : 'text-white/40'}`}>{title}</h3>
                 <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-bold text-white tracking-tighter">${price}</span>
-                    <span className="text-muted-foreground font-medium">{period}</span>
+                    <span className="text-5xl font-black text-white tracking-tighter">${price}</span>
+                    <span className="text-white/40 font-medium text-lg">{period}</span>
                 </div>
             </div>
 
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
+            <div className={`w-full h-px mb-8 ${popular ? 'bg-gradient-to-r from-transparent via-amber-500/30 to-transparent' : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'}`} />
 
-            <ul className="space-y-4 mb-10 flex-1">
+            <ul className="space-y-5 mb-10 flex-1 relative z-10">
                 {features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-sm text-gray-300 group-hover:text-white transition-colors duration-300">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${popular ? 'bg-primary/20 text-primary' : 'bg-white/10 text-white/50 group-hover:bg-primary/20 group-hover:text-primary transition-colors'}`}>
-                            <Check className="w-3.5 h-3.5" />
+                    <li key={idx} className="flex items-start gap-3 text-sm text-white/70 group-hover:text-white transition-colors duration-300">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${popular ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_-2px_rgba(245,158,11,0.4)]' : 'bg-white/10 text-white/40'}`}>
+                            <Check className="w-3 h-3 stroke-[3]" />
                         </div>
-                        <span className="font-medium">{feature}</span>
+                        <span className="font-medium leading-relaxed">{feature}</span>
                     </li>
                 ))}
             </ul>
@@ -507,15 +512,18 @@ function BillingPlanCard({
             <button 
                 disabled={current}
                 onClick={() => onSubscribe(variantId)}
-                className={`w-full py-4 rounded-xl font-bold text-sm transition-all relative overflow-hidden group/btn ${
+                className={`w-full py-4 rounded-xl font-bold text-sm transition-all relative overflow-hidden group/btn shadow-xl cursor-pointer z-20 ${
                     current 
                         ? 'bg-white/5 text-white/40 cursor-default border border-white/5'
                         : popular
-                            ? 'bg-primary text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]'
-                            : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/5'
+                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:brightness-110 shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20'
+                            : 'bg-white/10 text-white hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10'
                 }`}
             >
-                <span className="relative z-10">{current ? 'Current Plan' : 'Upgrade Now'}</span>
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                    {current ? 'Current Plan' : 'Upgrade Now'}
+                    {!current && <Zap className={`w-4 h-4 ${popular ? 'fill-white/50 text-white' : 'text-white/50'}`} />}
+                </span>
                 {!current && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                 )}
