@@ -39,10 +39,10 @@ export function Pricing() {
   }, [router]);
 
   return (
-    <section id="pricing" className="py-24 relative overflow-hidden bg-[#0a0a0a] text-white selection:bg-orange-500/30">
+    <section id="pricing" className="py-24 relative overflow-hidden bg-black text-white selection:bg-orange-500/30">
       {/* BACKGROUND AMBIENCE */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0a0a0a] to-[#111]" />
+        <div className="absolute inset-0 bg-black" />
         {/* Subtle Orange Glow center */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/5 blur-[120px] rounded-full opacity-40" />
         {/* Noise */}
@@ -119,8 +119,9 @@ export function Pricing() {
           {/* 1. STARTER CARD */}
           <PricingCard 
             title="Starter"
-            price={annual ? 17 : 19}
-            originalPrice={annual ? 29 : 29}
+            price={19}
+            yearlyPrice={205}
+            originalPrice={annual ? 315 : 29}
             description="Perfect for individuals just getting started."
             features={[annual ? "600 Credits/year" : "50 Credits/mo", "Thumbnail Recreator", "AI Art Generator", "Mockup Studio", "Standard Speed", "Commercial License", "Basic Support"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
@@ -130,8 +131,9 @@ export function Pricing() {
           {/* 2. PRO CARD (Most Popular) */}
           <PricingCard 
             title="Pro"
-            price={annual ? 35 : 39}
-            originalPrice={annual ? 59 : 59}
+            price={39}
+            yearlyPrice={420}
+            originalPrice={annual ? 646 : 59}
             description="Best for creators growing their audience."
             features={[annual ? "2400 Credits/year" : "200 Credits/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
@@ -142,8 +144,9 @@ export function Pricing() {
           {/* 3. AGENCY CARD */}
           <PricingCard 
             title="Agency"
-            price={annual ? 71 : 79}
-            originalPrice={annual ? 119 : 119}
+            price={79}
+            yearlyPrice={850}
+            originalPrice={annual ? 1307 : 119}
             description="For teams and agencies scaling up."
             features={[annual ? "4800 Credits/year" : "400 Credits/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
