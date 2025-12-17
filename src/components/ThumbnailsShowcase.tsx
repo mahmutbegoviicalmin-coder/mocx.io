@@ -85,7 +85,7 @@ export function ThumbnailsShowcase() {
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className="group flex flex-col gap-3 cursor-pointer"
                 >
-                    <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#111] transition-transform duration-300 group-hover:scale-[1.02] group-hover:border-white/20">
+                    <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#111] transition-transform duration-300 group-hover:scale-[1.02] group-hover:border-primary/50 group-hover:shadow-[0_0_30px_-5px_rgba(255,84,0,0.3)]">
                         <Image 
                             src={video.image} 
                             alt={video.title} 
@@ -93,15 +93,23 @@ export function ThumbnailsShowcase() {
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* Improved Hover Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
+                        
+                        {/* Play Button Icon on Hover */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100">
+                             <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-lg">
+                                <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent ml-1" />
+                             </div>
+                        </div>
                     </div>
                     
                     <div className="px-1">
                         <h4 className="text-white font-bold text-base md:text-lg leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                             {video.title}
                         </h4>
-                        <p className="text-white/40 text-sm font-medium mt-1">
+                        <p className="text-white/40 text-sm font-medium mt-1 flex items-center gap-2">
+                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                             {video.views}
                         </p>
                     </div>
