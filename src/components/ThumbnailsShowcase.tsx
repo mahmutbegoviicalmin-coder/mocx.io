@@ -19,40 +19,40 @@ const CREATORS = [
 
 const VIDEOS = [
   {
-    title: "I Trained Like Cristiano Ronaldo for 100 Days",
+    title: "I Trained Like Cristiano Ronaldo for 200 Days",
     views: "4.2M views",
     image: "/thumbnails/45a72f2e-f64e-4840-b5ed-5effc216c045.jpg",
-    stats: { ctr: "+14.2%", type: "CTR" }
+    stats: { ctr: "+34.2%", type: "CTR" }
   },
   {
     title: "I Survived 24 Hours in a Burning House",
     views: "8.5M views",
     image: "/thumbnails/7fb5f477-b495-412b-947d-83bca1eb9fc7.jpg",
-    stats: { ctr: "+18.5%", type: "CTR" }
+    stats: { ctr: "+38.5%", type: "CTR" }
   },
   {
     title: "How to Build a $10M Business from Scratch",
     views: "1.1M views",
     image: "/thumbnails/92e171a444d955a8f8fb3d0200522033_1765658486_zsa4a9bm.jpeg",
-    stats: { ctr: "+9.8%", type: "Retention" }
+    stats: { ctr: "+18.8%", type: "Retention" }
   },
   {
-    title: "I Bought The World's Cheapest Private Yacht",
+    title: "I Bought The World's Cheapest & Most Expensive Private Yacht",
     views: "12M views",
     image: "/thumbnails/97baab01-e8e3-4909-884d-1095e5f845eb.jpg",
-    stats: { ctr: "+22.1%", type: "CTR" }
+    stats: { ctr: "+41.1%", type: "CTR" }
   },
   {
     title: "The Insane History of The World's Richest City",
     views: "2.4M views",
     image: "/thumbnails/1765659063077-y3uduj21jk.png",
-    stats: { ctr: "+11.3%", type: "CTR" }
+    stats: { ctr: "+31.3%", type: "CTR" }
   },
   {
     title: "Mind-Blowing Paradoxes That Will Keep You Awake",
     views: "1.5M views",
     image: "/thumbnails/cb108048d4ad3465d47d0104b31f7651_1765658717760.png",
-    stats: { ctr: "+15.7%", type: "Engagement" }
+    stats: { ctr: "+55.7%", type: "Engagement" }
   }
 ];
 
