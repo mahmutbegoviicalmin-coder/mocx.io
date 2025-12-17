@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ArrowRight, Crown } from 'lucide-react';
+import { Check, ArrowRight, Crown, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -59,11 +59,17 @@ export function Pricing() {
             viewport={{ once: true }}
             className="space-y-4"
           >
+            {/* Christmas Sale Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-orange-600 text-white text-xs font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse">
+                <Sparkles className="w-3 h-3 fill-white" />
+                Christmas Sale • 35% OFF
+            </div>
+
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
               Simple, transparent pricing
             </h2>
             <p className="text-lg text-white/50 font-medium max-w-xl mx-auto">
-              Choose the plan that's right for you. Change or cancel anytime.
+              Prices slashed for the holidays. Upgrade now and lock in the discount.
             </p>
           </motion.div>
           
@@ -98,7 +104,7 @@ export function Pricing() {
                 >
                     Yearly
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg">
-                      Save 30%
+                      Save Extra 10%
                     </span>
                 </button>
             </div>
@@ -111,7 +117,8 @@ export function Pricing() {
           {/* 1. STARTER CARD */}
           <PricingCard 
             title="Starter"
-            price={annual ? 19 : 29}
+            price={annual ? 17 : 19} // Monthly: 19 (was 29). Yearly: ~10% off -> 17
+            originalPrice={annual ? 29 : 29}
             description="Perfect for individuals just getting started."
             features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
@@ -121,7 +128,8 @@ export function Pricing() {
           {/* 2. PRO CARD (Most Popular) */}
           <PricingCard 
             title="Pro"
-            price={annual ? 39 : 59}
+            price={annual ? 35 : 39} // Monthly: 39 (was 59). Yearly ~10% off -> 35
+            originalPrice={annual ? 59 : 59}
             description="Best for creators growing their audience."
             features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
@@ -132,7 +140,8 @@ export function Pricing() {
           {/* 3. AGENCY CARD */}
           <PricingCard 
             title="Agency"
-            price={annual ? 79 : 119}
+            price={annual ? 71 : 79} // Monthly: 79 (was 119). Yearly ~10% off -> 71
+            originalPrice={annual ? 119 : 119}
             description="For teams and agencies scaling up."
             features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
@@ -156,7 +165,7 @@ export function Pricing() {
 // INDIVIDUAL CARD COMPONENT
 // ------------------------------------------------------------------
 
-function PricingCard({ title, price, description, features, isPro = false, variantId, annual }: any) {
+function PricingCard({ title, price, originalPrice, description, features, isPro = false, variantId, annual }: any) {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -208,10 +217,10 @@ function PricingCard({ title, price, description, features, isPro = false, varia
 
         <div 
             className={`
-                relative flex flex-col h-full p-8 rounded-2xl transition-all duration-300 border
+                relative flex flex-col h-full p-8 rounded-[2rem] transition-all duration-300 border
                 ${isPro 
-                    ? 'bg-[#0f1115] border-orange-500/30 shadow-2xl shadow-orange-900/10' 
-                    : 'bg-[#0f1115]/60 backdrop-blur-sm border-white/5 hover:border-white/10 hover:bg-[#0f1115]/80'
+                    ? 'bg-[#0f1115] border-orange-500/30 shadow-2xl shadow-orange-900/20' 
+                    : 'bg-[#0f1115]/60 backdrop-blur-sm border-white/5 hover:border-white/10 hover:bg-[#0f1115]/80 shadow-xl'
                 }
             `}
         >
@@ -232,9 +241,19 @@ function PricingCard({ title, price, description, features, isPro = false, varia
                 </h3>
                 
                 {/* Price */}
-                <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-5xl font-bold text-white tracking-tight">${price}</span>
-                    <span className="text-white/40 font-medium text-sm">/mo</span>
+                <div className="flex flex-col mb-4">
+                    {/* Discount Badge / Old Price */}
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-white/30 text-lg line-through font-medium装饰">${originalPrice}</span>
+                        <span className="text-orange-500 text-xs font-bold uppercase tracking-wider bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+                            Save 35%
+                        </span>
+                    </div>
+                    
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-5xl font-bold text-white tracking-tight">${price}</span>
+                        <span className="text-white/40 font-medium text-sm">/mo</span>
+                    </div>
                 </div>
                 
                 {/* Description */}
@@ -251,7 +270,7 @@ function PricingCard({ title, price, description, features, isPro = false, varia
                     w-full h-12 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 mb-8 group
                     ${isPro 
                         ? 'bg-gradient-to-r from-[#FF5400] to-[#FF7B30] text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02]' 
-                        : 'bg-white/5 border border-white/5 text-white hover:bg-white/10 hover:border-white/10'
+                        : 'bg-white/5 border border-white/5 text-white hover:bg-white/10 hover:border-white/10 hover:scale-[1.01]'
                     }
                 `}
             >
@@ -264,27 +283,30 @@ function PricingCard({ title, price, description, features, isPro = false, varia
             </button>
 
             {/* FEATURES */}
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {features.map((feature: string, i: number) => {
                     const isCrossed = feature.startsWith('~');
                     const text = isCrossed ? feature.slice(1) : feature;
                     
                     return (
-                        <div key={i} className="flex items-start gap-3 text-sm group">
+                        <div key={i} className={`
+                            flex items-center gap-3 p-2 rounded-lg transition-colors
+                            ${isPro ? 'hover:bg-white/5' : 'hover:bg-white/5'}
+                        `}>
                             {/* Checkmark */}
                             <div className={`
-                                mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors
+                                w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors shadow-sm
                                 ${isPro 
                                     ? 'bg-orange-500 text-white' 
-                                    : 'bg-white/5 text-white/40 group-hover:bg-white/10'
+                                    : 'bg-white/10 text-white/40'
                                 }
                             `}>
                                 <Check className="w-3 h-3" strokeWidth={3} />
                             </div>
                             
                             {/* Text */}
-                            <span className={`transition-colors ${
-                                isPro ? 'text-white/90' : 'text-white/60 group-hover:text-white/80'
+                            <span className={`text-sm font-medium transition-colors ${
+                                isPro ? 'text-white/90' : 'text-white/60'
                             }`}>
                                 {text}
                             </span>
