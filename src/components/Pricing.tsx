@@ -80,47 +80,49 @@ export function Pricing() {
             viewport={{ once: true }}
             className="flex justify-center"
           >
-            <div className="relative flex items-center p-1 bg-white/5 border border-white/10 rounded-full cursor-pointer" onClick={() => setAnnual(!annual)}>
+            <div className="relative flex items-center p-1.5 bg-[#0f1115] border border-white/10 rounded-full cursor-pointer shadow-inner" onClick={() => setAnnual(!annual)}>
                 {/* Sliding Pill */}
                 <motion.div 
-                    className="absolute top-1 bottom-1 bg-white/10 rounded-full shadow-sm"
+                    className="absolute top-1.5 bottom-1.5 bg-white/10 rounded-full shadow-md border border-white/5"
                     initial={false}
                     animate={{ 
                         x: annual ? "100%" : "0%",
                     }}
                     style={{ width: "50%", left: 0 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 />
                 
                 <button 
                     onClick={(e) => { e.stopPropagation(); setAnnual(false); }}
-                    className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${!annual ? 'text-white' : 'text-white/50 hover:text-white'}`}
+                    className={`relative z-10 px-8 py-2.5 text-sm font-bold transition-colors duration-300 w-32 text-center ${!annual ? 'text-white' : 'text-white/40 hover:text-white'}`}
                 >
                     Monthly
                 </button>
                 <button 
                     onClick={(e) => { e.stopPropagation(); setAnnual(true); }}
-                    className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 flex items-center gap-2 ${annual ? 'text-white' : 'text-white/50 hover:text-white'}`}
+                    className={`relative z-10 px-8 py-2.5 text-sm font-bold transition-colors duration-300 w-32 text-center flex items-center justify-center gap-2 ${annual ? 'text-white' : 'text-white/40 hover:text-white'}`}
                 >
                     Yearly
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg">
-                      Save Extra 10%
-                    </span>
                 </button>
+                
+                {/* Floating Badge for Yearly */}
+                <div className="absolute -top-3 -right-6 bg-[#FF5400] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg border border-orange-400/20 rotate-3">
+                    Save 10%
+                </div>
             </div>
           </motion.div>
         </div>
 
         {/* PRICING CARDS GRID */}
-        <div className="grid md:grid-cols-3 gap-6 items-start max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 items-stretch max-w-6xl mx-auto">
           
           {/* 1. STARTER CARD */}
           <PricingCard 
             title="Starter"
-            price={annual ? 17 : 19} // Monthly: 19 (was 29). Yearly: ~10% off -> 17
+            price={annual ? 17 : 19}
             originalPrice={annual ? 29 : 29}
             description="Perfect for individuals just getting started."
-            features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support"]}
+            features={[annual ? "600 Credits/year" : "50 Credits/mo", "Thumbnail Recreator", "AI Art Generator", "Mockup Studio", "Standard Speed", "Commercial License", "Basic Support"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
             annual={annual}
           />
@@ -128,10 +130,10 @@ export function Pricing() {
           {/* 2. PRO CARD (Most Popular) */}
           <PricingCard 
             title="Pro"
-            price={annual ? 35 : 39} // Monthly: 39 (was 59). Yearly ~10% off -> 35
+            price={annual ? 35 : 39}
             originalPrice={annual ? 59 : 59}
             description="Best for creators growing their audience."
-            features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
+            features={[annual ? "2400 Credits/year" : "200 Credits/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
             annual={annual}
             isPro={true}
@@ -140,10 +142,10 @@ export function Pricing() {
           {/* 3. AGENCY CARD */}
           <PricingCard 
             title="Agency"
-            price={annual ? 71 : 79} // Monthly: 79 (was 119). Yearly ~10% off -> 71
+            price={annual ? 71 : 79}
             originalPrice={annual ? 119 : 119}
             description="For teams and agencies scaling up."
-            features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
+            features={[annual ? "4800 Credits/year" : "400 Credits/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
             annual={annual}
           />
@@ -262,28 +264,8 @@ function PricingCard({ title, price, originalPrice, description, features, isPro
                 </p>
             </div>
 
-            {/* CTA BUTTON */}
-            <button 
-                onClick={handleCheckout}
-                disabled={loading}
-                className={`
-                    w-full h-12 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 mb-8 group
-                    ${isPro 
-                        ? 'bg-gradient-to-r from-[#FF5400] to-[#FF7B30] text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02]' 
-                        : 'bg-white/5 border border-white/5 text-white hover:bg-white/10 hover:border-white/10 hover:scale-[1.01]'
-                    }
-                `}
-            >
-                {loading ? 'Processing...' : (
-                    <>
-                        Get Started
-                        {isPro && <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />}
-                    </>
-                )}
-            </button>
-
             {/* FEATURES */}
-            <div className="space-y-3">
+            <div className="space-y-3 mb-8 flex-grow">
                 {features.map((feature: string, i: number) => {
                     const isCrossed = feature.startsWith('~');
                     const text = isCrossed ? feature.slice(1) : feature;
@@ -314,6 +296,26 @@ function PricingCard({ title, price, originalPrice, description, features, isPro
                     );
                 })}
             </div>
+
+            {/* CTA BUTTON */}
+            <button 
+                onClick={handleCheckout}
+                disabled={loading}
+                className={`
+                    w-full h-12 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 mt-auto group
+                    ${isPro 
+                        ? 'bg-gradient-to-r from-[#FF5400] to-[#FF7B30] text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02]' 
+                        : 'bg-white/5 border border-white/5 text-white hover:bg-white/10 hover:border-white/10 hover:scale-[1.01]'
+                    }
+                `}
+            >
+                {loading ? 'Processing...' : (
+                    <>
+                        Get Started
+                        {isPro && <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />}
+                    </>
+                )}
+            </button>
         </div>
     </motion.div>
   );
