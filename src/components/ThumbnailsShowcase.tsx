@@ -131,7 +131,7 @@ export function ThumbnailsShowcase() {
                                     </p>
                                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                                 </div>
-                                <p className="text-green-400 font-bold text-xl tracking-tight">
+                                <p className="text-green-400 font-bold text-3xl tracking-tight">
                                     {video.stats.ctr}
                                 </p>
                             </div>
