@@ -35,8 +35,14 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-24 bg-[#0f1115] border-t border-[#1a1d23]">
-      <div className="container mx-auto px-4 max-w-3xl">
+    <section className="py-24 bg-[#0f1115] border-t border-white/5 relative overflow-hidden">
+        {/* BACKGROUND (Consistent with Hero) */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+          <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/05 blur-[120px] rounded-full" />
+        </div>
+
+      <div className="container mx-auto px-4 max-w-3xl relative z-10">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

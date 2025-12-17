@@ -39,14 +39,12 @@ export function Pricing() {
   }, [router]);
 
   return (
-    <section id="pricing" className="py-24 relative overflow-hidden bg-[#050505] text-white selection:bg-orange-500/30">
-      {/* BACKGROUND AMBIENCE */}
+    <section id="pricing" className="py-24 relative overflow-hidden bg-[#0f1115] text-white selection:bg-orange-500/30">
+      {/* BACKGROUND AMBIENCE (Consistent with Hero) */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[#050505]" />
-        {/* Subtle Orange Glow center */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/5 blur-[120px] rounded-full opacity-40" />
-        {/* Noise */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+        {/* Subtle Orange Glow center */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/05 blur-[120px] rounded-full opacity-40" />
       </div>
 
       <div className="container max-w-7xl mx-auto relative z-10 px-4">

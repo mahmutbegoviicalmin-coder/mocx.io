@@ -6,9 +6,12 @@ import { Particles } from "./Particles";
 
 export function BeforeAfter() {
   return (
-    <section className="py-32 relative overflow-hidden bg-[#050505] border-t border-white/5">
-      {/* Modern Background with subtle primary glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0a0a0a] via-[#050505] to-[#050505] z-0" />
+    <section className="py-32 relative overflow-hidden bg-[#0f1115] border-t border-white/5">
+       {/* BACKGROUND (Consistent with Hero) */}
+       <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/05 blur-[120px] rounded-full" />
+      </div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/5 blur-[120px] -z-10 rounded-full opacity-40 pointer-events-none" />
       
       {/* Particles Effect */}
