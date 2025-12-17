@@ -1,7 +1,22 @@
 import { NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export async function POST(request: Request) {
   try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const planName = (user.publicMetadata.planName as string) || 'Free Plan';
+
+    if (planName === 'Free Plan') {
+        return NextResponse.json({ error: 'Upgrade to enhance prompts.' }, { status: 403 });
+    }
+
     const { prompt, type } = await request.json();
 
     if (!prompt) {

@@ -27,7 +27,7 @@ export function Sidebar() {
   const [credits, setCredits] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false); // Mobile menu state
   const [unreadCount, setUnreadCount] = useState(0);
-  
+
   // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
@@ -44,23 +44,10 @@ export function Sidebar() {
   let planName = planNameRaw.replace(' Monthly', '').replace(' Yearly', '');
   
   // Show trial button ONLY if on Free Plan and NOT currently on trial
-  const showTrial = (planName === 'Free Plan' || planName === 'Mocx') && subscriptionStatus !== 'on_trial';
+  // REMOVED: No more trial button in sidebar
+  const showTrial = false;
 
-  const handleStartTrial = async () => {
-    try {
-        const res = await fetch('/api/subscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ variantId: PLANS.starter.monthly })
-        });
-        const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url;
-        }
-    } catch (e) {
-        console.error(e);
-    }
-  };
+  const handleStartTrial = async () => {};
 
   if (planName === 'Mocx') {
       if (credits && credits >= 300) planName = 'Pro';

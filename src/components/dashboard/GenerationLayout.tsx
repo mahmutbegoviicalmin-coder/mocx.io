@@ -42,37 +42,25 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
       : null;
       
   const { user } = useUser();
-  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
-  const isTrial = subscriptionStatus === 'on_trial';
+  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
+  
+  // Logic: Locked features if Free Plan
+  const isFreePlan = planName === 'Free Plan';
   
   const router = useRouter();
 
   // Credits Check
   const credits = user?.publicMetadata?.credits ? Number(user.publicMetadata.credits) : 0;
-  const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
   
   // Restriction Logic
   const isProOrAgency = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency');
   
+  // UNLOCKED: All modes are open for everyone
   let isLocked = false;
 
-  if (isTrial) {
-      // Trial User: Only 'thumbnail' allowed
-      if (mode !== 'thumbnail') {
-          isLocked = true;
-      }
-  } else {
-      // Regular User: Art & Mockup require Pro/Agency
-      if (mode === 'art' || mode === 'mockup') {
-          if (!isProOrAgency) isLocked = true;
-      }
-      // For 'thumbnail' mode in regular plans, usually Starter is enough, so we don't lock it here if paid.
-      // But if plan is 'Free Plan' (and not trial), everything is effectively locked by credit check, 
-      // but let's lock UI too for clarity.
-      if (planName === 'Free Plan') {
-          isLocked = true;
-      }
-  }
+  const COST = mode === 'thumbnail' ? 5 : (mode === 'mockup' ? 3 : 2);
+
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -219,27 +207,6 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
 
             <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
               
-              {/* LOCK OVERLAY */}
-              {isLocked && (
-                 <div className="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex flex-col items-center justify-center text-center p-6 rounded-[2rem] border border-primary/20 shadow-2xl">
-                    <div className="p-4 bg-primary/10 rounded-full mb-4 animate-pulse">
-                        <Lock className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">
-                        {isTrial && mode !== 'thumbnail' ? 'Trial Restriction' : 'Pro Plan Required'}
-                    </h3>
-                    <p className="text-white/40 text-sm max-w-xs mb-6">
-                        {isTrial && mode !== 'thumbnail' 
-                            ? 'During the trial period, only the Thumbnail Creator is available. Upgrade to access Art & Mockup Studio.'
-                            : 'This tool is exclusively available for Pro and Agency plan members.'
-                        }
-                    </p>
-                    <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105">
-                      View Plans
-                    </Link>
-                 </div>
-              )}
-
               {/* Upload Section */}
               {mode !== 'art' && (
                 <div className="space-y-3">
@@ -358,9 +325,16 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
               <button 
                 type="submit"
                 disabled={loading || uploading || isLocked}
-                className="w-full bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/20 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-primary to-orange-600 text-white rounded-xl py-4 font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                 {loading ? 'Generating...' : uploading ? 'Uploading...' : 'Generate Magic'}
+                 {loading ? 'Generating...' : uploading ? 'Uploading...' : (
+                    <>
+                        Generate Magic
+                        <span className="bg-black/20 text-white/80 text-[10px] px-2 py-0.5 rounded flex items-center gap-1">
+                            <Zap className="w-3 h-3 text-yellow-400 fill-current" /> {COST}
+                        </span>
+                    </>
+                 )}
               </button>
             </form>
             
@@ -383,11 +357,29 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
                 className="relative w-full h-full flex items-center justify-center select-none"
                 onContextMenu={(e) => e.preventDefault()} // Block Right Click context menu globally on container
               >
+                {/* WATERMARK FOR FREE USERS */}
+                {isFreePlan && (
+                    <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center select-none overflow-hidden">
+                        {/* Big Center Watermark */}
+                        <div className="text-[5vw] font-black text-white/20 -rotate-12 border-4 border-white/10 p-4 md:p-8 rounded-3xl backdrop-blur-[2px]">
+                            MOCX PREVIEW
+                        </div>
+                        {/* Tiled Pattern Overlay */}
+                        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-10">
+                             {Array.from({ length: 9 }).map((_, i) => (
+                                 <div key={i} className="flex items-center justify-center">
+                                     <span className="text-xl font-bold text-white -rotate-45">MOCX.IO</span>
+                                 </div>
+                             ))}
+                        </div>
+                    </div>
+                )}
+
                 <img 
                     src={displayImageUrl} 
-                    className={`max-w-full max-h-full object-contain p-4 lg:p-12 shadow-2xl relative z-10 ${isTrial ? 'pointer-events-none' : ''}`} // Disable dragging if trial
+                    className={`max-w-full max-h-full object-contain p-4 lg:p-12 shadow-2xl relative z-10 ${isFreePlan ? 'pointer-events-none' : ''}`} // Disable dragging if free
                     onContextMenu={(e) => e.preventDefault()} // Extra safety
-                    draggable={!isTrial}
+                    draggable={!isFreePlan}
                 />
                 
                 {/* Background Blur */}
@@ -395,8 +387,8 @@ export function GenerationLayout({ mode, title, subtitle, icon: Icon }: Generati
                     <img src={displayImageUrl} className="w-full h-full object-cover blur-[100px] opacity-30" />
                 </div>
                 
-                <div className="absolute bottom-8 flex gap-2 z-20 bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10">
-                    {isTrial ? (
+                <div className="absolute bottom-8 flex gap-2 z-30 bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10">
+                    {isFreePlan ? (
                         <Link href="/dashboard/billing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:brightness-110 shadow-lg shadow-amber-900/20">
                              <Lock className="w-4 h-4" /> Unlock to Download
                         </Link>

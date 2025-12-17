@@ -1,4 +1,6 @@
 import { createPool } from '@vercel/postgres';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
+import * as schema from './schema';
 
 // Neon integration may create DATABASE_URL / DATABASE_URL_UNPOOLED
 // or a custom-prefixed *_URL (e.g. STORAGE_URL). We support all.
@@ -14,8 +16,10 @@ if (!connectionString) {
   );
 }
 
+// Export raw pool for existing queries using db.sql
 export const db = createPool({
   connectionString,
 });
 
-
+// Export Drizzle instance for new type-safe queries
+export const drizzleDb = drizzle(db, { schema });

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
-import Jimp from 'jimp';
+// import Jimp from 'jimp'; // Removed
 import axios from 'axios';
 
 export async function GET(request: Request) {
@@ -27,42 +27,19 @@ export async function GET(request: Request) {
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
         const imageBuffer = Buffer.from(response.data, 'binary');
 
-        // 4. If NOT Trial, return original image immediately (faster)
-        // Check both 'on_trial' status OR if user has very few credits/is free plan (extra safety)
-        if (subscriptionStatus !== 'on_trial') {
-             return new NextResponse(imageBuffer as unknown as BodyInit, {
-                headers: {
-                    'Content-Type': response.headers['content-type'] || 'image/png',
-                    'Cache-Control': 'public, max-age=31536000, immutable'
-                }
-            });
-        }
-
-        // 5. If TRIAL -> Add "Destructive" Watermark (Grayscale + Pixelate)
-        // Note: Using fonts caused Vercel deployment issues due to missing file paths. 
-        // Applying effects is safer and equally effective at rendering the image unusable.
-        const image = await Jimp.read(imageBuffer);
-        
-        // Get dimensions
-        const w = image.bitmap.width;
-
-        // DOWNGRADE FOR TRIAL: Resize
-        if (w > 1024) {
-            image.resize(1024, Jimp.AUTO);
-        }
-
-        // Apply destructive effects to make image unusable but visible
-        image.pixelate(3);      // Moderate pixelation (was 5)
-        image.quality(20);      // 20% Quality (was 10%)
-
-        const watermarkedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
-
-        return new NextResponse(watermarkedBuffer as unknown as BodyInit, {
+        // ALWAYS return original image (Frontend handles watermark & download protection)
+        return new NextResponse(imageBuffer as unknown as BodyInit, {
             headers: {
-                'Content-Type': 'image/jpeg',
-                'Cache-Control': 'no-store'
+                'Content-Type': response.headers['content-type'] || 'image/png',
+                'Cache-Control': 'public, max-age=31536000, immutable'
             }
         });
+
+        /* DEPRECATED DESTRUCTIVE LOGIC
+        // 4. If NOT Trial, return original image immediately (faster)
+        if (subscriptionStatus !== 'on_trial') { ... }
+        // ... Jimp logic ...
+        */
 
     } catch (error) {
         console.error('Image proxy error:', error);

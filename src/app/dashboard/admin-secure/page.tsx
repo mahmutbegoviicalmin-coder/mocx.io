@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2, Zap, MessageSquare, AlertTriangle, ShieldCheck, ChevronLeft, ChevronRight, Globe, MapPin } from 'lucide-react';
+import { Loader2, Search, Edit2, X, Check, Save, User as UserIcon, Clock, DollarSign, ImageIcon, Users, Trash2, Zap, MessageSquare, AlertTriangle, ShieldCheck, ChevronLeft, ChevronRight, Globe, MapPin, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
@@ -49,6 +49,7 @@ interface Stats {
         agency: number;
         free: number;
     };
+    recentActivity?: any[];
 }
 
 interface FeedbackItem {
@@ -132,7 +133,7 @@ export default function AdminPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'users' | 'feedback' | 'notifications' | 'payouts'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'feedback' | 'notifications' | 'payouts' | 'email' | 'credits' | 'activity'>('users');
   const [users, setUsers] = useState<UserData[]>([]);
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
   const [adminNotifs, setAdminNotifs] = useState<any[]>([]);
@@ -143,6 +144,16 @@ export default function AdminPage() {
   const [notifTitle, setNotifTitle] = useState('');
   const [notifBody, setNotifBody] = useState('');
   const [sendingNotif, setSendingNotif] = useState(false);
+  
+  // Email Marketing State
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [isTestEmail, setIsTestEmail] = useState(true);
+
+  // Bulk Credits State
+  const [bulkAmount, setBulkAmount] = useState(0);
+  const [processingBulk, setProcessingBulk] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -191,9 +202,10 @@ export default function AdminPage() {
   const fetchData = async () => {
       try {
         const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+        const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
         
         const [usersRes, statsRes, feedbackRes, notifRes, payoutsRes] = await Promise.all([
-            fetch(`/api/admin/users?limit=${ITEMS_PER_PAGE}&offset=${offset}`),
+            fetch(`/api/admin/users?limit=${ITEMS_PER_PAGE}&offset=${offset}${searchParam}`),
             fetch('/api/admin/stats'),
             fetch('/api/admin/feedback'),
             fetch('/api/admin/notifications'),
@@ -239,16 +251,81 @@ export default function AdminPage() {
     }
   };
 
+  const sendEmailBlast = async () => {
+    if (!emailSubject.trim() || !emailBody.trim()) return;
+    if (!confirm(isTestEmail ? 'Send TEST email to yourself?' : 'WARNING: Send email to ALL Free users? This cannot be undone.')) return;
+    
+    setSendingEmail(true);
+    try {
+      const res = await fetch('/api/admin/broadcast-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: emailSubject, message: emailBody, testMode: isTestEmail }),
+      });
+      const data = await res.json();
+      if (data.success) {
+          alert(`Email sent successfully to ${data.count} recipients!`);
+          if (!isTestEmail) {
+              setEmailSubject('');
+              setEmailBody('');
+          }
+      } else {
+          alert('Failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch(e) {
+        console.error(e);
+        alert('Error sending email');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const handleBulkCredits = async (action: 'add' | 'set') => {
+    const confirmMsg = action === 'set' 
+        ? `DANGER: This will SET credits to ${bulkAmount} for ALL users. Existing credits will be overwritten. Are you sure?`
+        : `This will ADD ${bulkAmount} credits to ALL users. Are you sure?`;
+        
+    if (!confirm(confirmMsg)) return;
+    
+    setProcessingBulk(true);
+    try {
+        const res = await fetch('/api/admin/users/bulk-credits', {
+            method: 'POST',
+            body: JSON.stringify({ amount: bulkAmount, action })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Success! Updated ${data.updatedCount} users.`);
+            fetchData();
+        } else {
+            alert('Failed: ' + data.error);
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Error processing bulk request');
+    } finally {
+        setProcessingBulk(false);
+    }
+  };
+
   useEffect(() => {
     if (isLoaded) {
       if (!user || user.emailAddresses[0].emailAddress !== ADMIN_EMAIL) {
         router.push('/dashboard');
         return;
       }
-      fetchData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, user, router, currentPage]);
+  }, [isLoaded, user, router]);
+
+  useEffect(() => {
+      if (!isLoaded || !user || user.emailAddresses[0].emailAddress !== ADMIN_EMAIL) return;
+
+      const timer = setTimeout(() => {
+          fetchData();
+      }, 500);
+
+      return () => clearTimeout(timer);
+  }, [currentPage, search, isLoaded]); // Fetch on page/search change
 
   const handleEditClick = (u: UserData) => {
     setEditingUser(u);
@@ -335,13 +412,8 @@ export default function AdminPage() {
     );
   }
 
-  const filteredUsers = users.filter(u => {
-    const matchesSearch = u.email.toLowerCase().includes(search.toLowerCase()) ||
-    (u.firstName && u.firstName.toLowerCase().includes(search.toLowerCase())) ||
-    (u.lastName && u.lastName.toLowerCase().includes(search.toLowerCase()));
-    
-    return matchesSearch;
-  });
+  // Removed client-side filtering, now handled by API
+  const displayUsers = users;
   
   // const totalGenerated = users.reduce((acc, u) => acc + (u.publicMetadata.imagesGenerated || 0), 0); // Removed local calc
 
@@ -390,6 +462,33 @@ export default function AdminPage() {
                     >
                         <DollarSign className="w-4 h-4" />
                         Payouts
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('email')}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                            activeTab === 'email' ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:text-white'
+                        }`}
+                    >
+                        <Mail className="w-4 h-4" />
+                        Email
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('credits')}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                            activeTab === 'credits' ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:text-white'
+                        }`}
+                    >
+                        <Zap className="w-4 h-4" />
+                        Bulk Credits
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('activity')}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+                            activeTab === 'activity' ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:text-white'
+                        }`}
+                    >
+                        <Clock className="w-4 h-4" />
+                        Live Feed
                     </button>
                 </div>
             </div>
@@ -497,16 +596,17 @@ export default function AdminPage() {
                     <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
                         {/* Table Header (Desktop) */}
                         <div className="hidden md:grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-white/40 items-center p-4 bg-white/5">
-                            <div className="col-span-4">User</div>
+                            <div className="col-span-3">User</div>
                             <div className="col-span-3">Last Seen</div>
                             <div className="col-span-1">Plan</div>
                             <div className="col-span-1 text-center">Stats</div>
+                            <div className="col-span-1 text-center">Cost</div>
                             <div className="col-span-2 text-center">Renewal</div>
                             <div className="col-span-1 text-right">Action</div>
                         </div>
 
                         <div className="divide-y divide-white/5">
-                            {filteredUsers.map((user) => {
+                            {displayUsers.map((user) => {
                                 let planName = user.publicMetadata.planName || 'Free Plan';
                                 if (planName.includes('Mocx')) planName = planName.replace('Mocx', '').trim() || 'Starter';
                                 planName = planName.replace(/\(.*\)/, '').trim(); 
@@ -519,7 +619,7 @@ export default function AdminPage() {
                                     className="p-4 flex flex-col md:grid md:grid-cols-12 items-start md:items-center gap-4 md:gap-0 hover:bg-white/5 transition-colors group relative"
                                 >
                                     {/* User Info */}
-                                    <div className="col-span-4 flex items-center gap-3 w-full md:w-auto">
+                                    <div className="col-span-3 flex items-center gap-3 w-full md:w-auto">
                                         <UserAvatar url={user.imageUrl} alt={user.email} />
                                         <div className="min-w-0 flex-1">
                                             <div className="font-bold text-white truncate text-sm">{user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'User'}</div>
@@ -549,6 +649,11 @@ export default function AdminPage() {
                                     <div className="hidden md:block col-span-1 text-center">
                                         <div className="text-xs font-bold text-white">{user.publicMetadata.credits || 0} <span className="text-white/30 font-normal">cr</span></div>
                                         <div className="text-[10px] text-white/40">{user.publicMetadata.imagesGenerated || 0} gen</div>
+                                    </div>
+
+                                    {/* Cost */}
+                                    <div className="hidden md:block col-span-1 text-center text-red-400/80 font-mono text-xs">
+                                        ${((user.publicMetadata.imagesGenerated || 0) * 0.09).toFixed(2)}
                                     </div>
 
                                     {/* Renewal */}
@@ -767,6 +872,160 @@ export default function AdminPage() {
                                 </motion.div>
                             ))
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* TAB CONTENT: EMAIL */}
+            {activeTab === 'email' && (
+                <div className="space-y-6">
+                    <div>
+                        <h2 className="text-xl font-bold">Email Marketing</h2>
+                        <p className="text-white/40 text-sm mt-1">Send an email blast to all Free Plan users to encourage upgrade.</p>
+                    </div>
+
+                    <div className="bg-black/40 border border-white/10 rounded-2xl p-6 space-y-4">
+                        <div>
+                            <label className="text-xs font-bold text-white/60 uppercase tracking-wider">Subject Line</label>
+                            <input
+                                value={emailSubject}
+                                onChange={(e) => setEmailSubject(e.target.value)}
+                                className="mt-2 w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white outline-none focus:border-primary/50"
+                                placeholder="e.g. Unlock unlimited creativity with Pro..."
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold text-white/60 uppercase tracking-wider">Message Body (HTML Supported)</label>
+                            <textarea
+                                value={emailBody}
+                                onChange={(e) => setEmailBody(e.target.value)}
+                                className="mt-2 w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white outline-none focus:border-primary/50 min-h-[200px] resize-none font-mono"
+                                placeholder="Write your email content here..."
+                            />
+                            <p className="text-[10px] text-white/30 mt-2">Basic HTML is supported. Use &lt;br&gt; for line breaks if needed.</p>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 py-2">
+                            <input 
+                                type="checkbox" 
+                                id="testMode" 
+                                checked={isTestEmail} 
+                                onChange={(e) => setIsTestEmail(e.target.checked)}
+                                className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-primary"
+                            />
+                            <label htmlFor="testMode" className="text-sm text-white/70 select-none cursor-pointer">
+                                Send Test Email (only to me)
+                            </label>
+                        </div>
+
+                        <button
+                            onClick={sendEmailBlast}
+                            disabled={sendingEmail || !emailSubject.trim() || !emailBody.trim()}
+                            className={`w-full py-3 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${
+                                isTestEmail 
+                                ? 'bg-white text-black hover:bg-gray-200' 
+                                : 'bg-gradient-to-r from-red-600 to-orange-600 text-white hover:brightness-110'
+                            }`}
+                        >
+                            {sendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                            {sendingEmail ? 'Sending...' : isTestEmail ? 'Send Test Email' : 'Send to ALL Free Users'}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB CONTENT: BULK CREDITS */}
+            {activeTab === 'credits' && (
+                <div className="space-y-6">
+                    <div>
+                        <h2 className="text-xl font-bold">Bulk Credit Management</h2>
+                        <p className="text-white/40 text-sm mt-1">Manage credits for ALL users at once. Use with caution.</p>
+                    </div>
+
+                    <div className="bg-black/40 border border-white/10 rounded-2xl p-6 space-y-6">
+                        <div>
+                            <label className="text-xs font-bold text-white/60 uppercase tracking-wider">Amount</label>
+                            <input
+                                type="number"
+                                value={bulkAmount}
+                                onChange={(e) => setBulkAmount(Number(e.target.value))}
+                                className="mt-2 w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white outline-none focus:border-yellow-500/50 font-mono text-lg"
+                                placeholder="Enter amount..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button
+                                onClick={() => handleBulkCredits('add')}
+                                disabled={processingBulk || bulkAmount <= 0}
+                                className="w-full py-4 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {processingBulk ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                                Give {bulkAmount > 0 ? bulkAmount : ''} Credits to ALL
+                            </button>
+
+                            <button
+                                onClick={() => handleBulkCredits('set')}
+                                disabled={processingBulk || bulkAmount < 0}
+                                className="w-full py-4 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {processingBulk ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                                Set ALL to {bulkAmount} Credits
+                            </button>
+                        </div>
+                        
+                        <div className="border-t border-white/10 pt-6 mt-6">
+                            <p className="text-sm text-white/40">
+                                <span className="text-red-400 font-bold">Note:</span> "Set" will overwrite any existing credits. Use "Give" to add to existing balance. 
+                                To wipe all credits, enter <b>0</b> and click <b>"Set ALL to 0 Credits"</b>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB CONTENT: ACTIVITY */}
+            {activeTab === 'activity' && (
+                <div className="space-y-6">
+                    <h2 className="text-xl font-bold">Live Generation Feed</h2>
+                    <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
+                        <div className="grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-white/40 items-center p-4 bg-white/5">
+                            <div className="col-span-4">User</div>
+                            <div className="col-span-4">Prompt</div>
+                            <div className="col-span-2">Mode</div>
+                            <div className="col-span-2 text-right">Time</div>
+                        </div>
+                        <div className="divide-y divide-white/5">
+                            {stats.recentActivity?.map((gen: any) => {
+                                const user = users.find(u => u.id === gen.userId);
+                                const userLabel = user ? (user.email || 'Unknown User') : gen.userId;
+                                return (
+                                    <div key={gen.id} className="p-4 grid grid-cols-12 items-center gap-4 text-sm hover:bg-white/5 transition-colors">
+                                        <div className="col-span-4 font-mono text-xs text-white/50 truncate" title={gen.userId}>
+                                            {userLabel}
+                                        </div>
+                                        <div className="col-span-4 text-white/80 truncate" title={gen.prompt}>
+                                            {gen.prompt}
+                                        </div>
+                                        <div className="col-span-2">
+                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                                                gen.mode === 'thumbnail' ? 'bg-red-500/20 text-red-400' :
+                                                gen.mode === 'mockup' ? 'bg-orange-500/20 text-orange-400' :
+                                                'bg-purple-500/20 text-purple-400'
+                                            }`}>
+                                                {gen.mode || 'unknown'}
+                                            </span>
+                                        </div>
+                                        <div className="col-span-2 text-right text-white/40 text-xs">
+                                            {new Date(gen.createdAt).toLocaleString()}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {(!stats.recentActivity || stats.recentActivity.length === 0) && (
+                                <div className="p-8 text-center text-white/30 italic">No recent activity found.</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

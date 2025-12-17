@@ -65,7 +65,7 @@ export function Pricing() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-muted-foreground max-w-2xl mx-auto"
           >
-            Start with <span className="text-white font-bold">5 free credits</span> on sign up. No credit card required.
+            Purchase a plan to get started.
           </motion.p>
           
           <motion.div 

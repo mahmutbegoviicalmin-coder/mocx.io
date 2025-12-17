@@ -39,34 +39,29 @@ export function Hero() {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-16 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
+        <div className="flex items-center justify-center mb-16 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 w-full sm:w-auto">
           <Link 
             href="/sign-up" 
-            className="group relative h-12 px-8 flex items-center justify-center gap-2 bg-white text-black rounded-full font-semibold transition-all hover:bg-gray-200 active:scale-95"
+            className="group relative h-12 px-8 w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black rounded-full font-semibold transition-all hover:bg-gray-200 active:scale-95 shadow-[0_0_25px_-5px_rgba(255,255,255,0.3)] hover:shadow-[0_0_35px_-5px_rgba(255,255,255,0.4)]"
           >
-            Try for Free (5 Credits)
+            Try for Free
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          
-          <Link 
-            href="#demo"
-            className="h-12 px-8 flex items-center justify-center gap-2 bg-white/5 text-white border border-white/10 rounded-full font-medium hover:bg-white/10 transition-all active:scale-95"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            Watch Demo
           </Link>
         </div>
 
         {/* Free Trial Badge */}
-        <div className="flex items-center gap-3 mb-16 px-5 py-2.5 rounded-full bg-amber-500/10 border border-amber-500/20 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 group cursor-default hover:bg-amber-500/20 transition-colors shadow-[0_0_20px_-5px_rgba(245,158,11,0.3)]">
-            <div className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+        <div className="relative mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 group">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
+            <div className="relative flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-black/40 border border-amber-500/30 backdrop-blur-md hover:border-amber-500/50 transition-colors cursor-default max-w-[95vw] sm:max-w-none mx-auto">
+                <div className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                </div>
+                <p className="text-sm font-medium text-amber-100/90 whitespace-normal sm:whitespace-nowrap text-center leading-snug">
+                    <span className="text-white font-bold">Free credits on sign up</span> available now.
+                </p>
+                <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 hidden sm:block" />
             </div>
-            <p className="text-sm font-medium text-amber-100">
-                New: <span className="text-white font-bold border-b border-amber-500/50">Free credits on sign up</span> available now.
-            </p>
-            <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
         </div>
 
         {/* Social Proof Text */}

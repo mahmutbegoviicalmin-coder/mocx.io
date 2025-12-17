@@ -23,11 +23,13 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '30');
     const offset = parseInt(searchParams.get('offset') || '0');
+    const search = searchParams.get('search') || undefined;
 
     // Fetch users with pagination
     const userList = await client.users.getUserList({
       limit,
       offset,
+      query: search,
       orderBy: '-created_at'
     });
 

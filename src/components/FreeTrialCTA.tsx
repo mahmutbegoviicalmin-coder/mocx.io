@@ -25,11 +25,12 @@ export function FreeTrialCTA() {
                 </div>
                 
                 <h2 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
-                    Try Mocx <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">Free for 2 Days</span>
+                    Ready to Create? <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">Get Started</span>
                 </h2>
                 
-                <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-                    Experience the full power of AI thumbnail creation. Generate unlimited ideas, recreate viral styles, and boost your CTR. No commitment.
+                <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto leading-relaxed text-balance">
+                    Join thousands of creators using Mocx. <br className="hidden md:block" />
+                    Create high-quality thumbnails and mockups instantly.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
@@ -37,12 +38,12 @@ export function FreeTrialCTA() {
                         href="/sign-up" 
                         className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-2xl font-bold text-lg shadow-2xl shadow-amber-900/30 hover:shadow-amber-900/50 hover:scale-105 transition-all flex items-center gap-3"
                     >
-                        Start Free Trial
+                        Get Started
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
                 <p className="text-sm text-white/30 font-medium">
-                    Due today: $0.00 • Cancel anytime
+                    Instant access upon purchase
                 </p>
             </motion.div>
         </div>

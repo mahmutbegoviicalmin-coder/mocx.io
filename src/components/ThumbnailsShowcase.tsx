@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { BadgeCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const CREATORS = [
   { name: 'IShowSpeed', subs: '33M+', avatar: '/creators/i-show-speed-1400x825-1.jpg' },
@@ -51,6 +52,26 @@ const VIDEOS = [
 ];
 
 export function ThumbnailsShowcase() {
+  const [videoDuration, setVideoDuration] = useState(40);
+  const [creatorDuration, setCreatorDuration] = useState(50);
+
+  useEffect(() => {
+    const handleResize = () => {
+        if (window.innerWidth < 768) {
+            // Super fast on mobile (10x faster than desktop)
+            setVideoDuration(5);
+            setCreatorDuration(8);
+        } else {
+            setVideoDuration(40);
+            setCreatorDuration(50);
+        }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <section className="py-24 bg-[#050505] overflow-hidden relative border-y border-white/5">
       {/* Radial Glow */}
@@ -69,12 +90,13 @@ export function ThumbnailsShowcase() {
         {/* Video Marquee */}
         <div className="relative w-full mb-24 -mx-4 md:-mx-0 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
             <motion.div 
+                key={videoDuration}
                 className="flex gap-8 whitespace-nowrap pl-4"
                 animate={{ x: ["0%", "-50%"] }}
                 transition={{ 
                     repeat: Infinity, 
                     ease: "linear", 
-                    duration: 40 
+                    duration: videoDuration 
                 }}
             >
                 {[...VIDEOS, ...VIDEOS, ...VIDEOS].map((video, i) => (
@@ -107,13 +129,14 @@ export function ThumbnailsShowcase() {
             
             <div className="relative w-full overflow-hidden max-w-5xl mx-auto [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
                 <motion.div 
+                    key={creatorDuration}
                     className="flex gap-16 items-center"
                     animate={{ x: ["0%", "-50%"] }}
-                    transition={{ 
-                        repeat: Infinity, 
-                        ease: "linear", 
-                        duration: 50 
-                    }}
+                transition={{ 
+                    repeat: Infinity, 
+                    ease: "linear", 
+                    duration: creatorDuration 
+                }}
                 >
                     {[...CREATORS, ...CREATORS, ...CREATORS].map((creator, i) => (
                         <div key={i} className="flex items-center gap-3 shrink-0 opacity-60 hover:opacity-100 transition-opacity">

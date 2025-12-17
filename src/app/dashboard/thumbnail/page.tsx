@@ -78,13 +78,10 @@ export default function ThumbnailPage() {
 
   const credits = user?.publicMetadata?.credits ? Number(user.publicMetadata.credits) : 0;
   const planName = (user?.publicMetadata?.planName as string) || 'Free Plan';
-  const subscriptionStatus = user?.publicMetadata?.subscriptionStatus as string | undefined;
-  const isTrial = subscriptionStatus === 'on_trial';
   
-  // RESTRICTION LOGIC:
-  // Must be a paid plan to use this feature
-  const isAllowed = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency') || planName.toLowerCase().includes('starter');
-  const isLocked = !isAllowed;
+  // LOGIC:
+  const isFreePlan = planName === 'Free Plan';
+  const isLocked = false; // UNLOCKED FOR EVERYONE
   
   // Use Proxy URL to enforce watermark if on trial
   const displayImageUrl = generatedImage 
@@ -423,12 +420,28 @@ export default function ThumbnailPage() {
                 className="relative w-full h-full flex flex-col select-none"
                 onContextMenu={(e) => e.preventDefault()}
               >
-                <div className="flex-1 relative flex items-center justify-center p-4 lg:p-12">
+                <div className="flex-1 relative flex items-center justify-center p-4 lg:p-12 overflow-hidden">
+                     {/* WATERMARK FOR FREE USERS */}
+                     {isFreePlan && (
+                        <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center select-none overflow-hidden">
+                            <div className="text-[5vw] font-black text-white/20 -rotate-12 border-4 border-white/10 p-4 md:p-8 rounded-3xl backdrop-blur-[2px]">
+                                MOCX PREVIEW
+                            </div>
+                            <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-10">
+                                 {Array.from({ length: 9 }).map((_, i) => (
+                                     <div key={i} className="flex items-center justify-center">
+                                         <span className="text-xl font-bold text-white -rotate-45">MOCX.IO</span>
+                                     </div>
+                                 ))}
+                            </div>
+                        </div>
+                     )}
+
                      <img 
                         src={displayImageUrl} 
-                        className={`max-w-full max-h-full object-contain shadow-2xl rounded-xl relative z-10 ${isTrial ? 'pointer-events-none' : ''}`}
+                        className={`max-w-full max-h-full object-contain shadow-2xl rounded-xl relative z-10 ${isFreePlan ? 'pointer-events-none' : ''}`}
                         alt="Generated Result"
-                        draggable={!isTrial}
+                        draggable={!isFreePlan}
                         onContextMenu={(e) => e.preventDefault()}
                      />
                      
@@ -436,22 +449,6 @@ export default function ThumbnailPage() {
                      <div className="absolute inset-0 z-0">
                         <img src={displayImageUrl} className="w-full h-full object-cover blur-[100px] opacity-20" />
                      </div>
-                     
-                     {/* Transparent Overlay to block interaction completely */}
-                     {isTrial && (
-                        <div 
-                            className="absolute inset-0 z-50 cursor-not-allowed"
-                            onContextMenu={(e) => e.preventDefault()}
-                            onDragStart={(e) => e.preventDefault()}
-                        />
-                     )}
-                     
-                     {isTrial && (
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full text-[10px] text-white/70 font-medium flex items-center gap-2 whitespace-nowrap z-50 pointer-events-none">
-                            <Info className="w-3 h-3 text-yellow-400" />
-                            Low resolution preview. Upgrade for 4K result.
-                        </div>
-                     )}
                 </div>
                 
                 <div className="h-20 bg-[#1A1A1A] border-t border-white/10 flex items-center justify-between px-6 shrink-0">
@@ -463,8 +460,8 @@ export default function ThumbnailPage() {
                             <RefreshCw className="w-4 h-4" /> Regenerate
                         </button>
                     </div>
-                    {isTrial ? (
-                        <Link href="/dashboard/billing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:brightness-110 shadow-lg shadow-amber-900/20">
+                    {isFreePlan ? (
+                        <Link href="/dashboard/billing" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:brightness-110 shadow-lg shadow-amber-900/20 z-30">
                              <Lock className="w-4 h-4" /> Unlock to Download
                         </Link>
                     ) : (

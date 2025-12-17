@@ -47,8 +47,7 @@ export default function DashboardHome() {
   const isStarter = planName.toLowerCase().includes('starter');
 
   const hasAccess = (minPlan: string) => {
-      if (minPlan === 'starter') return isStarter || isPro || isAgency;
-      if (minPlan === 'pro') return isPro || isAgency;
+      // ALL tools are open for everyone now (pay per use or subscription)
       return true;
   };
 

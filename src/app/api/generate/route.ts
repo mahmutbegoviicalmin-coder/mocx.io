@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { drizzleDb } from '@/db/sql';
+import { generations } from '@/db/schema';
+import { CREDIT_COSTS } from '@/config/credits';
 
 export async function POST(request: Request) {
   try {
@@ -18,11 +21,18 @@ export async function POST(request: Request) {
     const credits = user.publicMetadata.credits !== undefined ? (user.publicMetadata.credits as number) : 0;
     const planName = (user.publicMetadata.planName as string) || 'Free Plan';
 
-    // Determine Cost
-    const COST = mode === 'thumbnail' ? 5 : 1;
+    if (planName === 'Free Plan') {
+        return NextResponse.json({ error: 'Must purchase plan' }, { status: 403 });
+    }
 
-    // Strict check: If Free Plan and no credits, block.
-    if (planName === 'Free Plan' && credits < 1) {
+    // Determine Cost
+    const COST = mode === 'thumbnail' ? CREDIT_COSTS.THUMBNAIL : 
+                 mode === 'art' ? CREDIT_COSTS.ART :
+                 mode === 'mockup' ? CREDIT_COSTS.MOCKUP : 1;
+
+    // Remove plan restriction blocks, only check credits
+    // Strict check: Block if credits < 1
+    if (credits < 1) {
         return NextResponse.json({ error: 'Upgrade to a paid plan or top up credits to generate.' }, { status: 403 });
     }
 
@@ -30,14 +40,9 @@ export async function POST(request: Request) {
     if (credits < COST) {
         return NextResponse.json({ error: `Insufficient credits. This action requires ${COST} credits.` }, { status: 403 });
     }
-
-    // Check Plan Restriction for Thumbnail Mode
-    if (mode === 'thumbnail') {
-        const isAllowed = planName.toLowerCase().includes('pro') || planName.toLowerCase().includes('agency') || planName.toLowerCase().includes('starter');
-        if (!isAllowed) {
-             return NextResponse.json({ error: 'Thumbnail Recreator is exclusively available for paid plans.' }, { status: 403 });
-        }
-    }
+    
+    // REMOVED: Thumbnail plan restriction logic
+    // All modes are now accessible to everyone with credits
 
     if (!process.env.NANOBANANA_API_KEY) {
         return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
@@ -121,6 +126,18 @@ export async function POST(request: Request) {
             imagesGenerated: currentUsage + 1
         }
     });
+
+    // Log generation to DB for Admin Stats
+    try {
+        await drizzleDb.insert(generations).values({
+            userId,
+            prompt,
+            imageUrl: data.data?.taskId || 'pending', // Store Task ID temporarily or result
+            mode
+        });
+    } catch (dbError) {
+        console.error('Failed to log generation to DB:', dbError);
+    }
 
     return NextResponse.json(data);
   } catch (error) {

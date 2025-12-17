@@ -55,12 +55,12 @@ export async function POST(req: Request) {
      const { id, email_addresses } = evt.data;
      console.log(`New user created: ${id}`);
      
-     // Initialize user credits to 5 (Free Trial Gift)
+     // Initialize user credits to 0 explicitly
      try {
          const client = await clerkClient();
          await client.users.updateUserMetadata(id, {
             publicMetadata: {
-                credits: 5,
+                credits: 0,
                 planName: 'Free Plan'
             }
          });

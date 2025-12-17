@@ -21,3 +21,9 @@ export const CREDIT_PACKS = [
     variantId: 1123144
   }
 ];
+
+export const CREDIT_COSTS = {
+    MOCKUP: 3,
+    ART: 2,
+    THUMBNAIL: 5
+};

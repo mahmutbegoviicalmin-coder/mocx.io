@@ -29,3 +29,11 @@ export const payoutRequests = pgTable('payout_requests', {
   status: text('status').default('pending'), // pending, paid, rejected
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const claimedTrials = pgTable('claimed_trials', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  ipHash: text('ip_hash').notNull(), // Hashed IP address for privacy/matching
+  userAgent: text('user_agent'), // Browser string
+  claimedAt: timestamp('claimed_at').defaultNow(),
+});

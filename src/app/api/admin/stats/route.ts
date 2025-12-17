@@ -1,5 +1,8 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { drizzleDb } from '@/db/sql';
+import { generations } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
 const ADMIN_EMAIL = 'mahmutbegoviic.almin@gmail.com';
 
@@ -120,13 +123,22 @@ export async function GET() {
 
     totalCost = totalImagesGenerated * COST_PER_IMAGE;
 
+    // 4. Fetch Recent Activity
+    let recentActivity: any[] = [];
+    try {
+        recentActivity = await drizzleDb.select().from(generations).orderBy(desc(generations.createdAt)).limit(50);
+    } catch (e) {
+        console.error('Failed to fetch activity', e);
+    }
+
     return NextResponse.json({
         totalUsers,
         totalRevenue,
         planCounts,
         apiBalance,
         totalCost,
-        totalImagesGenerated
+        totalImagesGenerated,
+        recentActivity
     });
   } catch (error) {
     console.error('[ADMIN_STATS_GET]', error);

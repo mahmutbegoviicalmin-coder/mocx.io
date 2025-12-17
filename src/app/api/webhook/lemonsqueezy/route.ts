@@ -178,21 +178,37 @@ export async function POST(request: Request) {
           });
       }
     } else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
-       // Revoke access plan but KEEP remaining credits
-       // User becomes Free Plan but can use leftover credits until they run out
+       // Only revoke access immediately if it's EXPIRED.
+       // If it's CANCELLED, they still have access until the period ends.
        const attributes = data.attributes;
+       
        if (userId) {
-        await client.users.updateUserMetadata(userId, {
-            privateMetadata: {
-              status: attributes.status, // 'cancelled' or 'expired'
-              endsAt: attributes.ends_at,
-            },
-            publicMetadata: {
-              planName: 'Free Plan', // Revert to free
-              // We do NOT reset credits to 0 here. 
-              // Existing credits persist and user can use them until 0.
-            }
-          });
+          const isExpired = eventName === 'subscription_expired' || attributes.status === 'expired';
+          
+          if (isExpired) {
+              // Only when truly expired do we set them to Free Plan
+              await client.users.updateUserMetadata(userId, {
+                privateMetadata: {
+                  status: attributes.status,
+                  endsAt: attributes.ends_at,
+                },
+                publicMetadata: {
+                  planName: 'Free Plan',
+                }
+              });
+          } else {
+             // If just cancelled (but period active), just update status but KEEP PLAN NAME
+             await client.users.updateUserMetadata(userId, {
+                privateMetadata: {
+                  status: attributes.status, // 'cancelled'
+                  endsAt: attributes.ends_at,
+                },
+                publicMetadata: {
+                   subscriptionStatus: attributes.status // Update status for UI badges
+                }
+                // Do NOT change planName here, so they keep access until 'subscription_expired' fires later
+             });
+          }
        }
     }
 
