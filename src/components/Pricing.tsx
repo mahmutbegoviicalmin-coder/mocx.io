@@ -39,10 +39,10 @@ export function Pricing() {
   }, [router]);
 
   return (
-    <section id="pricing" className="py-24 relative overflow-hidden bg-black text-white selection:bg-orange-500/30">
+    <section id="pricing" className="py-24 relative overflow-hidden bg-[#050505] text-white selection:bg-orange-500/30">
       {/* BACKGROUND AMBIENCE */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
+        <div className="absolute inset-0 bg-[#050505]" />
         {/* Subtle Orange Glow center */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/5 blur-[120px] rounded-full opacity-40" />
         {/* Noise */}
@@ -66,10 +66,10 @@ export function Pricing() {
             </div>
 
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-              Simple, transparent pricing
+              Simple pricing for serious creators
             </h2>
             <p className="text-lg text-white/50 font-medium max-w-xl mx-auto">
-              Prices slashed for the holidays. Upgrade now and lock in the discount.
+              Generate high-quality visuals, faster — without confusing limits or hidden costs.
             </p>
           </motion.div>
           
