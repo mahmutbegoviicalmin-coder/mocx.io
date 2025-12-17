@@ -169,6 +169,54 @@ export default function AdminPage() {
   const [editingAffiliate, setEditingAffiliate] = useState<UserData | null>(null);
   const [affiliateForm, setAffiliateForm] = useState({ starter: 0, pro: 0, agency: 0, free: 0 });
 
+  // Selection State
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Toggle selection for a single user
+  const toggleSelectUser = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
+  // Toggle select all on current page
+  const toggleSelectAll = () => {
+    if (selectedUsers.length === users.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(users.map(u => u.id));
+    }
+  };
+
+  // Handle Bulk Delete
+  // Reusing existing handler definition to fix duplication error
+  const handleBulkDelete = async () => {
+    if (selectedUsers.length === 0) return;
+    if (!confirm(`Are you sure you want to PERMANENTLY DELETE ${selectedUsers.length} users? This cannot be undone.`)) return;
+
+    setIsDeleting(true);
+    try {
+        const res = await fetch('/api/admin/users/bulk-delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userIds: selectedUsers })
+        });
+        
+        if (!res.ok) throw new Error('Failed to delete users');
+        
+        const data = await res.json();
+        alert(`Successfully deleted ${data.deletedCount} users.`);
+        setSelectedUsers([]);
+        fetchData(); // Refresh list
+    } catch (error) {
+        console.error('Bulk delete error:', error);
+        alert('Failed to delete users. Check console for details.');
+    } finally {
+        setIsDeleting(false);
+    }
+  };
+
   const handleAffiliateClick = (u: UserData) => {
     setEditingAffiliate(u);
     const stats = u.publicMetadata.affiliateStats || { starter: 0, pro: 0, agency: 0, free: 0 };
@@ -492,8 +540,6 @@ export default function AdminPage() {
                     </button>
                 </div>
             </div>
-
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
@@ -596,7 +642,15 @@ export default function AdminPage() {
                     <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden">
                         {/* Table Header (Desktop) */}
                         <div className="hidden md:grid grid-cols-12 text-xs font-bold uppercase tracking-wider text-white/40 items-center p-4 bg-white/5">
-                            <div className="col-span-3">User</div>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <input 
+                                    type="checkbox" 
+                                    checked={users.length > 0 && selectedUsers.length === users.length}
+                                    onChange={toggleSelectAll}
+                                    className="w-4 h-4 rounded border-white/20 bg-white/5 checked:bg-primary"
+                                />
+                                User
+                            </div>
                             <div className="col-span-3">Last Seen</div>
                             <div className="col-span-1">Plan</div>
                             <div className="col-span-1 text-center">Stats</div>
@@ -620,6 +674,14 @@ export default function AdminPage() {
                                 >
                                     {/* User Info */}
                                     <div className="col-span-3 flex items-center gap-3 w-full md:w-auto">
+                                        <div className="flex items-center justify-center shrink-0">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={selectedUsers.includes(user.id)}
+                                                onChange={() => toggleSelectUser(user.id)}
+                                                className="w-4 h-4 rounded border-white/20 bg-white/5 checked:bg-primary cursor-pointer"
+                                            />
+                                        </div>
                                         <UserAvatar url={user.imageUrl} alt={user.email} />
                                         <div className="min-w-0 flex-1">
                                             <div className="font-bold text-white truncate text-sm">{user.firstName ? `${user.firstName} ${user.lastName || ''}` : 'User'}</div>
@@ -640,7 +702,6 @@ export default function AdminPage() {
                                         )}
                                     </div>
 
-                                    {/* Plan */}
                                     <div className="hidden md:block col-span-1">
                                         <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide ${getPlanBadgeStyle(planName)}`}>{planName}</span>
                                     </div>
@@ -676,7 +737,8 @@ export default function AdminPage() {
                                         <button onClick={() => handleDeleteClick(user.id, user.email)} className="p-2 bg-white/5 hover:bg-red-500/10 rounded-lg text-white/50 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                 </motion.div>
-                            )})}
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -1030,6 +1092,41 @@ export default function AdminPage() {
                 </div>
             )}
         </div>
+
+        {/* Floating Bulk Actions Bar */}
+        <AnimatePresence>
+            {selectedUsers.length > 0 && (
+                <motion.div 
+                    initial={{ y: 100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 100, opacity: 0 }}
+                    className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a] border border-white/10 shadow-2xl rounded-2xl px-6 py-4 flex items-center gap-6"
+                >
+                    <div className="flex items-center gap-3 border-r border-white/10 pr-6">
+                        <span className="bg-white text-black text-xs font-bold px-2 py-1 rounded">
+                            {selectedUsers.length}
+                        </span>
+                        <span className="text-sm font-bold text-white">Selected</span>
+                    </div>
+                    
+                    <button 
+                        onClick={handleBulkDelete}
+                        disabled={isDeleting}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-red-500/20"
+                    >
+                        {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        Delete Selected
+                    </button>
+                    
+                    <button 
+                        onClick={() => setSelectedUsers([])}
+                        className="text-white/40 hover:text-white transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </motion.div>
+            )}
+        </AnimatePresence>
 
         {/* Edit Modal */}
         <AnimatePresence>

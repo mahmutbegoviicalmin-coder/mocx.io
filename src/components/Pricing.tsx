@@ -153,45 +153,53 @@ export function Pricing() {
 function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user) {
       router.push('/sign-up');
       return;
     }
 
     if (!variantId) {
-      console.error("Checkout URL missing. Please check environment variables.");
-      alert("Checkout configuration error. Please try again later.");
+      console.error("Checkout configuration missing.");
       return;
     }
 
-    // Ensure URL has correct params for overlay
-    let checkoutUrl = variantId;
-    
-    const hasParams = checkoutUrl.includes('?');
-    const appendChar = hasParams ? '&' : '?';
-    
-    if (!checkoutUrl.includes('embed=1')) {
-       checkoutUrl += `${appendChar}embed=1&media=0&logo=0&desc=0`;
-    }
+    setLoading(true);
 
-    // Always pass the userId since we now require auth
-       checkoutUrl += `&checkout[custom][userId]=${user.id}`;
+    try {
+        // Use the server-side API to generate a secure checkout URL
+        // This avoids guessing the store slug on the frontend
+        const res = await fetch('/api/subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ variantId })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.url) {
+            console.error('Failed to create checkout:', data);
+            alert('Failed to initiate checkout. Please try again.');
+            return;
+        }
 
-    // @ts-ignore
-    if (typeof window !== 'undefined' && window.LemonSqueezy) {
-       // @ts-ignore
-       window.LemonSqueezy.Url.Open(checkoutUrl);
-    } else {
-      // Fallback if script isn't loaded yet
-      const a = document.createElement('a');
-      a.href = checkoutUrl;
-      a.className = "lemonsqueezy-button";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+        const checkoutUrl = data.url;
+        
+        // @ts-ignore
+        if (typeof window !== 'undefined' && window.LemonSqueezy) {
+           // @ts-ignore
+           window.LemonSqueezy.Url.Open(checkoutUrl);
+        } else {
+          window.location.href = checkoutUrl;
+        }
+
+    } catch (error) {
+        console.error('Checkout error:', error);
+        alert('An error occurred. Please try again.');
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -295,13 +303,21 @@ function PricingCard({ title, price, originalPrice, period = "/mo", features, hi
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={handleCheckout}
+        disabled={loading}
         className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 relative z-10 cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
           highlighted 
             ? 'bg-white text-black hover:bg-white/90 shadow-xl shadow-white/5' 
             : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 hover:border-white/10'
         }`}
       >
-        <span>Get {title}</span>
+        {loading ? (
+            <span className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Processing...
+            </span>
+        ) : (
+            <span>Get {title}</span>
+        )}
       </motion.button>
     </motion.div>
   );

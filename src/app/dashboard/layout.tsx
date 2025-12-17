@@ -2,6 +2,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { currentUser } from "@clerk/nextjs/server";
 import { Pricing } from "@/components/Pricing";
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardLayout({
   children,
 }: {

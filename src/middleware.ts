@@ -5,7 +5,17 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/api/generate(.*)']);
 const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)', '/sign-up(.*)', '/legal(.*)', '/api/webhook(.*)']);
 
+// 🚫 Blokirane države: Indija, Pakistan, Bangladeš, Nigerija, Indonezija, Egipat, Vijetnam, Filipini
+const BLOCKED_COUNTRIES = ['IN', 'PK', 'BD', 'NG', 'ID', 'EG', 'VN', 'PH'];
+
 export default clerkMiddleware(async (auth, req) => {
+  // 1. Geo-Blocking logika (Radi na Vercel-u)
+  const country = (req as any).geo?.country;
+  
+  if (country && BLOCKED_COUNTRIES.includes(country)) {
+    return new NextResponse('Access Denied from your country.', { status: 403 });
+  }
+
   const { userId } = await auth();
 
   // Redirect authenticated users from landing page to dashboard

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Play, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Sparkles, Play, CheckCircle2, CreditCard } from 'lucide-react';
 import { HeroDemo } from './HeroDemo';
 
 export function Hero() {
@@ -49,18 +49,14 @@ export function Hero() {
           </Link>
         </div>
 
-        {/* Free Trial Badge */}
+        {/* Money Back Guarantee Badge */}
         <div className="relative mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 group">
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
             <div className="relative flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-black/40 border border-amber-500/30 backdrop-blur-md hover:border-amber-500/50 transition-colors cursor-default max-w-[95vw] sm:max-w-none mx-auto">
-                <div className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                </div>
+                <CreditCard className="w-4 h-4 text-amber-500 shrink-0" />
                 <p className="text-sm font-medium text-amber-100/90 whitespace-normal sm:whitespace-nowrap text-center leading-snug">
-                    <span className="text-white font-bold">Free credits on sign up</span> available now.
+                    <span className="text-white font-bold">7-day money-back guarantee</span>
                 </p>
-                <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 hidden sm:block" />
             </div>
         </div>
 

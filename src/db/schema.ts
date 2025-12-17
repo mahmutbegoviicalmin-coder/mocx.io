@@ -37,3 +37,12 @@ export const claimedTrials = pgTable('claimed_trials', {
   userAgent: text('user_agent'), // Browser string
   claimedAt: timestamp('claimed_at').defaultNow(),
 });
+
+export const referrals = pgTable('referrals', {
+  id: serial('id').primaryKey(),
+  referrerId: text('referrer_id').notNull(), // e.g. 'stefan' or user ID
+  referredUserId: text('referred_user_id').notNull().unique(), // The new user
+  referredUserEmail: text('referred_user_email'),
+  status: text('status').default('free'), // free, paid
+  createdAt: timestamp('created_at').defaultNow(),
+});

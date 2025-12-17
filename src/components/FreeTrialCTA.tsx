@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, CreditCard } from 'lucide-react';
 
 export function FreeTrialCTA() {
   return (
@@ -42,9 +42,12 @@ export function FreeTrialCTA() {
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
-                <p className="text-sm text-white/30 font-medium">
-                    Instant access upon purchase
-                </p>
+                <div className="flex items-center justify-center gap-2 text-white/40 pt-2">
+                    <CreditCard className="w-4 h-4" />
+                    <p className="text-sm font-medium">
+                        7-day money-back guarantee
+                    </p>
+                </div>
             </motion.div>
         </div>
       </div>
