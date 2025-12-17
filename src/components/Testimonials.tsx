@@ -51,7 +51,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-[#0f1115] relative overflow-hidden border-t border-[#1a1d23]">
+    <section className="py-32 bg-[#050505] relative overflow-hidden border-t border-white/5">
       <div className="container mx-auto px-4 relative z-10">
         
         {/* Header Section */}

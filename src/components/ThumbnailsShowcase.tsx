@@ -52,7 +52,7 @@ const VIDEOS = [
 
 export function ThumbnailsShowcase() {
   return (
-    <section className="py-24 bg-[#0f1115] overflow-hidden relative border-y border-[#1a1d23]">
+    <section className="py-24 bg-[#050505] overflow-hidden relative border-y border-white/5">
       
       <div className="container mx-auto px-4 relative z-10">
         

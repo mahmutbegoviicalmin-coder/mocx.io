@@ -6,9 +6,9 @@ import { Particles } from "./Particles";
 
 export function BeforeAfter() {
   return (
-    <section className="py-32 relative overflow-hidden bg-[#0f1115]">
+    <section className="py-32 relative overflow-hidden bg-[#050505] border-t border-white/5">
       {/* Modern Background with subtle primary glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#16181d] via-[#0f1115] to-[#0f1115] z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0a0a0a] via-[#050505] to-[#050505] z-0" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/5 blur-[120px] -z-10 rounded-full opacity-40 pointer-events-none" />
       
       {/* Particles Effect */}
