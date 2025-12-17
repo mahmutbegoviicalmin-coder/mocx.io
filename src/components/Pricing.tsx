@@ -167,7 +167,7 @@ export function Pricing() {
 // INDIVIDUAL CARD COMPONENT
 // ------------------------------------------------------------------
 
-function PricingCard({ title, price, originalPrice, description, features, isPro = false, variantId, annual }: any) {
+function PricingCard({ title, price, originalPrice, yearlyPrice, description, features, isPro = false, variantId, annual }: any) {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -256,6 +256,12 @@ function PricingCard({ title, price, originalPrice, description, features, isPro
                         <span className="text-5xl font-bold text-white tracking-tight">${price}</span>
                         <span className="text-white/40 font-medium text-sm">/mo</span>
                     </div>
+                    
+                    {annual && (
+                        <p className="text-xs text-white/40 font-medium mt-1">
+                            Billed ${yearlyPrice} yearly
+                        </p>
+                    )}
                 </div>
                 
                 {/* Description */}
