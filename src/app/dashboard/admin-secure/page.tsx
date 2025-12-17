@@ -17,10 +17,11 @@ interface UserData {
   imageUrl: string;
   lastSignInAt: number | null;
   createdAt: number;
-    publicMetadata: {
+  publicMetadata: {
     planName?: string;
     credits?: number;
     imagesGenerated?: number;
+    country?: string;
     subscriptionStatus?: string;
     affiliateStats?: {
         starter: number;
@@ -694,6 +695,11 @@ export default function AdminPage() {
                                         <div className="flex items-center gap-2 text-white/80">
                                             <Clock className="w-3 h-3 text-primary" />
                                             {user.lastSignInAt ? new Date(user.lastSignInAt).toLocaleDateString() : 'Never'}
+                                            {user.publicMetadata?.country && (
+                                              <span className="ml-1 px-1.5 py-0.5 rounded bg-white/10 text-white/70 font-mono text-[10px] border border-white/5">
+                                                {user.publicMetadata.country}
+                                              </span>
+                                            )}
                                         </div>
                                         {user.lastSignInAt && (
                                             <div className="text-[10px] text-white/30 ml-5">

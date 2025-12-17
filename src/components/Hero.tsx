@@ -1,96 +1,89 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Play, CheckCircle2, CreditCard } from 'lucide-react';
-import { HeroDemo } from './HeroDemo';
+import { ArrowRight, CreditCard, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-20 overflow-hidden bg-[#0F0F0F]">
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-20 overflow-hidden bg-[#0f1115] font-sans">
       
-      {/* Background Effects */}
-      <div className="absolute inset-0 z-0">
-        {/* Subtle Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        {/* Radial Fade */}
-        <div className="absolute inset-0 bg-[#0F0F0F] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,transparent_70%,black_100%)]"></div>
-        {/* Top Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full opacity-20 pointer-events-none" />
+      {/* 1. BACKGROUND (Premium, Calm, Technical) */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Subtle Grain/Noise Overlay */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+        
+        {/* One Subtle Radial Gradient */}
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full" />
+        
+        {/* Secondary Gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-[500px] bg-gradient-to-t from-[#0f1115] via-[#1a1d23]/5 to-transparent" />
       </div>
 
-      <div className="container relative z-10 px-4 mx-auto flex flex-col items-center text-center">
+      <div className="container relative z-10 px-6 mx-auto flex flex-col items-center text-center">
         
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/70 mb-8 hover:bg-white/10 transition-colors cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-          </span>
-          v2.0 is now live
-        </div>
+        {/* 2. TRUST BADGES */}
+        <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-wrap items-center justify-center gap-3 mb-8"
+        >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16181d] border border-white/5 text-[11px] font-medium text-white/70 hover:bg-[#1a1d23] transition-colors cursor-default shadow-sm tracking-wide">
+                <CreditCard className="w-3 h-3 text-orange-500" />
+                Money-Back Guarantee
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#16181d] border border-white/5 text-[11px] font-medium text-white/70 hover:bg-[#1a1d23] transition-colors cursor-default shadow-sm tracking-wide">
+                <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                Cancel Anytime
+            </div>
+        </motion.div>
 
-        {/* Headline */}
-        <h1 className="max-w-5xl mx-auto text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-          Make visuals that go <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">viral</span>. <br className="hidden md:block" />
-          Instantly.
-        </h1>
+        {/* 3. HEADLINE */}
+        <motion.h1 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            className="max-w-5xl mx-auto text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-8 leading-[1.1] tracking-[-0.02em]"
+        >
+          Create <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">high-converting</span> thumbnails <br className="hidden md:block" />
+          and <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">product</span> visuals.
+        </motion.h1>
 
-        {/* Subheadline */}
-        <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 text-balance">
-          AI-powered thumbnails, mockups, and content visuals built for Instagram, TikTok, YouTube & ads.
-        </p>
+        {/* 4. SUBHEADLINE */}
+        <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="max-w-2xl mx-auto text-lg md:text-xl text-white/60 mb-12 leading-relaxed font-normal antialiased text-balance"
+        >
+          An all-in-one AI visual studio for <span className="text-white font-medium">creators</span> and <span className="text-white font-medium">e-commerce brands</span>.
+        </motion.p>
 
-        {/* CTA Buttons */}
-        <div className="flex items-center justify-center mb-16 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300 w-full sm:w-auto">
+        {/* 5. APP-LIKE CTAs */}
+        <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+        >
+          {/* Primary CTA */}
           <Link 
             href="/sign-up" 
-            className="group relative h-12 px-8 w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black rounded-full font-semibold transition-all hover:bg-gray-200 active:scale-95 shadow-[0_0_25px_-5px_rgba(255,255,255,0.3)] hover:shadow-[0_0_35px_-5px_rgba(255,255,255,0.4)]"
+            className="group h-12 md:h-14 px-8 w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-[#0f1115] rounded-lg font-semibold text-base transition-all hover:-translate-y-[1px] hover:shadow-lg hover:shadow-white/5 active:translate-y-0 tracking-tight"
           >
-            Try for Free
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            Get started
+            <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
           </Link>
-        </div>
-
-        {/* Money Back Guarantee Badge */}
-        <div className="relative mb-16 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-400 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full blur-xl opacity-40 group-hover:opacity-60 transition-opacity" />
-            <div className="relative flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-black/40 border border-amber-500/30 backdrop-blur-md hover:border-amber-500/50 transition-colors cursor-default max-w-[95vw] sm:max-w-none mx-auto">
-                <CreditCard className="w-4 h-4 text-amber-500 shrink-0" />
-                <p className="text-sm font-medium text-amber-100/90 whitespace-normal sm:whitespace-nowrap text-center leading-snug">
-                    <span className="text-white font-bold">7-day money-back guarantee</span>
-                </p>
-            </div>
-        </div>
-
-        {/* Social Proof Text */}
-        <div className="flex items-center gap-6 text-sm text-white/30 mb-20 animate-in fade-in zoom-in duration-700 delay-500">
-            <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-white/20" />
-                <span>Professional Quality</span>
-            </div>
-             <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-white/20" />
-                <span>Powered by AI</span>
-            </div>
-        </div>
-
-        {/* App Window Preview */}
-        <div className="relative w-full max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-           {/* Glow behind the app */}
-           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
-           
-           <div className="relative rounded-2xl border border-white/10 bg-[#0A0A0A] shadow-2xl overflow-hidden">
-              {/* Window Controls */}
-              <div className="h-10 border-b border-white/5 bg-white/[0.02] flex items-center px-4 gap-2">
-                 <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                 <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                 <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-              </div>
-              
-              {/* Content */}
-              <div className="p-1 md:p-2 bg-[#050505]">
-                 <HeroDemo />
-              </div>
-           </div>
-        </div>
+          
+          {/* Secondary CTA */}
+          <Link 
+            href="#pricing"
+            className="h-12 md:h-14 px-8 w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-white/10 text-white/70 rounded-lg font-semibold text-base hover:bg-white/5 hover:text-white transition-colors tracking-tight"
+          >
+            View pricing
+          </Link>
+        </motion.div>
 
       </div>
     </section>

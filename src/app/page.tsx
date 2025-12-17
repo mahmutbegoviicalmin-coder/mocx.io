@@ -5,9 +5,8 @@ import { ThumbnailsShowcase } from "@/components/ThumbnailsShowcase";
 import { Pricing } from "@/components/Pricing";
 import { BeforeAfter } from "@/components/BeforeAfter";
 import { WhyMocx } from "@/components/WhyMocx";
-import { Trust } from "@/components/Trust";
+import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
-import { FreeTrialCTA } from "@/components/FreeTrialCTA";
 
 export default function Home() {
   return (
@@ -16,9 +15,8 @@ export default function Home() {
       <Hero />
       <ThumbnailsShowcase />
       <BeforeAfter />
-      <FreeTrialCTA />
       <WhyMocx />
-      <Trust />
+      <Testimonials />
       <Pricing />
       <FAQ />
       

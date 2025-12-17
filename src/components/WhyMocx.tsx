@@ -9,22 +9,22 @@ import {
 
 const benefits = [
   {
-    title: "Photorealistic visuals that build trust",
-    text: "Show your product in real-life environments that feel authentic, familiar and instantly more trustworthy.",
+    title: "Photorealistic Visuals",
+    text: "Show products in real-life environments. Authentic. Familiar. Trustworthy.",
     icon: ImageIcon,
     color: "from-blue-500/20 to-cyan-500/20",
     iconColor: "text-blue-400"
   },
   {
-    title: "No photographer or studio needed",
-    text: "Skip long photoshoots, props and setups. Drop a screenshot or image — Mocx handles the rest.",
+    title: "No Studio Needed",
+    text: "Skip photoshoots and props. Drop an image — Mocx handles the rest.",
     icon: Layers,
     color: "from-emerald-500/20 to-green-500/20",
     iconColor: "text-emerald-400"
   },
   {
-    title: "Consistent brand visuals",
-    text: "Keep your ads, product pages and social content aligned with reliable, professional-looking scenes.",
+    title: "Consistent Branding",
+    text: "Keep ads and social content aligned. Professional scenes, every time.",
     icon: Palette,
     color: "from-rose-500/20 to-red-500/20",
     iconColor: "text-rose-400"
@@ -56,7 +56,7 @@ const itemVariants = {
 
 export function WhyMocx() {
   return (
-    <section className="py-32 bg-background relative overflow-hidden">
+    <section className="py-32 bg-[#0f1115] relative overflow-hidden">
       {/* Ambient Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10" />
       
@@ -78,8 +78,8 @@ export function WhyMocx() {
             transition={{ delay: 0.1, duration: 0.5 }}
             className="text-2xl md:text-3xl font-medium text-white/90 leading-tight"
           >
-            Create mockups that look real. <br />
-            Convert better and take seconds, <span className="bg-gradient-to-r from-primary to-orange-500 text-transparent bg-clip-text">not hours</span>.
+            Real results. <br />
+            Created in seconds, <span className="bg-gradient-to-r from-primary to-orange-500 text-transparent bg-clip-text">not hours</span>.
           </motion.p>
         </div>
 

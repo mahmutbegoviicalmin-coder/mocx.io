@@ -2,15 +2,15 @@
 
 :root {
   /* Dark theme by default as requested - Airbnb Dark Mode Interpretation */
-  --background: #0F0F0F; /* Deep dark grey, almost black */
+  --background: #0f1115; /* Unified deep technical background */
   --foreground: #F7F7F7;
-  --card: #1E1E1E;
+  --card: #16181d;
   --card-foreground: #FFFFFF;
   --primary: #ff5400; /* Orange */
   --primary-foreground: #FFFFFF;
-  --muted: #2D2D2D;
+  --muted: #1a1d23;
   --muted-foreground: #A3A3A3;
-  --border: #2D2D2D;
+  --border: #1a1d23;
 }
 
 @theme inline {

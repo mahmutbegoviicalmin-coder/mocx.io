@@ -1,8 +1,8 @@
 'use client';
 
-import { Check, X } from 'lucide-react';
+import { Check, ArrowRight, Crown } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { PLANS } from '@/config/plans';
@@ -11,20 +11,16 @@ export function Pricing() {
   const [annual, setAnnual] = useState(false);
   const router = useRouter();
 
+  // LemonSqueezy Event Handling
   useEffect(() => {
-    // Listen for Lemon Squeezy events
     const handleLemonSqueezyEvent = (event: any) => {
-        // Check for the specific Payment.Success event in the detail
         if (event.detail && event.detail.event === 'Payment.Success') {
-             // Redirect to dashboard after successful payment
              router.push('/dashboard');
         }
     };
 
-    // The standard event name dispatched on window is 'LemonSqueezy.Event'
     window.addEventListener('LemonSqueezy.Event', handleLemonSqueezyEvent);
     
-    // Fallback: Setup the event handler if the object exists (sometimes needed for overlay)
     // @ts-ignore
     if (typeof window !== 'undefined' && window.LemonSqueezy) {
         // @ts-ignore
@@ -43,115 +39,125 @@ export function Pricing() {
   }, [router]);
 
   return (
-    <section id="pricing" className="py-32 px-4 relative overflow-hidden">
-      {/* Subtle background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10" />
+    <section id="pricing" className="py-24 relative overflow-hidden bg-[#0a0a0a] text-white selection:bg-orange-500/30">
+      {/* BACKGROUND AMBIENCE */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0a0a0a] to-[#111]" />
+        {/* Subtle Orange Glow center */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/5 blur-[120px] rounded-full opacity-40" />
+        {/* Noise */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
+      </div>
 
-      <div className="container max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-20 space-y-6">
-          <motion.h2 
+      <div className="container max-w-7xl mx-auto relative z-10 px-4">
+        
+        {/* HEADER & TOGGLE */}
+        <div className="text-center mb-16 space-y-6">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-white/90 pb-2"
+            className="space-y-4"
           >
-            Find Your Perfect Plan
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-lg text-muted-foreground max-w-2xl mx-auto"
-          >
-            Purchase a plan to get started.
-          </motion.p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-lg text-white/50 font-medium max-w-xl mx-auto">
+              Choose the plan that's right for you. Change or cancel anytime.
+            </p>
+          </motion.div>
           
+          {/* Custom Toggle */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center justify-center mt-8"
+            className="flex justify-center"
           >
-            <div className="relative bg-white/5 p-1 rounded-full backdrop-blur-md border border-white/10 flex items-center cursor-pointer" onClick={() => setAnnual(!annual)}>
-              <motion.div 
-                className="absolute top-1 bottom-1 bg-primary rounded-full shadow-lg z-0"
-                initial={false}
-                animate={{ 
-                  left: annual ? "50%" : "4px",
-                  right: annual ? "4px" : "50%",
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-              <button 
-                className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${!annual ? 'text-white' : 'text-muted-foreground hover:text-white'}`}
-                onClick={(e) => { e.stopPropagation(); setAnnual(false); }}
-              >
-                Monthly
-              </button>
-              <button 
-                className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${annual ? 'text-white' : 'text-muted-foreground hover:text-white'}`}
-                onClick={(e) => { e.stopPropagation(); setAnnual(true); }}
-              >
-                Yearly <span className="text-[10px] bg-black/30 px-1.5 py-0.5 rounded-full ml-1 text-white/80">-10%</span>
-              </button>
+            <div className="relative flex items-center p-1 bg-white/5 border border-white/10 rounded-full cursor-pointer" onClick={() => setAnnual(!annual)}>
+                {/* Sliding Pill */}
+                <motion.div 
+                    className="absolute top-1 bottom-1 bg-white/10 rounded-full shadow-sm"
+                    initial={false}
+                    animate={{ 
+                        x: annual ? "100%" : "0%",
+                    }}
+                    style={{ width: "50%", left: 0 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+                
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setAnnual(false); }}
+                    className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${!annual ? 'text-white' : 'text-white/50 hover:text-white'}`}
+                >
+                    Monthly
+                </button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setAnnual(true); }}
+                    className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 flex items-center gap-2 ${annual ? 'text-white' : 'text-white/50 hover:text-white'}`}
+                >
+                    Yearly
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg">
+                      Save 30%
+                    </span>
+                </button>
             </div>
           </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+        {/* PRICING CARDS GRID */}
+        <div className="grid md:grid-cols-3 gap-6 items-start max-w-6xl mx-auto">
+          
+          {/* 1. STARTER CARD */}
           <PricingCard 
             title="Starter"
-            price={annual ? 205 : 19}
-            originalPrice={annual ? 307 : 29}
-            period={annual ? "/year" : "/mo"}
-            features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
-            delay={0.1}
+            price={annual ? 19 : 29}
+            description="Perfect for individuals just getting started."
+            features={[annual ? "600 Images/year" : "50 Images/mo", "Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
+            annual={annual}
           />
 
+          {/* 2. PRO CARD (Most Popular) */}
           <PricingCard 
             title="Pro"
-            price={annual ? 420 : 39}
-            originalPrice={annual ? 630 : 59}
-            period={annual ? "/year" : "/mo"}
+            price={annual ? 39 : 59}
+            description="Best for creators growing their audience."
             features={[annual ? "2400 Images/year" : "200 Images/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
-            highlighted
-            delay={0.2}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
+            annual={annual}
+            isPro={true}
           />
 
+          {/* 3. AGENCY CARD */}
           <PricingCard 
             title="Agency"
-            price={annual ? 850 : 79}
-            originalPrice={annual ? 1275 : 119}
-            period={annual ? "/year" : "/mo"}
+            price={annual ? 79 : 119}
+            description="For teams and agencies scaling up."
             features={[annual ? "4800 Images/year" : "400 Images/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
-            delay={0.3}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
+            annual={annual}
           />
+
         </div>
         
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="mt-16 text-center border-t border-white/10 pt-8 max-w-2xl mx-auto"
-        >
-           <p className="text-muted-foreground">
-             Just need a few? <span className="text-white font-medium">Pay as you go</span> available at $0.50 per image.
-           </p>
-        </motion.div>
+        {/* Enterprise */}
+        <div className="mt-16 text-center">
+             <p className="text-white/30 text-sm font-medium">
+               Need a custom plan? <a href="mailto:support@mocx.io" className="text-white/60 hover:text-orange-400 transition-colors underline decoration-white/10 underline-offset-4">Contact sales</a>
+             </p>
+        </div>
       </div>
     </section>
   );
 }
 
-function PricingCard({ title, price, originalPrice, period = "/mo", features, highlighted = false, delay = 0, variantId }: { title: string, price: number, originalPrice?: number, period?: string, features: string[], highlighted?: boolean, delay?: number, variantId: string }) {
-  const { user, isLoaded } = useUser();
+// ------------------------------------------------------------------
+// INDIVIDUAL CARD COMPONENT
+// ------------------------------------------------------------------
+
+function PricingCard({ title, price, description, features, isPro = false, variantId, annual }: any) {
+  const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -160,165 +166,133 @@ function PricingCard({ title, price, originalPrice, period = "/mo", features, hi
       router.push('/sign-up');
       return;
     }
-
-    if (!variantId) {
-      console.error("Checkout configuration missing.");
-      return;
-    }
+    if (!variantId) return;
 
     setLoading(true);
-
     try {
-        // Use the server-side API to generate a secure checkout URL
-        // This avoids guessing the store slug on the frontend
         const res = await fetch('/api/subscription', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ variantId })
         });
-        
         const data = await res.json();
-        
-        if (!res.ok || !data.url) {
-            console.error('Failed to create checkout:', data);
-            alert('Failed to initiate checkout. Please try again.');
-            return;
+        if (data.url) {
+            // @ts-ignore
+            if (typeof window !== 'undefined' && window.LemonSqueezy) {
+               // @ts-ignore
+               window.LemonSqueezy.Url.Open(data.url);
+            } else {
+              window.location.href = data.url;
+            }
         }
-
-        const checkoutUrl = data.url;
-        
-        // @ts-ignore
-        if (typeof window !== 'undefined' && window.LemonSqueezy) {
-           // @ts-ignore
-           window.LemonSqueezy.Url.Open(checkoutUrl);
-        } else {
-          window.location.href = checkoutUrl;
-        }
-
-    } catch (error) {
-        console.error('Checkout error:', error);
-        alert('An error occurred. Please try again.');
+    } catch (e) {
+        console.error(e);
+        alert('Something went wrong.');
     } finally {
         setLoading(false);
     }
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      whileHover={{ 
-        y: highlighted ? -12 : -8,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }}
-      className={`relative rounded-[2rem] p-8 lg:p-10 transition-all duration-300 group flex flex-col h-full ${
-        highlighted 
-          ? 'bg-gradient-to-b from-[#1a1a1a] to-black border border-white/10 shadow-2xl shadow-primary/10 z-20 scale-100 lg:scale-110' 
-          : 'bg-[#0A0A0A]/50 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-[#0A0A0A]/80'
-      }`}
+      transition={{ duration: 0.4, delay: isPro ? 0.1 : 0 }}
+      className={`relative w-full ${isPro ? 'md:-mt-8 md:mb-8 z-10' : 'z-0'}`}
     >
-      {highlighted && (
-        <div className="absolute -top-px left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-      )}
-      
-      {highlighted && (
-        <motion.div 
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-lg shadow-primary/20 z-20 whitespace-nowrap"
-        >
-          Most Popular
-        </motion.div>
-      )}
-
-      {/* Glow Effect */}
-      <div className={`absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${highlighted ? 'bg-primary/5' : 'bg-white/5'}`} />
-
-      <div className="mb-8 relative z-10 flex flex-col items-start w-full">
-        <div className="flex items-center justify-between w-full mb-6">
-            <h3 className={`text-lg font-medium ${highlighted ? 'text-white' : 'text-white/70'}`}>{title}</h3>
-            
-            <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 ${
-                highlighted 
-                ? 'bg-primary/20 text-primary border border-primary/20' 
-                : 'bg-white/5 text-white/50 border border-white/5'
-            }`}>
-                {highlighted && <span className="w-1 h-1 rounded-full bg-primary animate-pulse" />}
-                Save 34%
-            </div>
-        </div>
-
-        <div className="flex flex-col items-start gap-1">
-            {originalPrice && (
-              <span className="text-sm text-white/30 line-through decoration-white/30 decoration-1 font-medium ml-1">
-                  ${originalPrice} {period}
-              </span>
-            )}
-            
-        <div className="flex items-baseline gap-1">
-                <span className={`font-bold text-white tracking-tighter ${highlighted ? 'text-5xl lg:text-6xl' : 'text-4xl lg:text-5xl'}`}>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={price}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                ${price}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-                <span className="text-white/40 font-medium text-sm">{period}</span>
-            </div>
-        </div>
-      </div>
-
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
-
-      <ul className="space-y-5 mb-10 flex-1 relative z-10">
-        {features.map((feature, idx) => {
-          const isCrossed = feature.startsWith('~');
-          const text = isCrossed ? feature.slice(1) : feature;
-          return (
-            <motion.li 
-                key={idx} 
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: delay + (idx * 0.1) }}
-                className="flex items-center gap-3 text-sm"
-            >
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted && !isCrossed ? 'bg-primary text-white shadow-lg shadow-primary/20' : isCrossed ? 'bg-white/5 text-white/20' : 'bg-white/10 text-white/70'}`}>
-                {isCrossed ? <X className="w-3 h-3" strokeWidth={3} /> : <Check className="w-3 h-3" strokeWidth={3} />}
-                </div>
-                <span className={`${highlighted && !isCrossed ? 'text-white' : isCrossed ? 'text-white/20 line-through decoration-white/20 decoration-2' : 'text-white/60'}`}>{text}</span>
-            </motion.li>
-          );
-        })}
-      </ul>
-
-      <motion.button 
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleCheckout}
-        disabled={loading}
-        className={`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 relative z-10 cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
-          highlighted 
-            ? 'bg-white text-black hover:bg-white/90 shadow-xl shadow-white/5' 
-            : 'bg-white/5 text-white hover:bg-white/10 border border-white/5 hover:border-white/10'
-        }`}
-      >
-        {loading ? (
-            <span className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Processing...
-            </span>
-        ) : (
-            <span>Get {title}</span>
+        {/* PRO GLOW EFFECT (Behind card) */}
+        {isPro && (
+             <div className="absolute inset-0 -z-10 bg-orange-500/20 blur-[60px] opacity-40 rounded-full" />
         )}
-      </motion.button>
+
+        <div 
+            className={`
+                relative flex flex-col h-full p-8 rounded-2xl transition-all duration-300 border
+                ${isPro 
+                    ? 'bg-[#0f1115] border-orange-500/30 shadow-2xl shadow-orange-900/10' 
+                    : 'bg-[#0f1115]/60 backdrop-blur-sm border-white/5 hover:border-white/10 hover:bg-[#0f1115]/80'
+                }
+            `}
+        >
+             {/* MOST POPULAR PILL */}
+            {isPro && (
+                <div className="absolute -top-4 left-0 right-0 flex justify-center">
+                    <div className="bg-gradient-to-r from-[#FF5400] to-[#FF7B30] text-white text-[11px] font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-orange-400/20">
+                        <Crown className="w-3 h-3 fill-white" />
+                        Most Popular
+                    </div>
+                </div>
+            )}
+
+            {/* HEADER */}
+            <div className="mb-8">
+                <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-4">
+                    {title}
+                </h3>
+                
+                {/* Price */}
+                <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-5xl font-bold text-white tracking-tight">${price}</span>
+                    <span className="text-white/40 font-medium text-sm">/mo</span>
+                </div>
+                
+                {/* Description */}
+                <p className="text-sm text-white/60 leading-relaxed min-h-[40px] border-b border-white/5 pb-6">
+                    {description}
+                </p>
+            </div>
+
+            {/* CTA BUTTON */}
+            <button 
+                onClick={handleCheckout}
+                disabled={loading}
+                className={`
+                    w-full h-12 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 mb-8 group
+                    ${isPro 
+                        ? 'bg-gradient-to-r from-[#FF5400] to-[#FF7B30] text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02]' 
+                        : 'bg-white/5 border border-white/5 text-white hover:bg-white/10 hover:border-white/10'
+                    }
+                `}
+            >
+                {loading ? 'Processing...' : (
+                    <>
+                        Get Started
+                        {isPro && <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />}
+                    </>
+                )}
+            </button>
+
+            {/* FEATURES */}
+            <div className="space-y-4">
+                {features.map((feature: string, i: number) => {
+                    const isCrossed = feature.startsWith('~');
+                    const text = isCrossed ? feature.slice(1) : feature;
+                    
+                    return (
+                        <div key={i} className="flex items-start gap-3 text-sm group">
+                            {/* Checkmark */}
+                            <div className={`
+                                mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors
+                                ${isPro 
+                                    ? 'bg-orange-500 text-white' 
+                                    : 'bg-white/5 text-white/40 group-hover:bg-white/10'
+                                }
+                            `}>
+                                <Check className="w-3 h-3" strokeWidth={3} />
+                            </div>
+                            
+                            {/* Text */}
+                            <span className={`transition-colors ${
+                                isPro ? 'text-white/90' : 'text-white/60 group-hover:text-white/80'
+                            }`}>
+                                {text}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
     </motion.div>
   );
 }

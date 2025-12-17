@@ -44,7 +44,9 @@ export async function GET(req: Request) {
       publicMetadata: u.publicMetadata,
       privateMetadata: u.privateMetadata,
       // Attempt to infer location/IP if possible in future or via client-side enrichment
-      // lastActiveSessionId removed due to TS error
+      lastActiveAt: u.lastActiveAt,
+      // @ts-ignore - Clerk type might not have it explicitly but it's available in some versions
+      location: (u as any).lastActiveSessionId ? null : null, 
     }));
 
     return NextResponse.json({

@@ -1,6 +1,8 @@
 import { Sidebar } from "@/components/Sidebar";
 import { currentUser } from "@clerk/nextjs/server";
 import { Pricing } from "@/components/Pricing";
+import LocationUpdater from "@/components/LocationUpdater";
+import { UserButton } from "@clerk/nextjs";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +16,11 @@ export default async function DashboardLayout({
 
   if (planName === 'Free Plan') {
     return (
-      <div className="min-h-screen bg-[#0F0F0F]">
+      <div className="min-h-screen bg-[#0F0F0F] relative">
+         <LocationUpdater />
+         <div className="absolute top-6 right-6 z-50">
+            <UserButton afterSignOutUrl="/" />
+         </div>
          <Pricing />
       </div>
     );
@@ -22,6 +28,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      <LocationUpdater />
       <Sidebar />
       <main className="lg:pl-64 min-h-screen pt-16 lg:pt-0">
         {children}

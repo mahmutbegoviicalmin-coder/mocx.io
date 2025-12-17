@@ -5,12 +5,15 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/api/generate(.*)']);
 const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)', '/sign-up(.*)', '/legal(.*)', '/api/webhook(.*)']);
 
-// 🚫 Blokirane države: Indija, Pakistan, Bangladeš, Nigerija, Indonezija, Egipat, Vijetnam, Filipini
-const BLOCKED_COUNTRIES = ['IN', 'PK', 'BD', 'NG', 'ID', 'EG', 'VN', 'PH'];
+// 🚫 Blokirane države: Indija, Pakistan, Bangladeš, Nigerija, Indonezija, Egipat, Vijetnam, Filipini, Alžir, Liban, Brazil
+const BLOCKED_COUNTRIES = ['IN', 'PK', 'BD', 'NG', 'ID', 'EG', 'VN', 'PH', 'DZ', 'LB', 'BR'];
 
 export default clerkMiddleware(async (auth, req) => {
-  // 1. Geo-Blocking logika (Radi na Vercel-u)
-  const country = (req as any).geo?.country;
+  // 1. Geo-Blocking logika (Poboljšana detekcija)
+  // Čitamo iz headera 'x-vercel-ip-country' jer je to standard na Vercelu
+  const country = req.headers.get('x-vercel-ip-country') || (req as any).geo?.country;
+  
+  console.log(`Geo-Block Check: Country=${country} Path=${req.nextUrl.pathname}`);
   
   if (country && BLOCKED_COUNTRIES.includes(country)) {
     return new NextResponse('Access Denied from your country.', { status: 403 });
