@@ -253,13 +253,13 @@ function PricingCard({ title, price, originalPrice, yearlyPrice, description, fe
                     </div>
                     
                     <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-bold text-white tracking-tight">${price}</span>
-                        <span className="text-white/40 font-medium text-sm">/mo</span>
+                        <span className="text-5xl font-bold text-white tracking-tight">${annual ? yearlyPrice : price}</span>
+                        <span className="text-white/40 font-medium text-sm">/{annual ? 'yr' : 'mo'}</span>
                     </div>
                     
                     {annual && (
                         <p className="text-xs text-white/40 font-medium mt-1">
-                            Billed ${yearlyPrice} yearly
+                            ${(yearlyPrice / 12).toFixed(2)}/mo equivalent
                         </p>
                     )}
                 </div>
