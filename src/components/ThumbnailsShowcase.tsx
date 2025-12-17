@@ -57,7 +57,9 @@ export function ThumbnailsShowcase() {
       {/* BACKGROUND (Consistent with Hero) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/05 blur-[120px] rounded-full" />
+        {/* Varied Glow: Top Right */}
+        <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] bg-orange-500/10 blur-[120px] rounded-full opacity-60" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/05 blur-[100px] rounded-full opacity-40" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

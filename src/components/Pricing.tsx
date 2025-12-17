@@ -43,8 +43,9 @@ export function Pricing() {
       {/* BACKGROUND AMBIENCE (Consistent with Hero) */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-        {/* Subtle Orange Glow center */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-600/05 blur-[120px] rounded-full opacity-40" />
+        {/* Varied Glow: Center Top & Bottom */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-orange-600/10 blur-[130px] rounded-full opacity-60" />
+        <div className="absolute bottom-0 left-0 right-0 h-[400px] bg-gradient-to-t from-orange-900/10 to-transparent" />
       </div>
 
       <div className="container max-w-7xl mx-auto relative z-10 px-4">

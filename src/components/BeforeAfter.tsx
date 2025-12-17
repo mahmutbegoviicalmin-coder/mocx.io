@@ -10,7 +10,8 @@ export function BeforeAfter() {
        {/* BACKGROUND (Consistent with Hero) */}
        <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/05 blur-[120px] rounded-full" />
+        {/* Varied Glow: Center Strong */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/10 blur-[150px] rounded-full opacity-50" />
       </div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/5 blur-[120px] -z-10 rounded-full opacity-40 pointer-events-none" />
       
