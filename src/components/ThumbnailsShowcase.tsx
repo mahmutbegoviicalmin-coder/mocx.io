@@ -21,32 +21,38 @@ const VIDEOS = [
   {
     title: "I Trained Like Cristiano Ronaldo for 100 Days",
     views: "4.2M views",
-    image: "/thumbnails/45a72f2e-f64e-4840-b5ed-5effc216c045.jpg" 
+    image: "/thumbnails/45a72f2e-f64e-4840-b5ed-5effc216c045.jpg",
+    stats: { ctr: "+14.2%", type: "CTR" }
   },
   {
     title: "I Survived 24 Hours in a Burning House",
     views: "8.5M views",
-    image: "/thumbnails/7fb5f477-b495-412b-947d-83bca1eb9fc7.jpg"
+    image: "/thumbnails/7fb5f477-b495-412b-947d-83bca1eb9fc7.jpg",
+    stats: { ctr: "+18.5%", type: "CTR" }
   },
   {
     title: "How to Build a $10M Business from Scratch",
     views: "1.1M views",
-    image: "/thumbnails/92e171a444d955a8f8fb3d0200522033_1765658486_zsa4a9bm.jpeg"
+    image: "/thumbnails/92e171a444d955a8f8fb3d0200522033_1765658486_zsa4a9bm.jpeg",
+    stats: { ctr: "+9.8%", type: "Retention" }
   },
   {
     title: "I Bought The World's Cheapest Private Yacht",
     views: "12M views",
-    image: "/thumbnails/97baab01-e8e3-4909-884d-1095e5f845eb.jpg"
+    image: "/thumbnails/97baab01-e8e3-4909-884d-1095e5f845eb.jpg",
+    stats: { ctr: "+22.1%", type: "CTR" }
   },
   {
     title: "The Insane History of The World's Richest City",
     views: "2.4M views",
-    image: "/thumbnails/1765659063077-y3uduj21jk.png"
+    image: "/thumbnails/1765659063077-y3uduj21jk.png",
+    stats: { ctr: "+11.3%", type: "CTR" }
   },
   {
     title: "Mind-Blowing Paradoxes That Will Keep You Awake",
     views: "1.5M views",
-    image: "/thumbnails/cb108048d4ad3465d47d0104b31f7651_1765658717760.png"
+    image: "/thumbnails/cb108048d4ad3465d47d0104b31f7651_1765658717760.png",
+    stats: { ctr: "+15.7%", type: "Engagement" }
   }
 ];
 
@@ -74,45 +80,64 @@ export function ThumbnailsShowcase() {
             </p>
         </div>
 
-        {/* Video Grid - Restored */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-24 max-w-7xl mx-auto">
+        {/* Video Grid - Completely Redesigned */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-24 max-w-7xl mx-auto">
             {VIDEOS.map((video, i) => (
                 <motion.div 
                     key={i}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className="group flex flex-col gap-3 cursor-pointer"
+                    transition={{ duration: 0.6, delay: i * 0.1 }}
+                    className="group relative rounded-2xl overflow-hidden bg-[#16181d] border border-white/5 hover:border-white/10 transition-all duration-500 shadow-2xl"
                 >
-                    <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#111] transition-transform duration-300 group-hover:scale-[1.02] group-hover:border-primary/50 group-hover:shadow-[0_0_30px_-5px_rgba(255,84,0,0.3)]">
+                    {/* Image Container with Overlay */}
+                    <div className="relative aspect-[16/10] overflow-hidden">
                         <Image 
                             src={video.image} 
                             alt={video.title} 
                             fill 
-                            className="object-cover"
+                            className="object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
-                        {/* Improved Hover Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
                         
-                        {/* Play Button Icon on Hover */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100">
-                             <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-lg">
-                                <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent ml-1" />
-                             </div>
+                        {/* Gradient Overlay - Always visible but stronger at bottom */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+                        
+                        {/* Top Right Badge */}
+                        <div className="absolute top-4 right-4 z-20">
+                            <div className="bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                                    {video.stats.type} <span className="text-green-400">{video.stats.ctr}</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div className="px-1">
-                        <h4 className="text-white font-bold text-base md:text-lg leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+
+                    {/* Content - Overlapping the image bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                         <div className="mb-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Viral Analysis</span>
+                         </div>
+                         
+                        <h3 className="text-white font-bold text-lg leading-snug mb-2 line-clamp-2 drop-shadow-md group-hover:text-white transition-colors">
                             {video.title}
-                        </h4>
-                        <p className="text-white/40 text-sm font-medium mt-1 flex items-center gap-2">
-                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                            {video.views}
-                        </p>
+                        </h3>
+                        
+                        <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-4 group-hover:border-white/20 transition-colors">
+                            <span className="text-white/60 text-xs font-medium flex items-center gap-1.5">
+                                <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
+                                Verified Result
+                            </span>
+                            <span className="text-white font-bold text-sm tracking-tight">
+                                {video.views}
+                            </span>
+                        </div>
                     </div>
+
+                    {/* Hover Glow Effect */}
+                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-2xl pointer-events-none transition-colors duration-500" />
                 </motion.div>
             ))}
         </div>
