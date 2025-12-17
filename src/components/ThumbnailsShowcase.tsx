@@ -80,8 +80,8 @@ export function ThumbnailsShowcase() {
             </p>
         </div>
 
-        {/* Video Grid - Completely Redesigned */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-24 max-w-7xl mx-auto">
+        {/* Video Grid - Completely Redesigned - Clean Analytics Card Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 max-w-7xl mx-auto">
             {VIDEOS.map((video, i) => (
                 <motion.div 
                     key={i}
@@ -89,10 +89,10 @@ export function ThumbnailsShowcase() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: i * 0.1 }}
-                    className="group relative rounded-2xl overflow-hidden bg-[#16181d] border border-white/5 hover:border-white/10 transition-all duration-500 shadow-2xl"
+                    className="group flex flex-col bg-[#111] border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5"
                 >
-                    {/* Image Container with Overlay */}
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                    {/* Image Area - Clean view of the thumbnail */}
+                    <div className="relative aspect-video w-full overflow-hidden bg-[#050505]">
                         <Image 
                             src={video.image} 
                             alt={video.title} 
@@ -100,44 +100,43 @@ export function ThumbnailsShowcase() {
                             className="object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
-                        
-                        {/* Gradient Overlay - Always visible but stronger at bottom */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f1115] via-[#0f1115]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
-                        
-                        {/* Top Right Badge */}
-                        <div className="absolute top-4 right-4 z-20">
-                            <div className="bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-                                    {video.stats.type} <span className="text-green-400">{video.stats.ctr}</span>
-                                </span>
+                        {/* Subtle inner shadow for depth */}
+                        <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)] pointer-events-none" />
+                    </div>
+
+                    {/* Content Area - Analytics Dashboard Style */}
+                    <div className="p-6 flex flex-col flex-grow">
+                        {/* Title */}
+                        <h3 className="text-white font-bold text-lg leading-snug mb-6 line-clamp-2 group-hover:text-primary transition-colors">
+                            {video.title}
+                        </h3>
+
+                        {/* Stats Grid */}
+                        <div className="mt-auto grid grid-cols-2 gap-4">
+                            {/* Views Stat */}
+                            <div className="bg-white/5 rounded-xl p-3 border border-white/5 group-hover:bg-white/10 transition-colors">
+                                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">
+                                    Total Views
+                                </p>
+                                <p className="text-white font-bold text-xl tracking-tight">
+                                    {video.views.split(' ')[0]}
+                                </p>
+                            </div>
+
+                            {/* Performance Stat - Highlighted */}
+                            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 group-hover:bg-green-500/20 transition-colors">
+                                <div className="flex items-center justify-between mb-1">
+                                    <p className="text-[10px] text-green-400 uppercase font-bold tracking-wider">
+                                        {video.stats.type}
+                                    </p>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                </div>
+                                <p className="text-green-400 font-bold text-xl tracking-tight">
+                                    {video.stats.ctr}
+                                </p>
                             </div>
                         </div>
                     </div>
-
-                    {/* Content - Overlapping the image bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                         <div className="mb-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Viral Analysis</span>
-                         </div>
-                         
-                        <h3 className="text-white font-bold text-lg leading-snug mb-2 line-clamp-2 drop-shadow-md group-hover:text-white transition-colors">
-                            {video.title}
-                        </h3>
-                        
-                        <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-4 group-hover:border-white/20 transition-colors">
-                            <span className="text-white/60 text-xs font-medium flex items-center gap-1.5">
-                                <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
-                                Verified Result
-                            </span>
-                            <span className="text-white font-bold text-sm tracking-tight">
-                                {video.views}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Hover Glow Effect */}
-                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-2xl pointer-events-none transition-colors duration-500" />
                 </motion.div>
             ))}
         </div>
