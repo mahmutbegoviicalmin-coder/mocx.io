@@ -46,8 +46,8 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
             className="max-w-5xl mx-auto text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-8 leading-[1.1] tracking-[-0.02em]"
         >
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Thumbnails</span> and product visuals <br />
-          built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">performance</span>.
+          <span className="block mb-2"><span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Thumbnails</span> and product visuals</span>
+          <span className="block">built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">performance</span>.</span>
         </motion.h1>
 
         {/* 4. SUBHEADLINE */}

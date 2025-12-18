@@ -43,8 +43,8 @@ const VIDEOS = [
     stats: { ctr: "+41.1%", type: "CTR" }
   },
   {
-    title: "The Insane History of The World's Richest City",
-    views: "2.4M views",
+    title: "How to Make High Converting YouTube Thumbnail",
+    views: "500K+ views",
     image: "/thumbnails/1765659063077-y3uduj21jk.png",
     stats: { ctr: "+31.3%", type: "CTR" }
   },
