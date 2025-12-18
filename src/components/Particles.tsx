@@ -59,7 +59,19 @@ export function Particles({ className = "" }: { className?: string }) {
 
     resize();
     createParticles();
-    draw();
+    
+    // Intersection Observer to pause animation when off-screen
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        // Only start if not already running to avoid multiple loops
+        cancelAnimationFrame(animationFrameId);
+        draw();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
+    
+    observer.observe(canvas);
 
     window.addEventListener('resize', () => {
       resize();
@@ -69,6 +81,7 @@ export function Particles({ className = "" }: { className?: string }) {
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
     };
   }, []);
 

@@ -165,7 +165,13 @@ export function ThumbnailsShowcase() {
                             className="flex items-center gap-3 pl-2 pr-4 py-2 bg-[#16181d] border border-white/5 rounded-full shrink-0"
                         >
                             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10 shrink-0">
-                                <Image src={creator.avatar} alt={creator.name} fill className="object-cover" />
+                                <Image 
+                                    src={creator.avatar} 
+                                    alt={creator.name} 
+                                    fill 
+                                    className="object-cover" 
+                                    sizes="32px"
+                                />
                             </div>
                             
                             <div className="flex flex-col text-left leading-none">

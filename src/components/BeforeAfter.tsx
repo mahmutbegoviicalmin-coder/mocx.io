@@ -52,6 +52,7 @@ export function BeforeAfter() {
                       src="/before.jpg" 
                       alt="Raw Screenshot"
                       fill
+                      sizes="(max-width: 768px) 100vw, 405px"
                       className="object-contain drop-shadow-2xl opacity-60 group-hover:opacity-80 transition-all duration-500 grayscale-[50%] group-hover:grayscale-0 scale-95 group-hover:scale-100"
                     />
                  </div>
@@ -88,6 +89,7 @@ export function BeforeAfter() {
                       src="/after.jpg" 
                       alt="Cinematic Mockup"
                       fill
+                      sizes="(max-width: 768px) 100vw, 495px"
                       className="object-contain drop-shadow-2xl transform transition-transform duration-700 group-hover:scale-[1.02]"
                     />
                  </div>
