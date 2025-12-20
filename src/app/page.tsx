@@ -3,7 +3,6 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { ThumbnailsShowcase } from "@/components/ThumbnailsShowcase";
 import { Pricing } from "@/components/Pricing";
-import { BeforeAfter } from "@/components/BeforeAfter";
 import { WhyMocx } from "@/components/WhyMocx";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
@@ -15,7 +14,6 @@ export default function Home() {
       <Hero />
       <ThumbnailsShowcase />
       <Testimonials />
-      <BeforeAfter />
       <WhyMocx />
       <Pricing />
       <FAQ />
