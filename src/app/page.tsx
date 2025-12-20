@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
+import { ToolsShowcase } from "@/components/ToolsShowcase";
 import { ThumbnailsShowcase } from "@/components/ThumbnailsShowcase";
 import { Pricing } from "@/components/Pricing";
 import { WhyMocx } from "@/components/WhyMocx";
@@ -12,6 +13,7 @@ export default function Home() {
     <main className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       <Navbar />
       <Hero />
+      <ToolsShowcase />
       <ThumbnailsShowcase />
       <Testimonials />
       <WhyMocx />
