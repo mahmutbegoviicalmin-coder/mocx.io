@@ -11,7 +11,7 @@ const TOOLS = [
     icon: Sparkles,
     gradient: 'from-purple-500/20 via-indigo-500/10 to-blue-500/5',
     border: 'group-hover:border-purple-500/30',
-    gifPath: '/tools/ai-creative-studio.gif'
+    gifPath: '/tools/ai image generator mocx.io.gif'
   },
   {
     title: 'Mockup Studio',
@@ -19,7 +19,7 @@ const TOOLS = [
     icon: ImageIcon,
     gradient: 'from-orange-500/20 via-amber-500/10 to-red-500/5',
     border: 'group-hover:border-orange-500/30',
-    gifPath: '/tools/mockup-studio.gif'
+    gifPath: '/tools/mockup generator mocx.io.gif'
   },
   {
     title: 'Thumbnail Recreator',
@@ -27,7 +27,7 @@ const TOOLS = [
     icon: Wand2,
     gradient: 'from-emerald-500/20 via-teal-500/10 to-cyan-500/5',
     border: 'group-hover:border-emerald-500/30',
-    gifPath: '/tools/thumbnail-recreator.gif'
+    gifPath: '/tools/thumbnail maker mocx.io.gif'
   }
 ];
 
