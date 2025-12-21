@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Sparkles, Image as ImageIcon, Wand2 } from 'lucide-react';
-import Image from 'next/image';
 
 const TOOLS = [
   {
@@ -11,7 +10,7 @@ const TOOLS = [
     icon: Sparkles,
     gradient: 'from-purple-500/20 via-indigo-500/10 to-blue-500/5',
     border: 'group-hover:border-purple-500/30',
-    gifPath: '/tools/ai image generator mocx.io.gif'
+    videoPath: '/tools/aimagegenerator.mp4'
   },
   {
     title: 'Mockup Studio',
@@ -19,7 +18,7 @@ const TOOLS = [
     icon: ImageIcon,
     gradient: 'from-orange-500/20 via-amber-500/10 to-red-500/5',
     border: 'group-hover:border-orange-500/30',
-    gifPath: '/tools/mockup generator mocx.io.gif'
+    videoPath: '/tools/mockupstudio.mp4'
   },
   {
     title: 'Thumbnail Recreator',
@@ -27,7 +26,7 @@ const TOOLS = [
     icon: Wand2,
     gradient: 'from-emerald-500/20 via-teal-500/10 to-cyan-500/5',
     border: 'group-hover:border-emerald-500/30',
-    gifPath: '/tools/thumbnail maker mocx.io.gif'
+    videoPath: '/tools/thumbnailgenerator.mp4'
   }
 ];
 
@@ -50,24 +49,24 @@ export function ToolsShowcase() {
             >
               <div className={`h-full flex flex-col bg-[#111318] border border-white/5 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${tool.border}`}>
                 
-                {/* Video Placeholder Area - Now displaying GIF */}
+                {/* Video Area */}
                 <div className={`relative aspect-[4/3] w-full bg-gradient-to-br ${tool.gradient} flex items-center justify-center overflow-hidden`}>
                   
                   {/* Grid Pattern Overlay */}
                   <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05] mix-blend-overlay pointer-events-none z-10"></div>
                   
-                  {/* GIF Display */}
+                  {/* Video Display */}
                   <div className="relative w-full h-full">
-                    {/* Using unoptimized for GIFs to ensure they play correctly */}
-                    <Image 
-                      src={tool.gifPath} 
-                      alt={tool.title}
-                      fill
-                      className="object-cover"
-                      unoptimized 
+                    <video 
+                      src={tool.videoPath} 
+                      autoPlay 
+                      loop 
+                      muted 
+                      playsInline 
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                     
-                    {/* Fallback overlay in case GIF is missing or loading (optional aesthetic touch) */}
+                    {/* Fallback overlay in case video is loading */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                   </div>
 
