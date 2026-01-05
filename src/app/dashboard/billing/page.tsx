@@ -7,6 +7,8 @@ import { PLANS } from '@/config/plans';
 import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { PaywallFeatures } from '@/components/PaywallFeatures';
+
 export default function BillingPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -291,6 +293,9 @@ export default function BillingPage() {
             )}
         </AnimatePresence>
 
+        {/* Feature Showcase (Videos) */}
+        <PaywallFeatures />
+
         {/* Plans Section */}
         <div className="space-y-10">
             <div className="flex flex-col md:flex-row justify-between items-end gap-6">
@@ -331,7 +336,7 @@ export default function BillingPage() {
                     title="Starter"
                     price={annual ? 205 : 19}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "600 Credits" : "50 Credits", "AI Thumbnail Recreator", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
+                    features={[annual ? "600 Credits" : "50 Credits", "AI Thumbnail Maker", "Standard Speed", "Commercial License", "Basic Support", "~AI Art Generator", "~Mockup Studio"]}
                     variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
                     onSubscribe={(id) => {
                         if (isCurrentPlan('Starter') && subscriptionStatus === 'on_trial') {
@@ -349,7 +354,7 @@ export default function BillingPage() {
                     title="Pro"
                     price={annual ? 420 : 39}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "2400 Credits" : "200 Credits", "AI Thumbnail Recreator", "Fast Generation", "High Res Downloads", "Priority Support", "AI Art Generator", "Mockup Studio"]}
+                    features={[annual ? "2400 Credits" : "200 Credits", "AI Thumbnail Maker", "Fast Generation", "High Res Downloads", "Priority Support", "AI Art Generator", "Mockup Studio"]}
                     variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Pro')}
@@ -360,7 +365,7 @@ export default function BillingPage() {
                     title="Agency"
                     price={annual ? 850 : 79}
                     period={annual ? "/year" : "/mo"}
-                    features={[annual ? "4800 Credits" : "400 Credits", "AI Thumbnail Recreator", "Max Speed (Queue Skip)", "API Access", "Dedicated 24/7 Support", "AI Art Generator", "Mockup Studio"]}
+                    features={[annual ? "4800 Credits" : "400 Credits", "AI Thumbnail Maker", "Max Speed (Queue Skip)", "API Access", "Dedicated 24/7 Support", "AI Art Generator", "Mockup Studio"]}
                     variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
                     onSubscribe={handleSubscribe}
                     current={isCurrentPlan('Agency')}

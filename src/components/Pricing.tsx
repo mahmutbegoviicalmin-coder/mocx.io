@@ -122,7 +122,7 @@ export function Pricing() {
             yearlyPrice={205}
             originalPrice={annual ? 315 : 29}
             description="Perfect for individuals just getting started."
-            features={[annual ? "600 Credits/year" : "50 Credits/mo", "Thumbnail Recreator", "AI Art Generator", "Mockup Studio", "Standard Speed", "Commercial License", "Basic Support"]}
+            features={[annual ? "600 Credits/year" : "50 Credits/mo", "Thumbnail Maker", "AI Art Generator", "Mockup Studio", "Standard Speed", "Commercial License", "Basic Support"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
             annual={annual}
           />
@@ -134,7 +134,7 @@ export function Pricing() {
             yearlyPrice={420}
             originalPrice={annual ? 646 : 59}
             description="Best for creators growing their audience."
-            features={[annual ? "2400 Credits/year" : "200 Credits/mo", "Thumbnail Recreator", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
+            features={[annual ? "2400 Credits/year" : "200 Credits/mo", "Thumbnail Maker", "Fast Generation", "Priority Support", "Website Screenshot", "High Resolution", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
             annual={annual}
             isPro={true}
@@ -147,7 +147,7 @@ export function Pricing() {
             yearlyPrice={850}
             originalPrice={annual ? 1307 : 119}
             description="For teams and agencies scaling up."
-            features={[annual ? "4800 Credits/year" : "400 Credits/mo", "Thumbnail Recreator", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
+            features={[annual ? "4800 Credits/year" : "400 Credits/mo", "Thumbnail Maker", "Max Speed", "API Access", "24/7 Support", "Custom Branding", "AI Art Generator", "Mockup Studio"]}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
             annual={annual}
           />

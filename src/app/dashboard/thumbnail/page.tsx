@@ -186,7 +186,7 @@ export default function ThumbnailPage() {
                     <div>
                         <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                             <Youtube className="w-5 h-5 text-red-500" />
-                            Thumbnail Recreator
+                            Thumbnail Maker
                         </h2>
                         <div className="flex items-center gap-2">
                             <div className="relative group cursor-default ml-2">
@@ -221,7 +221,7 @@ export default function ThumbnailPage() {
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2">Paid Plan Required</h3>
                     <p className="text-white/40 text-sm max-w-xs mb-6">
-                        The Thumbnail Recreator is available for Starter, Pro and Agency plan members.
+                        The Thumbnail Maker is available for Starter, Pro and Agency plan members.
                     </p>
                     <Link href="/dashboard/billing" className="bg-primary hover:brightness-110 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 hover:scale-105">
                       Upgrade to Pro
@@ -479,7 +479,7 @@ export default function ThumbnailPage() {
                 <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center border border-white/5 shadow-2xl">
                     <Youtube className="w-10 h-10 text-red-500/50" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Thumbnail Recreator</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">Thumbnail Maker</h3>
                 <p className="text-white/40 max-w-sm mx-auto text-sm">
                   1. Upload Reference<br/>
                   2. Select Type & Platform<br/>

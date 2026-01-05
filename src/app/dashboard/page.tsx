@@ -28,7 +28,7 @@ const TOOLS = [
   },
   {
     id: 'thumbnail',
-    title: 'Thumbnail Recreator',
+    title: 'Thumbnail Maker',
     description: 'Remix viral styles. Upload a reference and let AI recreate the vibe.',
     icon: Youtube,
     href: '/dashboard/thumbnail',

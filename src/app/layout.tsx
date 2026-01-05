@@ -17,8 +17,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mocx - Next-Gen AI Mockups",
-  description: "Create professional mockups in seconds with our advanced AI.",
+  title: "Mocx - Thumbnail Maker & Social Media Post Maker",
+  description: "Create professional mockups, viral thumbnails, and social media posts in seconds with our advanced AI Creative Studio.",
+  icons: {
+    icon: '/favicon.jpg',
+    shortcut: '/favicon.jpg',
+    apple: '/favicon.jpg',
+  },
+  openGraph: {
+    images: ['/meta.png'],
+  },
 };
 
 export default function RootLayout({

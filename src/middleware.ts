@@ -5,8 +5,13 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/api/generate(.*)']);
 const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)', '/sign-up(.*)', '/legal(.*)', '/api/webhook(.*)']);
 
-// 🚫 Blokirane države: Indija, Pakistan, Bangladeš, Nigerija, Indonezija, Egipat, Vijetnam, Filipini, Alžir, Liban, Brazil
-const BLOCKED_COUNTRIES = ['IN', 'PK', 'BD', 'NG', 'ID', 'EG', 'VN', 'PH', 'DZ', 'LB', 'BR'];
+// 🚫 Blokirane države: 
+// Postojeće: Indija, Pakistan, Bangladeš, Nigerija, Indonezija, Egipat, Vijetnam, Filipini, Alžir, Liban, Brazil
+// Nove (Bliski Istok osim UAE): Bahrein, Cipar, Iran, Irak, Izrael, Jordan, Kuvajt, Oman, Palestina, Katar, Saudijska Arabija, Sirija, Turska, Jemen
+const BLOCKED_COUNTRIES = [
+  'IN', 'PK', 'BD', 'NG', 'ID', 'EG', 'VN', 'PH', 'DZ', 'LB', 'BR', // Original blocked
+  'BH', 'CY', 'IR', 'IQ', 'IL', 'JO', 'KW', 'OM', 'PS', 'QA', 'SA', 'SY', 'TR', 'YE' // Middle East (except UAE/AE)
+];
 
 export default clerkMiddleware(async (auth, req) => {
   // 1. Geo-Blocking logika (Poboljšana detekcija)
