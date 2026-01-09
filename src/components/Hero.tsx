@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 export function Hero() {
   return (
@@ -61,33 +60,23 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-          className="max-w-2xl mx-auto text-lg md:text-xl text-white/40 mb-12 leading-relaxed font-normal"
+          className="max-w-xl mx-auto text-base md:text-lg lg:text-xl text-white/40 mb-12 leading-relaxed font-normal px-4"
         >
-          Mockups, thumbnails, and AI art — generated in seconds. 
-          Skip the designers, skip the delays, ship faster.
+          Mockups and thumbnails generated in seconds. Skip the designers, skip the delays, ship faster.
         </motion.p>
 
-        {/* CTA Buttons */}
+        {/* CTA Button */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center gap-4"
         >
           <Link 
             href="/sign-up" 
             className="group h-14 px-8 flex items-center justify-center gap-2 btn-primary text-base"
           >
-            Get Started Free
+            Start Creating
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          
-          <Link 
-            href="#demo"
-            className="h-14 px-8 flex items-center justify-center gap-2 btn-secondary text-base"
-          >
-            <Play className="w-4 h-4" />
-            Watch Demo
           </Link>
         </motion.div>
 
@@ -101,7 +90,6 @@ export function Hero() {
           {[
             { value: '1.8M+', label: 'Visuals Created' },
             { value: '50K+', label: 'Creators' },
-            { value: '4.9/5', label: 'Rating' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <div className="text-2xl md:text-3xl font-bold text-white mb-1">{stat.value}</div>
@@ -137,8 +125,8 @@ export function Hero() {
                 </div>
               </div>
               
-              {/* Content preview - 3 tool cards */}
-              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              {/* Content preview - 2 tool cards */}
+              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
                 {/* Mockup Studio */}
                 <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-white/[0.06] bg-gradient-to-br from-blue-500/5 to-blue-600/10">
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
@@ -162,19 +150,6 @@ export function Hero() {
                     </div>
                     <h3 className="text-white font-medium text-sm mb-1">Thumbnails</h3>
                     <p className="text-white/30 text-xs text-center">Click-worthy video covers</p>
-                  </div>
-                </div>
-
-                {/* AI Art */}
-                <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-white/[0.06] bg-gradient-to-br from-blue-300/5 to-blue-400/10">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                    <div className="w-14 h-14 mb-3 rounded-xl bg-blue-300/10 border border-blue-300/20 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-white font-medium text-sm mb-1">AI Art Generator</h3>
-                    <p className="text-white/30 text-xs text-center">Text to stunning images</p>
                   </div>
                 </div>
               </div>
