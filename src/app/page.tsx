@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
@@ -26,11 +27,14 @@ export default function Home() {
       
       <footer className="py-12 border-t border-white/5">
         <div className="container mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
-            </div>
-            <span className="text-white font-semibold text-xl tracking-tight">Mocx</span>
+          <div className="flex items-center justify-center mb-6">
+            <Image 
+              src="/light.png" 
+              alt="Mocx Logo" 
+              width={120} 
+              height={40} 
+              className="object-contain"
+            />
           </div>
           
           <p className="text-white/30 text-sm mb-6">

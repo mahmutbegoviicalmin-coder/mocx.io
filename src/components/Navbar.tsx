@@ -13,11 +13,15 @@ export function Navbar() {
     <nav className="absolute top-0 w-full z-50 bg-transparent">
       <div className="container flex h-16 md:h-20 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="relative flex items-center gap-2 transition-opacity hover:opacity-80">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">M</span>
-          </div>
-          <span className="text-white font-semibold text-xl tracking-tight">Mocx</span>
+        <Link href="/" className="relative transition-opacity hover:opacity-80">
+          <Image 
+            src="/light.png" 
+            alt="Mocx Logo" 
+            width={120} 
+            height={40} 
+            className="object-contain"
+            priority
+          />
         </Link>
         
         {/* Desktop Navigation */}

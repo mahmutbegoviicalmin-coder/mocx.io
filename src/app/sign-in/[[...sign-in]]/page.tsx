@@ -1,12 +1,26 @@
 import { SignIn } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0C0C0E] relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0C0C0E] relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#5B8DEF]/8 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-[#7BA4F7]/5 rounded-full blur-[100px] pointer-events-none" />
+      
+      {/* Logo */}
+      <Link href="/" className="mb-8 transition-opacity hover:opacity-80">
+        <Image 
+          src="/light.png" 
+          alt="Mocx Logo" 
+          width={140} 
+          height={50} 
+          className="object-contain"
+          priority
+        />
+      </Link>
       
       <SignIn 
         fallbackRedirectUrl="/dashboard" 

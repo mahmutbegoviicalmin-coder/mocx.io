@@ -109,7 +109,7 @@ export function Sidebar() {
         <div className="flex items-center justify-between">
             <Link href="/dashboard" className="relative w-32 h-10 block transition-opacity hover:opacity-80">
             <Image 
-                src="/logotip.png" 
+                src="/light.png" 
                 alt="Mocx Logo" 
                 fill 
                 className="object-contain object-left"
