@@ -25,7 +25,7 @@ const EXAMPLES = [
     metricLabel: "CTR Increase"
   },
   {
-    title: "Premium Product Photography",
+    title: "Top Freelance Platforms for Creators",
     views: "8.5M",
     type: "Mockup",
     image: "/thumbnails/92e171a444d955a8f8fb3d0200522033_1765658486_zsa4a9bm.jpeg",
@@ -33,15 +33,15 @@ const EXAMPLES = [
     metricLabel: "Sales Boost"
   },
   {
-    title: "AI-Generated Concept Art",
+    title: "2025 vs 2026 - What's Coming Next",
     views: "1.1M",
-    type: "AI Art",
+    type: "Thumbnail",
     image: "/thumbnails/d7855857-639e-47c2-af3d-5f0ae1d95834.png",
-    metric: "10sec",
-    metricLabel: "Generation Time"
+    metric: "+28.5%",
+    metricLabel: "CTR Increase"
   },
   {
-    title: "Viral YouTube Thumbnail",
+    title: "How I Made $1 Billion From Nothing",
     views: "12M",
     type: "Thumbnail",
     image: "/thumbnails/97baab01-e8e3-4909-884d-1095e5f845eb.jpg",
@@ -49,7 +49,7 @@ const EXAMPLES = [
     metricLabel: "CTR Increase"
   },
   {
-    title: "E-commerce Product Shot",
+    title: "Day 5 of My Fitness Transformation",
     views: "500K+",
     type: "Mockup",
     image: "/thumbnails/cb108048d4ad3465d47d0104b31f7651_1765658717760.png",
@@ -57,12 +57,12 @@ const EXAMPLES = [
     metricLabel: "Conversion Rate"
   },
   {
-    title: "Creative Visual Design",
+    title: "YouTube Thumbnail Design Secrets",
     views: "1.5M",
-    type: "AI Art",
+    type: "Thumbnail",
     image: "/thumbnails/1765659063077-y3uduj21jk.png",
-    metric: "Unique",
-    metricLabel: "One-of-a-Kind"
+    metric: "+52.3%",
+    metricLabel: "CTR Increase"
   }
 ];
 
