@@ -46,7 +46,7 @@ export function StickyCTA() {
                 </div>
                 <div>
                   <p className="text-white font-semibold text-sm">
-                    🔥 Flash Sale: 40% OFF ends soon!
+                    🔥 Flash Sale: 20% OFF ends soon!
                   </p>
                   <p className="text-white/40 text-xs hidden sm:block">
                     Join 50,000+ creators using Mocx today

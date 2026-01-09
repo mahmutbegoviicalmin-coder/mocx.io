@@ -6,15 +6,15 @@ import { CheckCircle } from 'lucide-react';
 
 const FAKE_SIGNUPS = [
   { name: 'James', location: 'New York', time: '2 min ago', plan: 'Pro' },
-  { name: 'Sophie', location: 'London', time: '4 min ago', plan: 'Business' },
+  { name: 'Sophie', location: 'London', time: '4 min ago', plan: 'Agency' },
   { name: 'Marco', location: 'Berlin', time: '5 min ago', plan: 'Pro' },
-  { name: 'Yuki', location: 'Tokyo', time: '7 min ago', plan: 'Pro' },
-  { name: 'Ahmed', location: 'Dubai', time: '8 min ago', plan: 'Business' },
+  { name: 'Yuki', location: 'Tokyo', time: '7 min ago', plan: 'Starter' },
+  { name: 'Ahmed', location: 'Dubai', time: '8 min ago', plan: 'Agency' },
   { name: 'Emma', location: 'Sydney', time: '10 min ago', plan: 'Pro' },
-  { name: 'Carlos', location: 'São Paulo', time: '12 min ago', plan: 'Pro' },
-  { name: 'Priya', location: 'Mumbai', time: '15 min ago', plan: 'Business' },
+  { name: 'Carlos', location: 'São Paulo', time: '12 min ago', plan: 'Starter' },
+  { name: 'Priya', location: 'Mumbai', time: '15 min ago', plan: 'Pro' },
   { name: 'Alex', location: 'Toronto', time: '18 min ago', plan: 'Pro' },
-  { name: 'Lisa', location: 'Paris', time: '20 min ago', plan: 'Pro' },
+  { name: 'Lisa', location: 'Paris', time: '20 min ago', plan: 'Starter' },
 ];
 
 export function SocialProofToast() {
