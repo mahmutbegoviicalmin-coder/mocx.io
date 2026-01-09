@@ -120,36 +120,42 @@ export function Hero() {
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="h-6 bg-white/[0.03] rounded-lg max-w-xs mx-auto flex items-center justify-center">
-                    <span className="text-white/30 text-xs">mocx.ai</span>
+                    <span className="text-white/30 text-xs">mocx.io</span>
                   </div>
                 </div>
               </div>
               
-              {/* Content preview - 2 tool cards */}
-              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto">
+              {/* Content preview - 2 tool cards with videos */}
+              <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">
                 {/* Mockup Studio */}
-                <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-white/[0.06] bg-gradient-to-br from-blue-500/5 to-blue-600/10">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                    <div className="w-14 h-14 mb-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-white font-medium text-sm mb-1">Product Mockups</h3>
-                    <p className="text-white/30 text-xs text-center">Photorealistic product shots</p>
+                <div className="group relative rounded-xl overflow-hidden border border-white/[0.08] bg-[#0C0C0E]">
+                  <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="w-full aspect-video object-cover"
+                  >
+                    <source src="/tools/mockupstudio.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 className="text-white font-medium text-sm">Product Mockups</h3>
                   </div>
                 </div>
 
                 {/* Thumbnail Maker */}
-                <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-white/[0.06] bg-gradient-to-br from-blue-400/5 to-blue-500/10">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                    <div className="w-14 h-14 mb-3 rounded-xl bg-blue-400/10 border border-blue-400/20 flex items-center justify-center">
-                      <svg className="w-7 h-7 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-white font-medium text-sm mb-1">Thumbnails</h3>
-                    <p className="text-white/30 text-xs text-center">Click-worthy video covers</p>
+                <div className="group relative rounded-xl overflow-hidden border border-white/[0.08] bg-[#0C0C0E]">
+                  <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="w-full aspect-video object-cover"
+                  >
+                    <source src="/tools/thumbnailgenerator.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 className="text-white font-medium text-sm">Thumbnails</h3>
                   </div>
                 </div>
               </div>

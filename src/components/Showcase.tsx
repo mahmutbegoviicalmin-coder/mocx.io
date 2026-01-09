@@ -84,10 +84,10 @@ export function Showcase() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className="text-6xl md:text-8xl lg:text-9xl text-white tracking-tighter mb-6">
-            <span className="font-serif italic">1.8M</span><span className="text-blue-400 font-bold">+</span>
+          <h2 className="text-6xl md:text-7xl lg:text-8xl text-white tracking-tight mb-6 font-bold">
+            1.8M<span className="text-blue-400">+</span>
           </h2>
-          <p className="text-lg md:text-xl text-white/40 max-w-xl mx-auto">
+          <p className="text-base md:text-lg text-white/40 max-w-md mx-auto">
             Visuals created by creators and brands worldwide
           </p>
         </motion.div>
@@ -154,7 +154,7 @@ export function Showcase() {
           ))}
         </div>
 
-        {/* Creators Marquee */}
+        {/* Creators Grid */}
         <div className="pt-16 border-t border-white/[0.04]">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -167,42 +167,36 @@ export function Showcase() {
             </span>
           </motion.div>
 
-          <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-            <motion.div 
-              className="flex gap-4 w-max"
-              animate={{ x: "-50%" }}
-              transition={{ 
-                repeat: Infinity, 
-                ease: "linear", 
-                duration: 30 
-              }}
-            >
-              {[...CREATORS, ...CREATORS].map((creator, i) => (
-                <div 
-                  key={i}
-                  className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/[0.04] rounded-full shrink-0 hover:bg-white/[0.04] hover:border-white/[0.08] transition-colors"
-                >
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
-                    <Image 
-                      src={creator.avatar} 
-                      alt={creator.name} 
-                      fill 
-                      className="object-cover" 
-                      sizes="32px"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-white font-medium text-sm whitespace-nowrap">
-                      {creator.name}
-                    </span>
-                    <BadgeCheck className="w-4 h-4 text-blue-400" />
-                  </div>
-                  <span className="text-white/40 text-xs font-medium">
-                    {creator.subs}
-                  </span>
+          <div className="flex flex-wrap justify-center gap-3">
+            {CREATORS.map((creator, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="flex items-center gap-3 px-4 py-2.5 bg-white/[0.02] border border-white/[0.04] rounded-full hover:bg-white/[0.04] hover:border-white/[0.08] transition-colors"
+              >
+                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10">
+                  <Image 
+                    src={creator.avatar} 
+                    alt={creator.name} 
+                    fill 
+                    className="object-cover" 
+                    sizes="32px"
+                  />
                 </div>
-              ))}
-            </motion.div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white font-medium text-sm whitespace-nowrap">
+                    {creator.name}
+                  </span>
+                  <BadgeCheck className="w-4 h-4 text-blue-400" />
+                </div>
+                <span className="text-white/40 text-xs font-medium">
+                  {creator.subs}
+                </span>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
