@@ -98,51 +98,6 @@ export function Hero() {
           ))}
         </motion.div>
 
-        {/* Preview Cards */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
-          className="mt-20 w-full max-w-5xl"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Mockup Studio Card */}
-            <div className="group relative rounded-3xl overflow-hidden border border-white/[0.06] bg-[#131316] hover:border-white/[0.12] transition-all duration-300">
-              <div className="relative aspect-video">
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline
-                  className="w-full h-full object-cover"
-                >
-                  <source src="/tools/mockupstudio.mp4" type="video/mp4" />
-                </video>
-              </div>
-              <div className="p-4 flex items-center justify-center gap-2 border-t border-white/[0.04]">
-                <span className="text-white font-medium">Product Mockups</span>
-              </div>
-            </div>
-
-            {/* Thumbnail Maker Card */}
-            <div className="group relative rounded-3xl overflow-hidden border border-white/[0.06] bg-[#131316] hover:border-white/[0.12] transition-all duration-300">
-              <div className="relative aspect-video">
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline
-                  className="w-full h-full object-cover"
-                >
-                  <source src="/tools/thumbnailgenerator.mp4" type="video/mp4" />
-                </video>
-              </div>
-              <div className="p-4 flex items-center justify-center gap-2 border-t border-white/[0.04]">
-                <span className="text-white font-medium">Thumbnails</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
       </div>
     </section>
