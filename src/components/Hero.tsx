@@ -103,74 +103,42 @@ export function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
-          className="mt-20 w-full max-w-4xl"
+          className="mt-20 w-full max-w-5xl"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Mockup Studio Card */}
-            <div className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-gradient-to-br from-[#131316] to-[#0C0C0E] shadow-2xl hover:border-blue-500/20 transition-all duration-500">
-              {/* Video Container */}
-              <div className="relative aspect-[16/10] bg-gradient-to-br from-blue-500/5 to-blue-600/10">
+            <div className="group relative rounded-3xl overflow-hidden border border-white/[0.06] bg-[#131316] hover:border-white/[0.12] transition-all duration-300">
+              <div className="relative aspect-video">
                 <video 
                   autoPlay 
                   loop 
                   muted 
                   playsInline
-                  poster="/prompt1.jpg"
                   className="w-full h-full object-cover"
                 >
                   <source src="/tools/mockupstudio.mp4" type="video/mp4" />
                 </video>
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#131316] via-transparent to-transparent opacity-60" />
               </div>
-              
-              {/* Card Footer */}
-              <div className="p-5 border-t border-white/[0.04]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-base">Product Mockups</h3>
-                    <p className="text-white/40 text-xs">Photorealistic product shots</p>
-                  </div>
-                </div>
+              <div className="p-4 flex items-center justify-center gap-2 border-t border-white/[0.04]">
+                <span className="text-white font-medium">Product Mockups</span>
               </div>
             </div>
 
             {/* Thumbnail Maker Card */}
-            <div className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-gradient-to-br from-[#131316] to-[#0C0C0E] shadow-2xl hover:border-blue-500/20 transition-all duration-500">
-              {/* Video Container */}
-              <div className="relative aspect-[16/10] bg-gradient-to-br from-blue-400/5 to-blue-500/10">
+            <div className="group relative rounded-3xl overflow-hidden border border-white/[0.06] bg-[#131316] hover:border-white/[0.12] transition-all duration-300">
+              <div className="relative aspect-video">
                 <video 
                   autoPlay 
                   loop 
                   muted 
                   playsInline
-                  poster="/thumbnails/45a72f2e-f64e-4840-b5ed-5effc216c045.jpg"
                   className="w-full h-full object-cover"
                 >
                   <source src="/tools/thumbnailgenerator.mp4" type="video/mp4" />
                 </video>
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#131316] via-transparent to-transparent opacity-60" />
               </div>
-              
-              {/* Card Footer */}
-              <div className="p-5 border-t border-white/[0.04]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-base">Thumbnails</h3>
-                    <p className="text-white/40 text-xs">Click-worthy video covers</p>
-                  </div>
-                </div>
+              <div className="p-4 flex items-center justify-center gap-2 border-t border-white/[0.04]">
+                <span className="text-white font-medium">Thumbnails</span>
               </div>
             </div>
           </div>
