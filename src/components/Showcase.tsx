@@ -49,7 +49,7 @@ const EXAMPLES = [
     metricLabel: "CTR Increase"
   },
   {
-    title: "Day 5 of My Fitness Transformation",
+    title: "Day 5 Buried Underground",
     views: "500K+",
     type: "Mockup",
     image: "/thumbnails/cb108048d4ad3465d47d0104b31f7651_1765658717760.png",
