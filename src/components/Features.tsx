@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { 
   Layers, 
-  Sparkles, 
   Zap, 
   Image as ImageIcon,
   Video,
@@ -21,7 +20,7 @@ const tools = [
     gradient: 'from-blue-500/10 via-blue-600/5 to-transparent',
     iconBg: 'bg-blue-500/10',
     iconColor: 'text-blue-400',
-    preview: '/thumbnails/92e171a444d955a8f8fb3d0200522033_1765658486_zsa4a9bm.jpeg',
+    preview: '/prompt1.jpg',
     features: ['Realistic environments', 'No photography needed', 'Instant results']
   },
   {
@@ -34,17 +33,6 @@ const tools = [
     iconColor: 'text-blue-300',
     preview: '/thumbnails/45a72f2e-f64e-4840-b5ed-5effc216c045.jpg',
     features: ['High CTR designs', 'Face enhancement', '4K resolution']
-  },
-  {
-    id: 'art',
-    title: 'AI Art Generator',
-    description: 'Turn text into stunning visuals. Generate unique artwork, illustrations, and creative images from prompts.',
-    icon: Sparkles,
-    gradient: 'from-blue-300/10 via-blue-400/5 to-transparent',
-    iconBg: 'bg-blue-300/10',
-    iconColor: 'text-blue-200',
-    preview: '/thumbnails/d7855857-639e-47c2-af3d-5f0ae1d95834.png',
-    features: ['Text to image', 'Multiple styles', 'Commercial license']
   }
 ];
 
@@ -91,7 +79,7 @@ export function Features() {
             All-in-One Platform
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white mb-6 tracking-tight">
-            Three powerful tools,
+            Two powerful tools,
             <br />
             <span className="font-serif italic text-blue-400">one creative studio</span>
           </h2>
@@ -101,7 +89,7 @@ export function Features() {
         </motion.div>
 
         {/* Tools Bento Grid */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-20">
+        <div className="grid md:grid-cols-2 gap-6 mb-20 max-w-4xl mx-auto">
           {tools.map((tool, i) => (
             <motion.div
               key={tool.id}
