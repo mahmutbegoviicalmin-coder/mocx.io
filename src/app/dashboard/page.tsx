@@ -12,7 +12,7 @@ const TOOLS = [
     description: 'Create stunning images from text descriptions. No design skills needed.',
     icon: Palette,
     href: '/dashboard/art',
-    color: 'from-purple-500 to-indigo-600',
+    color: 'from-blue-500 to-blue-600',
     delay: 0.1,
     minPlan: 'pro'
   },

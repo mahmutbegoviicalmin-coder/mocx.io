@@ -447,7 +447,7 @@ export default function AdminPage() {
 
   const getPlanBadgeStyle = (plan: string) => {
     const p = (plan || '').toLowerCase();
-    if (p.includes('agency')) return 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]';
+    if (p.includes('agency')) return 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]';
     if (p.includes('pro')) return 'bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]';
     if (p.includes('starter')) return 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]';
     return 'bg-white/5 text-white/50 border border-white/10';
@@ -572,7 +572,7 @@ export default function AdminPage() {
                     </div>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                    <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
                         <ImageIcon className="w-6 h-6" />
                     </div>
                     <div>
@@ -1079,7 +1079,7 @@ export default function AdminPage() {
                                             <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
                                                 gen.mode === 'thumbnail' ? 'bg-red-500/20 text-red-400' :
                                                 gen.mode === 'mockup' ? 'bg-orange-500/20 text-orange-400' :
-                                                'bg-purple-500/20 text-purple-400'
+                                                'bg-blue-500/20 text-blue-400'
                                             }`}>
                                                 {gen.mode || 'unknown'}
                                             </span>

@@ -220,7 +220,7 @@ function PricingCard({ title, price, originalPrice, yearlyPrice, description, fe
             {/* Most Popular Badge */}
             {isPro && (
                 <div className="absolute -top-4 left-0 right-0 flex justify-center">
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-[11px] font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-[11px] font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1.5">
                         <Crown className="w-3 h-3" />
                         Most Popular
                     </div>
@@ -282,7 +282,7 @@ function PricingCard({ title, price, originalPrice, yearlyPrice, description, fe
                 className={`
                     w-full h-12 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 mt-auto group
                     ${isPro 
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02]' 
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02]' 
                         : 'bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 hover:scale-[1.01]'
                     }
                 `}

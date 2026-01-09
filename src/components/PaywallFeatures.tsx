@@ -10,7 +10,7 @@ const FEATURES = [
     description: 'Transform your ideas into stunning visuals instantly. Our AI Creative Studio gives you the power to generate unlimited high-quality assets tailored to your brand identity.',
     video: '/tools/aimagegenerator.mp4',
     badge: 'NEW FEATURE',
-    badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
     cta: 'Try it now',
     href: '/dashboard/art',
     align: 'left' // Text on left, video on right

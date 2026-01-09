@@ -23,7 +23,7 @@ const testimonials = [
     name: "Alex T.",
     role: "Thumbnail Designer",
     initials: "AT",
-    color: "bg-purple-500",
+    color: "bg-blue-500",
     quote: "Crazy results, thank you. The skin details in thumbnails are just insane. I mainly use it to enhance faces, and it works so well."
   },
   {
@@ -54,7 +54,7 @@ export function Testimonials() {
     <section className="py-24 md:py-32 relative overflow-hidden border-t border-white/5">
       {/* Background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/10 blur-[150px] rounded-full" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[150px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full" />
         <div className="absolute inset-0 noise-overlay" />
       </div>

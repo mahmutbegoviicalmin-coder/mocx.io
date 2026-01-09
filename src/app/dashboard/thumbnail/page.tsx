@@ -306,7 +306,7 @@ export default function ThumbnailPage() {
                     {/* TYPE */}
                     <div className="space-y-3">
                         <label className="text-xs font-bold text-white/60 uppercase tracking-wider flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px] font-bold">3</span>
+                            <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px] font-bold">3</span>
                             Thumbnail Type
                         </label>
                         <div className="space-y-2">
@@ -320,11 +320,11 @@ export default function ThumbnailPage() {
                                         onClick={() => setSelectedPresetId(preset.id)}
                                         className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left group ${
                                             isSelected 
-                                            ? 'bg-purple-500/10 border-purple-500/50 shadow-[0_0_15px_-5px_rgba(168,85,247,0.4)]' 
+                                            ? 'bg-blue-500/10 border-blue-500/50 shadow-[0_0_15px_-5px_rgba(59,130,246,0.4)]' 
                                             : 'bg-white/5 border-white/5 hover:bg-white/10'
                                         }`}
                                     >
-                                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/50 group-hover:text-white'}`}>
+                                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-blue-500 text-white' : 'bg-white/10 text-white/50 group-hover:text-white'}`}>
                                             <Icon className="w-4 h-4" />
                                         </div>
                                         <div>

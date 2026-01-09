@@ -8,7 +8,7 @@ const features = [
   { text: "AI-powered", icon: Zap, color: "text-yellow-400" },
   { text: "Commercial license included", icon: ShieldCheck, color: "text-green-400" },
   { text: "Fast, secure payments", icon: Lock, color: "text-blue-400" },
-  { text: "Cancel anytime", icon: CreditCard, color: "text-purple-400" }
+  { text: "Cancel anytime", icon: CreditCard, color: "text-blue-400" }
 ];
 
 const brands = [
@@ -40,7 +40,7 @@ export function Trust() {
     <section className="py-24 bg-black relative border-t border-white/5 overflow-hidden">
       {/* Background Gradient Mesh */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
-         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[100px]" />
+         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[100px]" />
          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[100px]" />
       </div>
 

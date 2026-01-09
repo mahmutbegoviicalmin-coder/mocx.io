@@ -228,9 +228,9 @@ export default function AffiliatePage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[160px]"
+                        className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[160px]"
                     >
-                        <div className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Agency Plan</div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">Agency Plan</div>
                         <div className="text-5xl font-bold text-white mb-1">{stats.planCounts.agency}</div>
                         <div className="text-xs text-white/30">Active Users</div>
                     </motion.div>
@@ -349,9 +349,9 @@ export default function AffiliatePage() {
                                         </button>
                                         <button 
                                             onClick={() => setPayoutMethod('bank')}
-                                            className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-all ${payoutMethod === 'bank' ? 'bg-purple-500/10 border-purple-500 text-white' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
+                                            className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-all ${payoutMethod === 'bank' ? 'bg-blue-500/10 border-blue-500 text-white' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
                                         >
-                                            <Banknote className={`w-6 h-6 ${payoutMethod === 'bank' ? 'text-purple-500' : ''}`} />
+                                            <Banknote className={`w-6 h-6 ${payoutMethod === 'bank' ? 'text-blue-500' : ''}`} />
                                             <span className="text-sm font-medium">Bank Transfer</span>
                                         </button>
                                     </div>
@@ -432,7 +432,7 @@ export default function AffiliatePage() {
                                                         type="text" 
                                                         value={payoutDetails.fullName}
                                                         onChange={(e) => setPayoutDetails({...payoutDetails, fullName: e.target.value})}
-                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -442,7 +442,7 @@ export default function AffiliatePage() {
                                                         type="text" 
                                                         value={payoutDetails.phone}
                                                         onChange={(e) => setPayoutDetails({...payoutDetails, phone: e.target.value})}
-                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                                                     />
                                                 </div>
                                             </div>
@@ -454,7 +454,7 @@ export default function AffiliatePage() {
                                                     type="text" 
                                                     value={payoutDetails.address}
                                                     onChange={(e) => setPayoutDetails({...payoutDetails, address: e.target.value})}
-                                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                                                 />
                                             </div>
 
@@ -466,7 +466,7 @@ export default function AffiliatePage() {
                                                         type="text" 
                                                         value={payoutDetails.city}
                                                         onChange={(e) => setPayoutDetails({...payoutDetails, city: e.target.value})}
-                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -476,7 +476,7 @@ export default function AffiliatePage() {
                                                         type="text" 
                                                         value={payoutDetails.country}
                                                         onChange={(e) => setPayoutDetails({...payoutDetails, country: e.target.value})}
-                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                                                     />
                                                 </div>
                                             </div>
@@ -488,7 +488,7 @@ export default function AffiliatePage() {
                                                     type="text" 
                                                     value={payoutDetails.accountNumber}
                                                     onChange={(e) => setPayoutDetails({...payoutDetails, accountNumber: e.target.value})}
-                                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition-colors font-mono"
+                                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors font-mono"
                                                     placeholder="000-000000000-00"
                                                 />
                                             </div>

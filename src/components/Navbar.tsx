@@ -27,7 +27,7 @@ export function Navbar() {
       <div className="container flex h-16 md:h-20 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="relative flex items-center gap-2 transition-opacity hover:opacity-80">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
             <span className="text-white font-bold text-sm">M</span>
           </div>
           <span className="text-white font-semibold text-xl tracking-tight">Mocx</span>

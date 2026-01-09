@@ -21,7 +21,7 @@ export default function Home() {
       <footer className="py-12 border-t border-white/5">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">M</span>
             </div>
             <span className="text-white font-semibold text-xl tracking-tight">Mocx</span>
