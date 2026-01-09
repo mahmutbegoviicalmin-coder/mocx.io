@@ -41,7 +41,7 @@ const EXAMPLES = [
     metricLabel: "CTR Increase"
   },
   {
-    title: "How I Made $1 Billion From Nothing",
+    title: "I Bought the Cheapest and Most Expensive Yacht",
     views: "12M",
     type: "Thumbnail",
     image: "/thumbnails/97baab01-e8e3-4909-884d-1095e5f845eb.jpg",
