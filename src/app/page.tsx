@@ -6,7 +6,6 @@ import { Showcase } from "@/components/Showcase";
 import { Testimonials } from "@/components/Testimonials";
 import { Pricing } from "@/components/Pricing";
 import { FAQ } from "@/components/FAQ";
-import { UrgencyBanner } from "@/components/UrgencyBanner";
 import { SocialProofToast } from "@/components/SocialProofToast";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StickyCTA } from "@/components/StickyCTA";
@@ -14,7 +13,6 @@ import { StickyCTA } from "@/components/StickyCTA";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0C0C0E] text-white selection:bg-blue-400/30 selection:text-white">
-      <UrgencyBanner />
       <SocialProofToast />
       <ExitIntentPopup />
       <StickyCTA />

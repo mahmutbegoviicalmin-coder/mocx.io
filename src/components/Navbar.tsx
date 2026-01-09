@@ -3,27 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <nav className={`fixed top-10 w-full z-50 transition-all duration-500 ${
-      scrolled 
-        ? 'bg-[#050507]/80 backdrop-blur-xl border-b border-white/5' 
-        : 'bg-transparent'
-    }`}>
+    <nav className="absolute top-0 w-full z-50 bg-transparent">
       <div className="container flex h-16 md:h-20 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="relative flex items-center gap-2 transition-opacity hover:opacity-80">

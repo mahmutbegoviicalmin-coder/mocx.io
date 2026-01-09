@@ -10,15 +10,28 @@ export function ExitIntentPopup() {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasShown) {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Only trigger when cursor is within 5px of the top edge AND moving upward fast
+      if (e.clientY <= 5 && !hasShown) {
         setIsVisible(true);
         setHasShown(true);
       }
     };
 
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Double check - also trigger on actual leave if near top
+      if (e.clientY <= 10 && !hasShown) {
+        setIsVisible(true);
+        setHasShown(true);
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+    };
   }, [hasShown]);
 
   if (!isVisible) return null;
