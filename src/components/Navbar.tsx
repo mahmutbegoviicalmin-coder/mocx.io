@@ -19,7 +19,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+    <nav className={`fixed top-10 w-full z-50 transition-all duration-500 ${
       scrolled 
         ? 'bg-[#050507]/80 backdrop-blur-xl border-b border-white/5' 
         : 'bg-transparent'

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ArrowRight, Crown, Sparkles } from 'lucide-react';
+import { Check, ArrowRight, Crown, Sparkles, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -118,6 +118,7 @@ export function Pricing() {
             features={[annual ? "600 Credits/year" : "50 Credits/mo", "Thumbnail Maker", "AI Art Generator", "Mockup Studio", "Standard Speed", "Commercial License"]}
             variantId={annual ? PLANS.starter.yearly : PLANS.starter.monthly}
             annual={annual}
+            spotsLeft={23}
           />
 
           {/* Pro */}
@@ -131,6 +132,7 @@ export function Pricing() {
             variantId={annual ? PLANS.pro.yearly : PLANS.pro.monthly}
             annual={annual}
             isPro={true}
+            spotsLeft={8}
           />
 
           {/* Agency */}
@@ -143,6 +145,7 @@ export function Pricing() {
             features={[annual ? "4800 Credits/year" : "400 Credits/mo", "All Pro features", "Max Speed", "API Access", "24/7 Support", "Custom Branding"]}
             variantId={annual ? PLANS.agency.yearly : PLANS.agency.monthly}
             annual={annual}
+            spotsLeft={5}
           />
 
         </div>
@@ -158,7 +161,7 @@ export function Pricing() {
   );
 }
 
-function PricingCard({ title, price, originalPrice, yearlyPrice, description, features, isPro = false, variantId, annual }: any) {
+function PricingCard({ title, price, originalPrice, yearlyPrice, description, features, isPro = false, variantId, annual, spotsLeft }: any) {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -275,6 +278,16 @@ function PricingCard({ title, price, originalPrice, yearlyPrice, description, fe
                 ))}
             </div>
 
+            {/* Scarcity */}
+            {spotsLeft && (
+              <div className={`flex items-center gap-2 mb-4 px-3 py-2 rounded-lg ${spotsLeft <= 10 ? 'bg-red-500/10 border border-red-500/20' : 'bg-yellow-500/10 border border-yellow-500/20'}`}>
+                <AlertTriangle className={`w-4 h-4 ${spotsLeft <= 10 ? 'text-red-400' : 'text-yellow-400'}`} />
+                <span className={`text-xs font-semibold ${spotsLeft <= 10 ? 'text-red-400' : 'text-yellow-400'}`}>
+                  Only {spotsLeft} spots left at this price!
+                </span>
+              </div>
+            )}
+
             {/* CTA */}
             <button 
                 onClick={handleCheckout}
@@ -289,7 +302,7 @@ function PricingCard({ title, price, originalPrice, yearlyPrice, description, fe
             >
                 {loading ? 'Processing...' : (
                     <>
-                        Get Started
+                        Get Started Now
                         {isPro && <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />}
                     </>
                 )}

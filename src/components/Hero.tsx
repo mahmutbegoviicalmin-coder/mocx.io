@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { ArrowRight, Sparkles, Image, Users, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LiveViewers } from './LiveViewers';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-32 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-32 overflow-hidden">
       
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
@@ -74,14 +75,16 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+          className="flex flex-col items-center gap-4"
         >
           <Link 
             href="/sign-up" 
             className="group h-14 px-8 flex items-center justify-center gap-2 btn-primary text-base"
           >
-            Start Creating
+            Start Creating - 40% OFF
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
+          <LiveViewers />
         </motion.div>
 
         {/* Stats */}
