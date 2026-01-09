@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 
 const testimonials = [
   {
@@ -24,20 +24,20 @@ const testimonials = [
     role: "Thumbnail Designer",
     initials: "AT",
     color: "bg-purple-500",
-    quote: "Crazy results, thank you. The skin details in thumbnails are just insane. I mainly use it to enhance faces, and it works so well. Definitely adding to my workflow."
+    quote: "Crazy results, thank you. The skin details in thumbnails are just insane. I mainly use it to enhance faces, and it works so well."
   },
   {
     name: "David Park",
     role: "Content Creator",
     initials: "DP",
-    color: "bg-orange-500",
+    color: "bg-cyan-500",
     quote: "This generator is dope. Turned my horrible quality images into 4K viral thumbnails. Crazy stuff right here. Good job."
   },
   {
     name: "Elena R.",
     role: "E-commerce Manager",
     initials: "ER",
-    color: "bg-rose-500",
+    color: "bg-pink-500",
     quote: "Tried the AI mockup generator for our new collection. This is GAAAASSS!!! Saved us weeks of photography work."
   },
   {
@@ -51,85 +51,88 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-32 bg-[#0f1115] relative overflow-hidden border-t border-white/5">
-       {/* BACKGROUND (Consistent with Hero) */}
-       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-        {/* Varied Glow: Bottom Left & Top Right */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-500/05 blur-[120px] rounded-full opacity-50" />
-        <div className="absolute -bottom-[20%] -left-[10%] w-[700px] h-[700px] bg-orange-500/10 blur-[120px] rounded-full opacity-60" />
+    <section className="py-24 md:py-32 relative overflow-hidden border-t border-white/5">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 noise-overlay" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container relative z-10">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 max-w-7xl mx-auto">
-            <div className="max-w-2xl">
-                <motion.h2 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight"
-                >
-                    Don't trust what we say, <br />
-                    <span className="text-white/50">trust what you see.</span>
-                </motion.h2>
-                <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 }}
-                    className="text-lg text-white/40 font-medium"
-                >
-                    See the great things our creators and brands say about us.
-                </motion.p>
-            </div>
-
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 max-w-6xl mx-auto">
+          <div className="max-w-2xl">
             <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/60 mb-6"
             >
-                <Link 
-                    href="/sign-up" 
-                    className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
-                >
-                    Get Started <ArrowRight className="w-4 h-4" />
-                </Link>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Trusted by Creators
             </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-medium text-white mb-4 tracking-tight"
+            >
+              Don't trust what we say,
+              <br />
+              <span className="font-serif italic text-white/50">trust what you see.</span>
+            </motion.h2>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <Link 
+              href="/sign-up" 
+              className="inline-flex items-center gap-2 btn-primary text-sm group"
+            >
+              Get Started <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
           {testimonials.map((t, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group p-8 rounded-2xl bg-[#0A0A0A] border border-white/5 hover:border-white/10 transition-all hover:bg-[#111]"
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="group p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-all"
             >
-              <div className="flex items-center gap-4 mb-6">
-                {/* Avatar Placeholder */}
-                <div className={`w-12 h-12 rounded-full ${t.color} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
-                    {t.initials}
-                </div>
-                
-                <div>
-                    <h4 className="text-white font-bold text-base leading-none mb-1.5">
-                        {t.name}
-                    </h4>
-                    <p className="text-white/40 text-xs font-medium uppercase tracking-wider">
-                        {t.role}
-                    </p>
-                </div>
-              </div>
-
-              <p className="text-white/70 leading-relaxed text-sm md:text-base font-medium">
+              {/* Quote Icon */}
+              <Quote className="w-8 h-8 text-white/10 mb-4" />
+              
+              {/* Quote Text */}
+              <p className="text-white/70 leading-relaxed text-sm mb-6">
                 "{t.quote}"
               </p>
+
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white font-bold text-sm`}>
+                  {t.initials}
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold text-sm">
+                    {t.name}
+                  </h4>
+                  <p className="text-white/40 text-xs">
+                    {t.role}
+                  </p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

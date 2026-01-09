@@ -2,32 +2,32 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 
 const faqs = [
   {
-    question: "Do I own the rights to the mockups I generate?",
-    answer: "Yes. All mockups you generate with Mocx come with a commercial license. You can use them in your ads, stores, social media, presentations and client work."
+    question: "What can I create with Mocx?",
+    answer: "Mocx is an all-in-one AI creative studio. You can create product mockups for e-commerce, viral thumbnails for YouTube and social media, and unique AI-generated art from text prompts."
+  },
+  {
+    question: "Do I own the rights to what I create?",
+    answer: "Yes. All visuals you generate with Mocx come with a commercial license. You can use them in your ads, stores, social media, presentations and client work."
   },
   {
     question: "What do I need to get started?",
-    answer: "All you need is a screenshot, design export or product image. Upload it to Mocx, pick a scene and style, and we’ll generate a photorealistic mockup for you."
+    answer: "Just upload an image or describe what you want. For mockups, upload a product photo. For thumbnails, upload a face or scene. For AI art, just type a prompt."
   },
   {
-    question: "Is Mocx suitable for e-commerce and dropshipping?",
-    answer: "Absolutely. Mocx is built with e-commerce in mind. Use your mockups on Shopify, WooCommerce, landing pages, marketplaces and ad platforms like Meta, TikTok and Google."
+    question: "Is Mocx suitable for e-commerce and content creators?",
+    answer: "Absolutely. Mocx is built for both e-commerce brands and content creators. Use mockups for Shopify, WooCommerce, and marketplaces. Use thumbnails for YouTube, TikTok, and social media."
   },
   {
     question: "Can I cancel my subscription?",
-    answer: "Yes. You can upgrade, downgrade or cancel your subscription at any time. There are no long-term contracts or hidden fees."
-  },
-  {
-    question: "Do you offer a pay-as-you-go option?",
-    answer: "Yes. If you don’t need a full subscription, you can use Mocx on a pay-as-you-go basis and only pay for the mockups you generate."
+    answer: "Yes. You can upgrade, downgrade or cancel your subscription at any time from your dashboard. There are no long-term contracts or hidden fees."
   },
   {
     question: "Will there be watermarks on my images?",
-    answer: "Mockups generated on paid plans are delivered without watermarks and are ready for commercial use."
+    answer: "Images generated on paid plans are delivered without watermarks in full resolution and are ready for commercial use."
   }
 ];
 
@@ -35,44 +35,65 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="py-24 bg-[#0f1115] border-t border-white/5 relative overflow-hidden">
-        {/* BACKGROUND (Consistent with Hero) */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay"></div>
-          {/* Varied Glow: Bottom Right */}
-          <div className="absolute -bottom-[20%] -right-[10%] w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full opacity-60" />
-        </div>
+    <section className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[150px] rounded-full" />
+        <div className="absolute inset-0 noise-overlay" />
+      </div>
 
-      <div className="container mx-auto px-4 max-w-3xl relative z-10">
-        <motion.h2 
+      <div className="container mx-auto max-w-3xl relative z-10">
+        {/* Header */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-center mb-12"
+          className="text-center mb-12"
         >
-          Frequently asked questions
-        </motion.h2>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/60 mb-6">
+            <HelpCircle className="w-3 h-3" />
+            FAQ
+          </div>
+          <h2 className="text-3xl md:text-4xl text-white mb-4">
+            <span className="font-medium">Frequently asked </span>
+            <span className="font-serif italic text-blue-400">questions</span>
+          </h2>
+          <p className="text-white/40">
+            Everything you need to know about Mocx
+          </p>
+        </motion.div>
 
-        <div className="space-y-4">
+        {/* Questions */}
+        <div className="space-y-3">
           {faqs.map((faq, index) => (
             <motion.div 
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="border border-border rounded-lg overflow-hidden bg-card"
+              transition={{ delay: index * 0.05 }}
+              className={`rounded-2xl overflow-hidden transition-all duration-300 ${
+                openIndex === index 
+                  ? 'bg-white/[0.05] border border-white/10' 
+                  : 'bg-white/[0.02] border border-white/5 hover:border-white/10'
+              }`}
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left focus:outline-none hover:bg-white/5 transition-all cursor-pointer active:bg-white/10"
+                className="w-full flex items-center justify-between p-5 text-left focus:outline-none group"
               >
-                <span className="text-lg font-medium pr-8">{faq.question}</span>
-                <ChevronDown 
-                  className={`w-5 h-5 transition-transform duration-200 ${
-                    openIndex === index ? "transform rotate-180" : ""
-                  }`} 
-                />
+                <span className={`font-medium pr-8 transition-colors ${
+                  openIndex === index ? 'text-white' : 'text-white/80 group-hover:text-white'
+                }`}>
+                  {faq.question}
+                </span>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                  openIndex === index 
+                    ? 'bg-blue-500/20 text-blue-400 rotate-180' 
+                    : 'bg-white/5 text-white/40 group-hover:bg-white/10'
+                }`}>
+                  <ChevronDown className="w-4 h-4" />
+                </div>
               </button>
               <AnimatePresence>
                 {openIndex === index && (
@@ -82,7 +103,7 @@ export function FAQ() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="px-6 pb-6 text-muted-foreground">
+                    <div className="px-5 pb-5 text-white/50 leading-relaxed">
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -95,4 +116,3 @@ export function FAQ() {
     </section>
   );
 }
-

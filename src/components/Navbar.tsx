@@ -4,9 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,65 +19,104 @@ export function Navbar() {
   }, []);
 
   return (
-    <>
-    {/* Holiday Banner */}
-    <div className="fixed top-0 left-0 w-full h-8 bg-gradient-to-r from-[#8B0000] via-[#FF0000] to-[#8B0000] text-white z-[60] flex items-center justify-center text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-lg shadow-red-900/50 px-4">
-        <span className="md:hidden">HOLIDAY SALE: 34% OFF ALL PLANS</span>
-        <span className="hidden md:inline">HOLIDAY SALE: SAVE 34% ON ALL PLANS <span className="mx-2 opacity-50">|</span> LIMITED TIME OFFER</span>
-    </div>
-
-    <nav className={`fixed top-8 w-full z-50 transition-all duration-300 ${
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
       scrolled 
-        ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 h-16' 
-        : 'bg-transparent h-20'
+        ? 'bg-[#050507]/80 backdrop-blur-xl border-b border-white/5' 
+        : 'bg-transparent'
     }`}>
-      <div className="container flex h-full items-center justify-between">
-        <Link href="/" className="relative w-28 h-8 md:w-32 md:h-10 transition-opacity hover:opacity-80">
-          <Image 
-            src="/logotip.png" 
-            alt="Mocx Logo" 
-            fill 
-            className="object-contain object-left"
-            priority
-          />
+      <div className="container flex h-16 md:h-20 items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="relative flex items-center gap-2 transition-opacity hover:opacity-80">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+            <span className="text-white font-bold text-sm">M</span>
+          </div>
+          <span className="text-white font-semibold text-xl tracking-tight">Mocx</span>
         </Link>
         
-        <div className="flex items-center gap-8 text-sm font-medium">
-          <div className="hidden md:flex items-center gap-6 text-white/70">
-            <Link href="/#pricing" className="hover:text-white transition-colors hover:scale-105 transform duration-200 hover:bg-white/5 px-3 py-1.5 rounded-full">
-              Pricing
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-1">
+          <Link href="/#features" className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+            Features
+          </Link>
+          <Link href="/#pricing" className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+            Pricing
+          </Link>
+          <Link href="/contact" className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+            Contact
+          </Link>
+        </div>
+        
+        {/* Auth Buttons */}
+        <div className="flex items-center gap-3">
+          <SignedOut>
+            <Link href="/sign-in" className="hidden md:block text-sm text-white/70 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5">
+              Log in
             </Link>
-            <Link href="/contact" className="hover:text-white transition-colors hover:scale-105 transform duration-200 hover:bg-white/5 px-3 py-1.5 rounded-full">
-              Contact
+            <Link 
+              href="/sign-up" 
+              className="text-sm bg-white text-black px-5 py-2.5 rounded-full font-semibold transition-all hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            >
+              Get Started
             </Link>
-          </div>
+          </SignedOut>
           
-          <div className="flex items-center gap-4">
-            <SignedOut>
-              <Link href="/sign-in" className="text-white/90 hover:text-white transition-colors px-4 py-2 hover:bg-white/5 rounded-full hover:scale-105 duration-200">
-                Log in
-              </Link>
-              <Link 
-                href="/sign-up" 
-                className="relative overflow-hidden bg-white text-black px-6 py-2.5 rounded-full font-semibold transition-all hover:bg-gray-200 hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.5)] active:scale-95 hover:scale-105 duration-200"
-              >
-                Get Started
-              </Link>
-            </SignedOut>
-            
-            <SignedIn>
-              <Link 
-                href="/dashboard" 
-                className="text-white hover:text-primary transition-colors mr-2"
-              >
-                Dashboard
-              </Link>
-              <UserButton />
-            </SignedIn>
-          </div>
+          <SignedIn>
+            <Link 
+              href="/dashboard" 
+              className="text-sm text-white/70 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
+            >
+              Dashboard
+            </Link>
+            <UserButton />
+          </SignedIn>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-[#050507]/95 backdrop-blur-xl border-b border-white/5 p-4">
+          <div className="flex flex-col gap-2">
+            <Link 
+              href="/#features" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-3 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+            >
+              Features
+            </Link>
+            <Link 
+              href="/#pricing" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-3 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+            >
+              Pricing
+            </Link>
+            <Link 
+              href="/contact" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-4 py-3 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+            >
+              Contact
+            </Link>
+            <SignedOut>
+              <Link 
+                href="/sign-in" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              >
+                Log in
+              </Link>
+            </SignedOut>
+          </div>
+        </div>
+      )}
     </nav>
-    </>
   );
 }
