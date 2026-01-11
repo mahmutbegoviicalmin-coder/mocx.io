@@ -113,17 +113,6 @@ export function Showcase() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#131316] via-transparent to-transparent" />
-                
-                {/* Type Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
-                    example.type === 'Thumbnail' ? 'bg-blue-400/10 text-blue-300 border border-blue-400/20' :
-                    example.type === 'Mockup' ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20' :
-                    'bg-blue-300/10 text-blue-200 border border-blue-300/20'
-                  }`}>
-                    {example.type}
-                  </span>
-                </div>
               </div>
 
               {/* Content */}
