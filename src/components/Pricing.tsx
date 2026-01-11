@@ -55,11 +55,6 @@ export function Pricing() {
             viewport={{ once: true }}
             className="space-y-5"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-white/50 text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3 h-3 text-blue-400" />
-              Simple Pricing
-            </div>
-
             <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tight text-white">
               <span className="font-medium">Choose your </span>
               <span className="font-serif italic text-blue-400">plan</span>
